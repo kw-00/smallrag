@@ -15,8 +15,8 @@ add_subdirectory(logging)
 add_subdirectory(err)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_subdirectory(test)
     enable_testing() 
+    add_subdirectory(test)
 endif()
 
 
