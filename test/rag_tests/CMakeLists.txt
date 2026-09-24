@@ -12,4 +12,16 @@ target_link_libraries(smallrag_text_tests PRIVATE
     smallrag_err
 )
 
+add_executable(smallrag_embds_tests
+    smallrag_embds_tests.c
+)
+
+add_test(NAME smallrag_embds_tests COMMAND smallrag_embds_tests)
+
+target_link_libraries(smallrag_embds_tests PRIVATE
+    smallrag_rag
+    smallrag_logging
+    smallrag_err
+)
+
 
