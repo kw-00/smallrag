@@ -20,6 +20,7 @@ typedef char *smallrag_err_t;
 smallragDECLARE_ERR(smallragERR_ARGUMENT);
 smallragDECLARE_ERR(smallragERR_OUT_OF_BOUNDS);
 smallragDECLARE_ERR(smallragERR_INVALID_STATE);
+smallragDECLARE_ERR(smallragERR_STREAM);
 smallragDECLARE_ERR(smallragERR_UNSUPPORTED);
 
 /* Pushes an error down the error stack. Do this when your function's execution ends up in an invalid state 
