@@ -93,10 +93,11 @@ int smallrag_write_embds(int fd, const struct smallrag_embds *embds)
         smallrag_pusherrstd();
         return -1;
     }
+    void *src = embds->vecs;
     size_t tot_bytes = embds->tot_dim * sizeof(float);
     size_t tot_written = 0;
     while (tot_written < tot_bytes) {
-        ssize_t written = write(fd, embds + tot_written, tot_bytes - tot_written);
+        ssize_t written = write(fd, src + tot_written, tot_bytes - tot_written);
         if (written == -1) {
             smallrag_pusherrstd();
             return -1;
