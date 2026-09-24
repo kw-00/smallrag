@@ -38,7 +38,7 @@ struct smallrag_embds {
     size_t tot_dim;
 };
 
-int smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_dim, size_t vec_cnt);
+void smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_dim, size_t vec_cnt);
 
 /* Maps embds to a file containing binary data, up to embds' tot_dim. That mapping is read-only.
  */

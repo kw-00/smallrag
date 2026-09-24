@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 int smallrag_mmap_text(int fd, struct smallrag_text *text)
 {
@@ -12,6 +13,7 @@ int smallrag_mmap_text(int fd, struct smallrag_text *text)
         return -1;
     }
     text->text = mapping;
+    return 0;
 }
 
 int smallrag_split_text(const struct smallrag_text *src, size_t frag_len, size_t frag_overlap, struct smallrag_text_frags *frags)
@@ -62,7 +64,7 @@ int smallrag_split_text(const struct smallrag_text *src, size_t frag_len, size_t
 }
 
 
-int smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_dim, size_t vec_cnt)
+void smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_dim, size_t vec_cnt)
 {
     embds->vecs = vecs;
     embds->vec_dim = vec_dim;
@@ -72,12 +74,36 @@ int smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_di
 
 int smallrag_mmap_embds(int fd, struct smallrag_embds *embds)
 {
-    exit(69);
+    void *mapping = mmap(NULL, embds->tot_dim, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (mapping == MAP_FAILED) {
+        smallrag_pusherrstd();
+        return -1;
+    }
+    embds->vecs = mapping;
+    return 0;
 }
 
 int smallrag_write_embds(int fd, const struct smallrag_embds *embds)
 {
-    exit(69);
+    if (ftruncate(fd, 0) == -1) {
+        smallrag_pusherrstd();
+        return -1;
+    }
+    if (lseek(fd, 0, SEEK_SET) == -1) {
+        smallrag_pusherrstd();
+        return -1;
+    }
+    size_t tot_bytes = embds->tot_dim * sizeof(float);
+    size_t tot_written = 0;
+    while (tot_written < tot_bytes) {
+        ssize_t written = write(fd, embds + tot_written, tot_bytes - tot_written);
+        if (written == -1) {
+            smallrag_pusherrstd();
+            return -1;
+        }
+        tot_written += written;
+    }
+    return 0;
 }
 
 
