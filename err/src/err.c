@@ -41,7 +41,7 @@ static _Thread_local  struct priv_err_entry *err_stack_ptr = NULL;
             smallrag_loge("Cannot push error — error stack would overflow"); \
         } \
         err_stack_ptr++; \
-    } while (true)
+    } while (false)
     
 #define privINIT_ERR_ENTRY_META \
     .time = __TIME__, \
@@ -100,7 +100,7 @@ void smallrag_clearerr()
 noreturn void smallrag_throw()
 {
     struct priv_err_entry *cur = err_stack + 1;
-    fprintf(smallragERR_OUT, "Traceback (most recent call last):\n");
+    fputs("Traceback (most recent call last):\n", smallragERR_OUT);
     while (cur++ < err_stack_ptr) {
         fprintf(smallragERR_OUT, "%s> %s:%s:%d", __TIME__, __FILE__, __func__, __LINE__);
         if (cur->err != NULL) {

@@ -1,13 +1,13 @@
 
 
-add_library(err
+add_library(smallrag_err
     src/err.c
 )
 
-target_include_directories(err PUBLIC
+target_include_directories(smallrag_err PUBLIC
     include
 )
 
-target_link_libraries(err PRIVATE
-    logging
+target_link_libraries(smallrag_err PRIVATE
+    smallrag_logging
 )

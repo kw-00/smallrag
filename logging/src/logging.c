@@ -12,7 +12,7 @@ static void priv_log(char *level_prefix, char *msg, va_list args)
 {
     print_log_meta(level_prefix);
     vfprintf(smallragLOG_OUT, msg, args);
-    fprintf(smallragLOG_OUT, "\n");
+    fputc('\n', smallragLOG_OUT);
 }
 
 #define privCALL_LOG_INTERNAL(level_prefix) \

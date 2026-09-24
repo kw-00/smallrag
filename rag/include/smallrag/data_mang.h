@@ -10,7 +10,7 @@ struct smallrag_text {
     size_t len;
 };
 
-/* Maps text to a file up to text's text_len. That mapping is read-only.
+/* Maps text to a file up to text's len. That mapping is read-only.
  */
 int smallrag_mmap_text(int fd, struct smallrag_text *text);
 
@@ -21,7 +21,10 @@ struct smallrag_text_frags {
     size_t count;
 };
 
-/* Splits text into fragments.
+/* Splits text into fragments, returning the fragments via the frags parameter. Allocates memory for the fragments.
+ * This means frags->frags should be freed when no longer useful. 
+ *
+ * Sets frags->count to match the number of fragments the text was split into.
  */
 int smallrag_split_text(const struct smallrag_text *src, size_t frag_len, size_t frag_overlap, struct smallrag_text_frags *frags);
 

@@ -15,16 +15,16 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(llama)
 
-add_library(rag
+add_library(smallrag_rag
     src/data_mang.c
 )
 
-target_include_directories(rag PUBLIC include)
+target_include_directories(smallrag_rag PUBLIC include)
 
-target_link_libraries(rag PRIVATE 
+target_link_libraries(smallrag_rag PRIVATE 
     llama
-    logging
-    err
+    smallrag_logging
+    smallrag_err
 )
 
 
