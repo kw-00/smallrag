@@ -74,7 +74,7 @@ void smallrag_embds_init(struct smallrag_embds *embds, float *vecs, size_t vec_d
 
 int smallrag_mmap_embds(int fd, struct smallrag_embds *embds)
 {
-    void *mapping = mmap(NULL, embds->tot_dim, PROT_READ, MAP_PRIVATE, fd, 0);
+    void *mapping = mmap(NULL, embds->tot_dim * sizeof(float), PROT_READ, MAP_PRIVATE, fd, 0);
     if (mapping == MAP_FAILED) {
         smallrag_pusherrstd();
         return -1;
