@@ -1,16 +1,31 @@
 include(FetchContent)
+
+# Configure llama.cpp before adding it.
+set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_COMMON OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(
-    llama.cpp
-    URL https://github.com/ggml-org/llama.cpp.git
-    GIT_TAG f95b0d95394d5e311ba8228689972843178c5e28
-)
-FetchContent_MakeAvailable(llama.cpp)
-
-add_library(embedding
-    src/fragments.c
-    src/embeddings.c
+    llama
+    GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+    GIT_TAG master
 )
 
-target_include_directories(llama_wrapper PUBLIC include)
+FetchContent_MakeAvailable(llama)
 
-target_link_libraries(llama_wrapper PRIVATE llama)
+add_library(rag
+    src/data_mang.c
+)
+
+target_include_directories(rag PUBLIC include)
+
+target_link_libraries(rag PRIVATE 
+    llama
+    logging
+    err
+)
+
+
+

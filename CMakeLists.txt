@@ -8,3 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(smallrag)
 
+add_subdirectory(rag)
+add_subdirectory(logging)
+add_subdirectory(err)
+
