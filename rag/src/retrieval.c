@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 int smallrag_mmap_text(int fd, struct smallrag_text *text)
 {

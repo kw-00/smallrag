@@ -5,6 +5,7 @@
 #include <sys/param.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #ifndef smallragERR_BT_LIMIT
 #define smallragERR_BT_LIMIT 256

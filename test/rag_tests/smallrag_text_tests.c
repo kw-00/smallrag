@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <sys/mman.h>
 #include <unistd.h>
-
+#include <stdbool.h>
 
 void test_smallrag_mmap_text(void)
 {
