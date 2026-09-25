@@ -16,7 +16,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(llama)
 
 add_library(smallrag_rag
-    src/data_mang.c
+    src/retrieval.c
 )
 
 target_include_directories(smallrag_rag PUBLIC include)

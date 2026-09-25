@@ -1,5 +1,5 @@
-#ifndef SMALLRAG_EMBEDDING_H
-#define SMALLRAG_EMBEDDING_H
+#ifndef SMALLRAG_RETRIEVAL_H
+#define SMALLRAG_RETRIEVAL_H
 
 #include <stddef.h>
 

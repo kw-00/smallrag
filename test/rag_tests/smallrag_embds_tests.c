@@ -1,5 +1,5 @@
 #include "smallrag/err.h"
-#include "smallrag/data_mang.h"
+#include "smallrag/retrieval.h"
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>

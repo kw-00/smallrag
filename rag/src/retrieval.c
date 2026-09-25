@@ -1,4 +1,4 @@
-#include "smallrag/data_mang.h"
+#include "smallrag/retrieval.h"
 #include "smallrag/err.h"
 #include <stddef.h>
 #include <stdlib.h>
