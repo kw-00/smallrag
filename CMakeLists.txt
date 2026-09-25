@@ -10,7 +10,7 @@ add_compile_definitions(_POSIX_C_SOURCE=200800L)
 
 project(smallrag)
 
-add_subdirectory(rag)
+add_subdirectory(retrieval)
 add_subdirectory(logging)
 add_subdirectory(err)
 

@@ -1,4 +1,4 @@
 
 
-add_subdirectory(rag_tests)
+add_subdirectory(retrieval_tests)
 
