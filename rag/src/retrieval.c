@@ -108,15 +108,15 @@ int smallrag_write_embds(int fd, const struct smallrag_embds *embds)
     return 0;
 }
 
-
-int smallrag_embd_model_get_embds(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds) 
+int smallrag_embd_provider_get_embds(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds) 
 {
-    return model->ops->get_embds(model, frags, embds);
+    return provider->ops->get_embds(provider, frags, embds);
 }
 
-void smallrag_embd_model_free(struct smallrag_embd_model *model) 
+
+void smallrag_embd_provider_free(struct smallrag_embd_provider *provider) 
 {
-    return model->ops->free(model);
+    return provider->ops->free(provider);
 }
 
 

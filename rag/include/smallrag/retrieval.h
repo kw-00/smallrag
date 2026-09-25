@@ -49,30 +49,30 @@ int smallrag_mmap_embds(int fd, struct smallrag_embds *embds);
  */
 int smallrag_write_embds(int fd, const struct smallrag_embds *embds);
 
-struct smallrag_embd_model;
-/* Operations that can be performed on a certain model type.
+struct smallrag_embd_provider;
+/* Operations that can be performed on a certain provider type.
  */
-struct smallrag_embd_model_ops {
-    int (*get_embds)(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
-    void (*free)(struct smallrag_embd_model *model);
+struct smallrag_embd_provider_ops {
+    int (*get_embds)(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
+    void (*free)(struct smallrag_embd_provider *provider);
 };
 
 
-/* Represents an embedding model of unspecified types for polymorphic behaviour.
- * ops represent how operations of the model are implemented; model_data is a type-erased representation of the model
+/* Represents an embedding provider of unspecified types for polymorphic behaviour.
+ * ops represent how operations of the provider are implemented; provider_data is a type-erased representation of the provider
  * which ops should be aware of.
  */
-struct smallrag_embd_model {
-    struct smallrag_embd_model_ops *ops;
-    void *model_data;
+struct smallrag_embd_provider {
+    struct smallrag_embd_provider_ops *ops;
+    void *provider_data;
 };
 
-/* Uses model to get embeddings for frags.
+/* Uses provider to get embeddings for frags.
  */
-int smallrag_embd_model_get_embds(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
+int smallrag_embd_provider_get_embds(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
 
-/* Releases resources associated with a model.
+/* Releases resources associated with a provider.
  */
-void smallrag_embd_model_free(struct smallrag_embd_model *model);
+void smallrag_embd_provider_free(struct smallrag_embd_provider *provider);
 
 #endif

@@ -13,26 +13,26 @@ llama_model_free()
 llama_model_get_vocab()
 */
 
-static int priv_get_embds(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds)
+static int priv_get_embds(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds)
 {
     return -1;
 }
 
-static void priv_free_model(struct smallrag_embd_model *model)
+static void priv_free_provider(struct smallrag_embd_provider *provider)
 {
-    struct llama_model *intern_model = (struct llama_model *)model->model_data;
+    struct llama_model *intern_model = (struct llama_model *)provider->provider_data;
     llama_model_free(intern_model);
 }
 
-struct smallrag_embd_model_ops llama_embmod_ops = {
+struct smallrag_embd_provider_ops llama_embprov_ops = {
     .get_embds = &priv_get_embds,
-    .free = &priv_free_model
+    .free = &priv_free_provider
 };
 
-int smallrag_llama_init_embmod(struct llama_model *llama_model, struct smallrag_embd_model *embmod)
+int smallrag_llama_init_embprov(struct llama_model *llama_model, struct smallrag_embd_provider *embprov)
 {
-    embmod->ops = &llama_embmod_ops;
-    embmod->model_data = llama_model;
+    embprov->ops = &llama_embprov_ops;
+    embprov->provider_data = llama_model;
     return 0;
 }
 
