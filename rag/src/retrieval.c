@@ -114,7 +114,7 @@ int smallrag_embd_model_get_embds(const struct smallrag_embd_model *model, const
     return model->ops->get_embds(model, frags, embds);
 }
 
-int smallrag_embd_model_free(struct smallrag_embd_model *model) 
+void smallrag_embd_model_free(struct smallrag_embd_model *model) 
 {
     return model->ops->free(model);
 }

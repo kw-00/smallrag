@@ -54,7 +54,7 @@ struct smallrag_embd_model;
  */
 struct smallrag_embd_model_ops {
     int (*get_embds)(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
-    int (*free)(struct smallrag_embd_model *model);
+    void (*free)(struct smallrag_embd_model *model);
 };
 
 
@@ -73,6 +73,6 @@ int smallrag_embd_model_get_embds(const struct smallrag_embd_model *model, const
 
 /* Releases resources associated with a model.
  */
-int smallrag_embd_model_free(struct smallrag_embd_model *model);
+void smallrag_embd_model_free(struct smallrag_embd_model *model);
 
 #endif

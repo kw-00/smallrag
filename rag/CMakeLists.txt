@@ -15,13 +15,14 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(llama)
 
-add_library(smallrag_rag
+add_library(smallrag_retrieval
     src/retrieval.c
+    src/embedding_llama.c
 )
 
-target_include_directories(smallrag_rag PUBLIC include)
+target_include_directories(smallrag_retrieval PUBLIC include)
 
-target_link_libraries(smallrag_rag PRIVATE 
+target_link_libraries(smallrag_retrieval PRIVATE 
     llama
     smallrag_logging
     smallrag_err
