@@ -70,7 +70,7 @@ void smallrag_pusherrmsg(smallrag_err_t err, char *msg)
         .err = err,
         privINIT_ERR_ENTRY_META
     }; 
-    size_t msg_len = strlen(msg);
+    const size_t msg_len = strlen(msg);
     memcpy(err_stack_ptr->msg, msg, MIN(smallragERR_MSG_LIMIT, msg_len));
     err_stack_ptr->msg[smallragERR_MSG_LIMIT - 1] = '\0';
 }
@@ -120,7 +120,7 @@ noreturn void smallrag_throw()
 }
 noreturn void smallrag_throwstd() 
 {
-    int errno_snap = errno;
+    const int errno_snap = errno;
     fprintf(smallragERR_OUT, "%s> %s:%s:%d: ", __TIME__, __FILE__, __func__, __LINE__);
     fprintf(smallragERR_OUT, "Standard exception occurred: %s\n", strerror(errno_snap));
     exit(1);

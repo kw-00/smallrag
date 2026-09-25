@@ -14,16 +14,16 @@ void test_smallrag_mmap_embds(void)
         smallrag_pusherrstd();
         smallrag_throw();
     }
-    int fd = fileno(tmp);
+    const int fd = fileno(tmp);
     if (fd == -1) {
         smallrag_pusherrstd();
         smallrag_throw();
     }
     float content[4] = {1.0f, 2.0f, 3.0f, 4.0f};
-    size_t vec_dim = 2;
-    size_t vec_cnt = 2;
-    size_t count = vec_dim * vec_cnt;
-    size_t len = count * sizeof(float);
+    const size_t vec_dim = 2;
+    const size_t vec_cnt = 2;
+    const size_t count = vec_dim * vec_cnt;
+    const size_t len = count * sizeof(float);
     if (fwrite(content, sizeof(float), count, tmp) != count) {
         smallrag_pusherrmsg(smallragERR_STREAM, "Error occurred during write");
         smallrag_throw();
@@ -58,16 +58,16 @@ void test_smallrag_write_embds(void)
         smallrag_pusherrstd();
         smallrag_throw();
     }
-    int fd = fileno(tmp);
+    const int fd = fileno(tmp);
     if (fd == -1) {
         smallrag_pusherrstd();
         smallrag_throw();
     }
     float content[4] = {1.0f, 2.0f, 3.0f, 4.0f};
-    size_t vec_dim = 2;
-    size_t vec_cnt = 2;
-    size_t count = vec_dim * vec_cnt;
-    size_t len = count * sizeof(float);
+    const size_t vec_dim = 2;
+    const size_t vec_cnt = 2;
+    const size_t count = vec_dim * vec_cnt;
+    const size_t len = count * sizeof(float);
     struct smallrag_embds embds;
     smallrag_embds_init(&embds, content, vec_dim, vec_cnt);
     if (smallrag_write_embds(fd, &embds) == -1) {

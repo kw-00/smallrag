@@ -50,7 +50,7 @@ int smallrag_split_text(const struct smallrag_text *src, size_t frag_len, size_t
     size_t last_frag_len = src->len % frag_len;
     if (last_frag_len == 0) last_frag_len = frag_len;
     size_t offset = 0;
-    size_t offset_delta = frag_len - frag_overlap;
+    const size_t offset_delta = frag_len - frag_overlap;
 
     for (int i = 0; i < cnt - 1; i++) {
         frag_span[i].text = src->text + offset;
@@ -94,11 +94,11 @@ int smallrag_write_embds(int fd, const struct smallrag_embds *embds)
         smallrag_pusherrstd();
         return -1;
     }
-    void *src = embds->vecs;
-    size_t tot_bytes = embds->tot_dim * sizeof(float);
+    const void *src = embds->vecs;
+    const size_t tot_bytes = embds->tot_dim * sizeof(float);
     size_t tot_written = 0;
     while (tot_written < tot_bytes) {
-        ssize_t written = write(fd, src + tot_written, tot_bytes - tot_written);
+        const ssize_t written = write(fd, src + tot_written, tot_bytes - tot_written);
         if (written == -1) {
             smallrag_pusherrstd();
             return -1;

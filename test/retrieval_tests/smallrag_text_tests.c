@@ -24,7 +24,7 @@ void test_smallrag_mmap_text(void)
         smallrag_pusherrstd();
         smallrag_throw();
     }
-    int fd = fileno(tmp);
+    const int fd = fileno(tmp);
     if (fd == -1) {
         smallrag_pusherrstd();
         smallrag_throw();

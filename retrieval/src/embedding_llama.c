@@ -3,6 +3,7 @@
 
 #include "llama.h"
 #include "smallrag/retrieval.h"
+#include "smallrag/err.h"
 /*
 llama_init_from_model()
 llama_model_default_params()
@@ -13,24 +14,26 @@ llama_model_free()
 llama_model_get_vocab()
 */
 
-
-struct priv_provider_data {
-    struct llama_model *model;
-    struct llama_context *context;
-};
-
 static int priv_get_embds(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds)
 {
-    return -1;
+    struct llama_context *ctx = (struct llama_context *)provider->provider_data;
+    const enum llama_pooling_type pooling = llama_pooling_type(ctx);
+    if (pooling != LLAMA_POOLING_TYPE_MEAN) {
+        smallrag_pusherrmsg(smallragERR_UNSUPPORTED, "Only LLAMA_POOLING_TYPE_MEAN is currently supported");
+        return -1;
+    }
+    const struct llama_model *model = llama_get_model(ctx);
+    const struct llama_vocab *vocab = llama_model_get_vocab(model);
+    const struct llama_
+
+
+
 }
 
 static void priv_free_provider(struct smallrag_embd_provider *provider)
 {
-    struct priv_provider_data *intern_prov = (struct priv_provider_data*)provider->provider_data;
-    struct llama_model *model = intern_prov->model;
-    struct llama_context *context = intern_prov->context;
-    llama_model_free(model);
-    llama_free(context);
+    const struct llama_context *ctx = (struct llama_context *)provider->provider_data;
+    llama_free(ctx);
 }
 
 struct smallrag_embd_provider_ops llama_embprov_ops = {
