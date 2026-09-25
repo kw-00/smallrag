@@ -49,5 +49,30 @@ int smallrag_mmap_embds(int fd, struct smallrag_embds *embds);
  */
 int smallrag_write_embds(int fd, const struct smallrag_embds *embds);
 
+struct smallrag_embd_model;
+/* Operations that can be performed on a certain model type.
+ */
+struct smallrag_embd_model_ops {
+    int (*get_embds)(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
+    int (*free)(struct smallrag_embd_model *model);
+};
+
+
+/* Represents an embedding model of unspecified types for polymorphic behaviour.
+ * ops represent how operations of the model are implemented; model_data is a type-erased representation of the model
+ * which ops should be aware of.
+ */
+struct smallrag_embd_model {
+    struct smallrag_embd_model_ops *ops;
+    void *model_data;
+};
+
+/* Uses model to get embeddings for frags.
+ */
+int smallrag_embd_model_get_embds(const struct smallrag_embd_model *model, const struct smallrag_text_frags *frags, struct smallrag_embds *embds);
+
+/* Releases resources associated with a model.
+ */
+int smallrag_embd_model_free(struct smallrag_embd_model *model);
 
 #endif
