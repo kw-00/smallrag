@@ -13,6 +13,12 @@ llama_model_free()
 llama_model_get_vocab()
 */
 
+
+struct priv_provider_data {
+    struct llama_model *model;
+    struct llama_context *context;
+};
+
 static int priv_get_embds(const struct smallrag_embd_provider *provider, const struct smallrag_text_frags *frags, struct smallrag_embds *embds)
 {
     return -1;
@@ -20,8 +26,11 @@ static int priv_get_embds(const struct smallrag_embd_provider *provider, const s
 
 static void priv_free_provider(struct smallrag_embd_provider *provider)
 {
-    struct llama_model *intern_model = (struct llama_model *)provider->provider_data;
-    llama_model_free(intern_model);
+    struct priv_provider_data *intern_prov = (struct priv_provider_data*)provider->provider_data;
+    struct llama_model *model = intern_prov->model;
+    struct llama_context *context = intern_prov->context;
+    llama_model_free(model);
+    llama_free(context);
 }
 
 struct smallrag_embd_provider_ops llama_embprov_ops = {
