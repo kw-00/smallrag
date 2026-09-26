@@ -18,7 +18,8 @@ typedef char *smallrag_err_t;
 #define smallragDECLARE_ERR(name) const smallrag_err_t name = #name
 
 smallragDECLARE_ERR(smallragERR_ARGUMENT);
-smallragDECLARE_ERR(smallragERR_OUT_OF_BOUNDS);
+smallragDECLARE_ERR(smallragERR_INDEX);
+smallragDECLARE_ERR(smallragERR_NUM_OVERFLOW);
 smallragDECLARE_ERR(smallragERR_INVALID_STATE);
 smallragDECLARE_ERR(smallragERR_STREAM);
 smallragDECLARE_ERR(smallragERR_UNSUPPORTED);
