@@ -15,7 +15,6 @@ void test_smallrag_mmap_text(void)
         smallrag_throw();
     }
     char *content = "AAAABBBBCCCCDDDD";
-    size_t len = strlen(content);
     if (fputs(content, tmp) == -1) {
         smallrag_pusherrstd();
         smallrag_throw();
@@ -29,16 +28,18 @@ void test_smallrag_mmap_text(void)
         smallrag_pusherrstd();
         smallrag_throw();
     }
-    struct smallrag_text text;
-    text.len = len;
-    if (smallrag_mmap_text(fd, &text) == -1) {
+    char *text;
+    ssize_t mapped_len = smallrag_mmap_text(fd, &text);
+    if (mapped_len == -1) {
         smallrag_throw();
     }
 
-    assert(memcmp(text.text, content, len) == 0 
+    assert(memcmp(text, content, mapped_len) == 0 
         && "mmapped smallrag_text.text expected to match contents of file it was mapped to.");
 
-    if (munmap(text.text, len) == -1) {
+    assert(strlen(text) == mapped_len);
+
+    if (munmap(text, mapped_len) == -1) {
         smallrag_pusherrstd();
         smallrag_throw();
     }
@@ -50,29 +51,30 @@ void test_smallrag_mmap_text(void)
 
 void test_smallrag_split_text(void)
 {
-    char *content = "AAAABBBBCCCCDDDD";
-    struct smallrag_text text = {
-        .text = content,
-        .len = strlen(content)
-    };
+    char *src = "AAAA\0BBBB\0CCCC\0DDDD";
+    size_t src_len = strlen(src);
 
-    struct smallrag_text_frags frags;
-    smallrag_split_text(&text, 4, 2, &frags);
-    assert(frags.count == 7);
+    size_t *fragm_sizes;
+    char **fragms;
+    ssize_t cnt = smallrag_split_text(src, src_len, '\0', &fragm_sizes, &fragms);
+    if (cnt == -1) {
+        smallrag_throw();
+    }
+    assert(cnt == 4 && "Returned undexpected number of fragments");
 #define privASSERT_FRAG_VAL(index, value) \
-    do { \
-        assert(memcmp(frags.frags[index].text, value, frags.frags[index].len) == 0); \
-    } while (false)
+        assert(memcmp(fragms[index], value, fragm_sizes[index]) == 0);
     privASSERT_FRAG_VAL(0, "AAAA");
-    privASSERT_FRAG_VAL(1, "AABB");
-    privASSERT_FRAG_VAL(2, "BBBB");
-    privASSERT_FRAG_VAL(3, "BBCC");
-    privASSERT_FRAG_VAL(4, "CCCC");
-    privASSERT_FRAG_VAL(5, "CCDD");
-    privASSERT_FRAG_VAL(6, "DDDD");
+    privASSERT_FRAG_VAL(1, "BBBB");
+    privASSERT_FRAG_VAL(2, "CCCC");
+    privASSERT_FRAG_VAL(3, "DDDD");
 
-    smallrag_split_text(&text, 4, 0, &frags);
-    assert(frags.count == 4);
+    src = "\0\0\0AAAA\0BBBB\0\0\0CCCC\0DDDD";
+    src_len = strlen(src);
+    cnt = smallrag_split_text(src, src_len, '\0', &fragm_sizes, &fragms);
+    if (cnt == -1) {
+        smallrag_throw();
+    }
+    assert(cnt == 4);
     privASSERT_FRAG_VAL(0, "AAAA");
     privASSERT_FRAG_VAL(1, "BBBB");
     privASSERT_FRAG_VAL(2, "CCCC");

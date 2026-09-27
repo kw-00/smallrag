@@ -3,8 +3,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <limits.h>
+#include <stdint.h>
 
 
 ssize_t smallrag_mmap_text(int fd, char **text)
@@ -14,7 +18,7 @@ ssize_t smallrag_mmap_text(int fd, char **text)
         smallrag_pusherrstd();
         return -1;
     }
-    const off_t fsize = statbuf->st_size;
+    const off_t fsize = statbuf.st_size;
     if (fsize > SSIZE_MAX) {
         smallrag_pusherr(smallragERR_NUM_OVERFLOW);
         return -1;
@@ -30,7 +34,10 @@ ssize_t smallrag_mmap_text(int fd, char **text)
 }
 
 ssize_t smallrag_split_text(
-        const char *source, size_t src_len, char delim, size_t **fragm_sizes, char ***fragments)
+        char *source, 
+        size_t src_len, 
+        char delim, 
+        size_t **fragm_sizes, char ***fragments)
 {
     size_t cnt = 0;
     bool in_fragm = false;
@@ -50,7 +57,7 @@ ssize_t smallrag_split_text(
         smallrag_pusherr(smallragERR_NUM_OVERFLOW);
         return -1;
     }
-    *fragm_sizes = malloc(sizes_alloc_size);
+    *fragm_sizes = malloc(alloc_size);
     if (*fragm_sizes == NULL) {
         smallrag_pusherrstd();
         return -1;
@@ -68,25 +75,27 @@ ssize_t smallrag_split_text(
 
     in_fragm = false;
     size_t fragm_idx = 0;
+    size_t fragm_size = 1;
+    size_t i = 0;
     while(true) {
         if (i < src_len) {
             if (source[i] != delim) {
                 if (!in_fragm) {
                     *fragments[fragm_idx] = source + i;
                     in_fragm = true;
+                } else {
+                    // Never overflows, as its size is bounded up to src_len through i
+                    fragm_size++;
                 }
             } else {
                 if (in_fragm) {
-                    // Safe because the right side cannot be largr than i can get
-                    // and i cannot be larger than size_t max
-                    *fragm_sizes[fragm_idx] = (size_t)(source + i - *fragments[fragm_idx]);
+                    *fragm_sizes[fragm_idx] = fragm_size; 
                     in_fragm = false;
+                    fragm_size = 1;
                 }
             }
         } else if (in_fragm) {
-            // Safe because the right side cannot be largr than i can get
-            // and i cannot be larger than size_t max
-            *fragm_sizes[fragm_idx] = (size_t)(source + i - *fragments[fragm_idx]);
+            *fragm_sizes[fragm_idx] = fragm_size; 
             in_fragm = false;
         } else {
             break;
@@ -100,20 +109,15 @@ ssize_t smallrag_split_text(
     return cnt;
 }
 
-struct smallrag_embds {
-    float *vecs;
-    size_t vec_dim;
-    size_t vec_cnt;
-};
 
-ssize_t smallrag_mmap_embds(int fd, struct smallrag_embds *s)
+ssize_t smallrag_mmap_embds(int fd, struct smallrag_embds *embds)
 {
     struct stat statbuf;
     if (fstat(fd, &statbuf) == -1) {
         smallrag_pusherrstd();
         return -1;
     }
-    const off_t fsize = statbuf->st_size;
+    const off_t fsize = statbuf.st_size;
     if (fsize > SIZE_MAX) {
         smallrag_pusherr(smallragERR_NUM_OVERFLOW);
         return -1;
@@ -135,7 +139,7 @@ ssize_t smallrag_mmap_embds(int fd, struct smallrag_embds *s)
                 "Total embds size (dimensions * embedding count) does not match file size");
         return -1;
     }
-    void *mapping = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    void *mapping = mmap(NULL, vec_bytes, PROT_READ, MAP_PRIVATE, fd, 0);
     if (mapping == MAP_FAILED) {
         smallrag_pusherrstd();
         return -1;

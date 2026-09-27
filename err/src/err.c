@@ -14,6 +14,14 @@
 #define smallragERR_MSG_LIMIT 256
 #endif
 
+smallragDEFINE_ERR(smallragERR_ARGUMENT);
+smallragDEFINE_ERR(smallragERR_INDEX);
+smallragDEFINE_ERR(smallragERR_NUM_OVERFLOW);
+smallragDEFINE_ERR(smallragERR_INVALID_STATE);
+smallragDEFINE_ERR(smallragERR_STREAM);
+smallragDEFINE_ERR(smallragERR_UNSUPPORTED);
+
+
 enum priv_err_entry_type {
     privERR_ERR,
     privERR_ERRNO

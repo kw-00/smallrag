@@ -6,7 +6,6 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-
 void test_smallrag_mmap_embds(void)
 {
     FILE *tmp = tmpfile(); 
@@ -32,14 +31,18 @@ void test_smallrag_mmap_embds(void)
         smallrag_pusherrstd();
         smallrag_throw();
     }
-    struct smallrag_embds embds;
-    smallrag_embds_init(&embds, NULL, vec_dim, vec_cnt);
-    if (smallrag_mmap_embds(fd, &embds) == -1) {
+    struct smallrag_embds embds = {
+        .vecs = content,
+        .dim = vec_dim,
+        .cnt = vec_cnt
+    };
+    ssize_t numbers_mapped = smallrag_mmap_embds(fd, &embds);
+    if (numbers_mapped == -1) {
         smallrag_throw();
     }
 
     assert(memcmp(embds.vecs, content, len) == 0 
-        && "mmapped smallrag_embds.vecs expected to match contents of file it was mapped to.");
+            && "mmapped smallrag_embds.vecs expected to match contents of file it was mapped to.");
 
     if (munmap(embds.vecs, len) == -1) {
         smallrag_pusherrstd();
@@ -50,7 +53,6 @@ void test_smallrag_mmap_embds(void)
         smallrag_throw();
     }
 }
-
 void test_smallrag_write_embds(void)
 {
     FILE *tmp = tmpfile(); 
@@ -68,11 +70,16 @@ void test_smallrag_write_embds(void)
     const size_t vec_cnt = 2;
     const size_t count = vec_dim * vec_cnt;
     const size_t len = count * sizeof(float);
-    struct smallrag_embds embds;
-    smallrag_embds_init(&embds, content, vec_dim, vec_cnt);
-    if (smallrag_write_embds(fd, &embds) == -1) {
+    struct smallrag_embds embds = {
+        .vecs = content,
+        .dim = vec_dim,
+        .cnt = vec_cnt
+    };
+    ssize_t bytes_written = smallrag_write_embds(fd, &embds);
+    if (bytes_written == -1) {
         smallrag_throw();
     }
+    assert(bytes_written == len && "Discrepancy between reported write size and expected size");
 
     float readback[4];
     if (fseek(tmp, 0, SEEK_SET) != 0) {
@@ -85,13 +92,14 @@ void test_smallrag_write_embds(void)
     }
 
     assert(memcmp(readback, content, len) == 0 
-        && "smallrag_write_embds expected to write the embeddings' binary contents to the file.");
+            && "smallrag_write_embds expected to write the embeddings' binary contents to the file.");
 
     if (close(fd) == -1) {
         smallrag_pusherrstd();
         smallrag_throw();
     }
 }
+
 
 int main(void)
 {

@@ -15,7 +15,8 @@
  */
 typedef char *smallrag_err_t;
 
-#define smallragDECLARE_ERR(name) const smallrag_err_t name = #name
+#define smallragDECLARE_ERR(name) extern const smallrag_err_t name;
+#define smallragDEFINE_ERR(name) const smallrag_err_t name = #name;
 
 smallragDECLARE_ERR(smallragERR_ARGUMENT);
 smallragDECLARE_ERR(smallragERR_INDEX);

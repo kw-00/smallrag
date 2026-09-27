@@ -2,6 +2,7 @@
 #define SMALLRAG_RETRIEVAL_H
 
 #include <stddef.h>
+#include <sys/types.h>
 
 
 /* Maps the string passed through the text parameter to file fd, up the the entire file's length.
@@ -29,7 +30,10 @@ ssize_t smallrag_mmap_text(int fd, char **text);
  * but not free((*fragments)[i]).
  */
 ssize_t smallrag_split_text(
-        const char *source, size_t src_len, char delim, size_t **fragm_sizes, char ***fragments);
+        char *source, 
+        size_t src_len, 
+        char delim, 
+        size_t **fragm_sizes, char ***fragments);
 
 
 /* Represents vector embeddings for text fragments.
