@@ -52,27 +52,31 @@ ssize_t smallrag_split_text(
         }
     }
 
+    size_t sizes_alloc_size;
+    if (__builtin_mul_overflow(sizeof(size_t), cnt, &sizes_alloc_size)) {
+        smallrag_pusherr(smallragERR_NUM_OVERFLOW);
+        return -1;
+    }
+    size_t fragments_alloc_size;
+    if (__builtin_mul_overflow(sizeof(char *), cnt, &fragments_alloc_size)) {
+        smallrag_pusherr(smallragERR_NUM_OVERFLOW);
+        return -1;
+    }
     size_t alloc_size;
-    if (__builtin_mul_overflow(sizeof(size_t), cnt, &alloc_size)) {
+    if (__builtin_add_overflow(sizes_alloc_size, fragments_alloc_size, &alloc_size)) {
         smallrag_pusherr(smallragERR_NUM_OVERFLOW);
         return -1;
     }
-    *fragm_sizes = malloc(alloc_size);
-    if (*fragm_sizes == NULL) {
+
+    void *full_alloc = malloc(alloc_size);
+    if (full_alloc == NULL) {
         smallrag_pusherrstd();
         return -1;
     }
+    *fragm_sizes = full_alloc;
 
-    if (__builtin_mul_overflow(sizeof(char *), cnt, &alloc_size)) {
-        smallrag_pusherr(smallragERR_NUM_OVERFLOW);
-        return -1;
-    }
-    *fragments = malloc(alloc_size);
-    if (*fragments == NULL) {
-        smallrag_pusherrstd();
-        return -1;
-    }
-
+    *fragments = full_alloc + sizes_alloc_size; 
+    
     in_fragm = false;
     size_t fragm_idx = 0;
     size_t fragm_size = 1;
@@ -184,12 +188,13 @@ ssize_t smallrag_write_embds(int fd, const struct smallrag_embds *embds)
 
 int *smallrag_get_embds(
         const struct smallrag_embd_provider *provider, 
+        size_t full_text_size,
         size_t fragm_cnt, 
         const size_t *fragm_sizes, 
         const char **fragments, 
         struct smallrag_embds *embds)
 {
-    provider->ops->get_embds(provider, fragm_cnt, fragm_sizes, fragments, embds);
+    provider->ops->get_embds(provider, full_text_size, fragm_cnt, fragm_sizes, fragments, embds);
 }
 
 void smallrag_embd_provider_free(struct smallrag_embd_provider *provider)

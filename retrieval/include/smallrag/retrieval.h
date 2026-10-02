@@ -23,11 +23,8 @@ ssize_t smallrag_mmap_text(int fd, char **text);
  * character span representing the text of a single fragment.
  * (*fragm_sizes)[i] corresponds to (*fragments)[i].
  *
- * Allocates memory for fragm_sizes and fragments, but not for the text itself — the text of each
- * fragment is merely a view over the source text.
- *
- * Therfore, to free memory allocated by this function, call free(*fragm_sizes) and free(*fragments),
- * but not free((*fragments)[i]).
+ * Allocates memory for fragm_sizes and fragments together. To free memory, call free(fragments).
+ * This will also free the memory used for fragm_sizes. 
  */
 ssize_t smallrag_split_text(
         char *source, 
@@ -64,6 +61,7 @@ struct smallrag_embd_provider;
 struct smallrag_embd_provider_ops {
     int (*get_embds)(
             const struct smallrag_embd_provider *provider, 
+            size_t full_text_size,
             size_t fragm_cnt, 
             const size_t *fragm_sizes, 
             const char **fragments, 
@@ -90,6 +88,7 @@ struct smallrag_embd_provider {
  */
 int *smallrag_get_embds(
         const struct smallrag_embd_provider *provider, 
+        size_t full_text_size,
         size_t fragm_cnt, 
         const size_t *fragm_sizes, 
         const char **fragments, 

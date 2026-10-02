@@ -24,6 +24,7 @@ smallragDECLARE_ERR(smallragERR_NUM_OVERFLOW);
 smallragDECLARE_ERR(smallragERR_INVALID_STATE);
 smallragDECLARE_ERR(smallragERR_STREAM);
 smallragDECLARE_ERR(smallragERR_UNSUPPORTED);
+smallragDECLARE_ERR(smallragERR_UNEXPECTED);
 
 /* Pushes an error down the error stack. Do this when your function's execution ends up in an invalid state 
  * and you want to give the caller error information.

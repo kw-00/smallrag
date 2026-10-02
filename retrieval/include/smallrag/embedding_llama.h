@@ -10,7 +10,8 @@ int smallrag_embprov_llama_conf_init(size_t n_tokenizer_threads);
  */
 int smallrag_embprov_llama_init(
         struct llama_context *context, 
-        ssize_t n_threads,
+        size_t n_threads,
+        size_t batch_size,
         struct smallrag_embd_provider *embprov);
 
 
