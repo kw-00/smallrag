@@ -1,9 +1,9 @@
-#include "smallrag/embedder.h"
+#include "smallrag/embedder_wrapper_functions.h"
 
 int get_embeddings(
         struct embedder *embedder,
-        const char **texts,
-        const size_t *text_lengths,
+        char **texts,
+        size_t *text_lengths,
         size_t text_count,
         struct embeddings *embeddings)
 {

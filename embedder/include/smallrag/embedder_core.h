@@ -1,4 +1,4 @@
-
+#include <stddef.h>
 
 struct embeddings {
     float *embeddings;
@@ -20,4 +20,5 @@ struct embedder {
             size_t text_count,
             struct embeddings *embeddings);
     void (*dispose)(struct embedder *embedder);
+    void *data;
 };
