@@ -1,5 +1,7 @@
-#include "smallrag/embedder_core.h"
+#ifndef SMALLRAG_EMBEDDER_WRAPPER_FUNCTIONS_H
+#define SMALLRAG_EMBEDDER_WRAPPER_FUNCTIONS_H
 
+#include "smallrag/embedder_core.h"
 
 /* Uses an embedder to provide vector embeddings for a given set of text chunks.
  * Calls the embedder's get_embeddings() method to achieve this.
@@ -22,3 +24,5 @@ int get_embeddings(
 /* Releases resources owned by an embedder using the embedder's dispose() method.
  */
 void dispose_embedder(struct embedder *embedder);
+
+#endif

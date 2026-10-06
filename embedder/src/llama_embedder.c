@@ -136,6 +136,7 @@ static ssize_t tokenize(
         size_t alloc_size = sizeof(size_t);
         if (__builtin_mul_overflow(alloc_size, text_count, &alloc_size)) {
             LOG_ERROR("Number overflow");
+            ERROR_CLEANUP();
             return -1;
         }
         token_count_memory = malloc(alloc_size);
@@ -175,7 +176,7 @@ static ssize_t tokenize(
             text_idx += texts_for_worker;
             for (
                     size_t relative_text_idx = 0; 
-                    relative_text_idx < context->text_count; 
+                    relative_text_idx < texts_for_worker; 
                     relative_text_idx++)
             {
                 tokens_offset += context->text_lengths[relative_text_idx];
@@ -216,7 +217,6 @@ static ssize_t tokenize(
                     ERROR_CLEANUP();
                     return -1;
                 }
-                total_token_count += context->token_counts[relative_text_idx];
             }
         }
         size_t alloc_size;
@@ -289,6 +289,15 @@ static int get_embeddings(
         n_threads = _SC_NPROCESSORS_ONLN;
     }
     const struct llama_model *model = llama_get_model(context);
+    const enum llama_pooling_type pooling_type = llama_pooling_type(context);
+    if (pooling_type == LLAMA_POOLING_TYPE_NONE) {
+        LOG_ERROR("LLAMA_POOLING_TYPE_NONE not supported");
+        return -1;
+    }
+    if (pooling_type == LLAMA_POOLING_TYPE_RANK) {
+        LOG_ERROR("LLAMA_POOLING_TYPE_RANK not supported");
+        return -1;
+    }
     const struct llama_vocab *vocab = llama_model_get_vocab(model);
 
     llama_token *tokens;
@@ -329,8 +338,8 @@ static int get_embeddings(
     }
 
     int32_t dimension_count = llama_model_n_embd_out(model);
-    const enum llama_pooling_type pooling_type = llama_pooling_type(context);
     {
+
         const size_t batch_count 
             = total_token_count / batch_size + (total_token_count % batch_size > 0);
        
@@ -347,6 +356,17 @@ static int get_embeddings(
 
         // Number of tokens in current sequence that haven't been batched yet
         size_t sequence_tokens_left = token_counts[sequence_idx];
+
+        if (batch_size > INT32_MAX) {
+            LOG_ERROR("Number overflow");
+            ERROR_CLEANUP();
+            return -1;
+        }
+        struct llama_batch batch = llama_batch_init(batch_size, 0, 1);
+        // One sequence ID per token
+        for (size_t i = 0; i < batch_count; i++) {
+            batch.n_seq_id[i] = 1;
+        }
         for (size_t i = 0; i < batch_count; i++) {
             // Calculate batch size (may be smaller than usual if it's the last batch)
             size_t actual_batch_size;
@@ -355,13 +375,6 @@ static int get_embeddings(
             } else {
                 actual_batch_size = total_token_count % batch_size;
             }
-            if (actual_batch_size > INT32_MAX) {
-                LOG_ERROR("Number overflow");
-                ERROR_CLEANUP();
-                return -1;
-            }
-            struct llama_batch batch = llama_batch_init(
-                    actual_batch_size, dimension_count, text_count);
 
             // Move tokens into batch
             memcpy(batch.token, tokens + token_idx, actual_batch_size);
@@ -403,12 +416,15 @@ static int get_embeddings(
                     break;
                 }
             }
+            batch.n_tokens = actual_batch_size;
             if (llama_decode(context, batch) != 0) {
                 LOG_ERROR("Decode failed");
                 ERROR_CLEANUP();
                 return -1;
             }
         }
+        // Free batch
+        llama_batch_free(batch);
         for (
                 size_t text_idx = 0, embedding_offset = 0; 
                 text_idx < text_count;
@@ -428,7 +444,11 @@ static int get_embeddings(
 }
 
 
-int init_llama_embedder(struct embedder *embedder, struct llama_context *context, size_t n_threads)
+int init_llama_embedder(
+        struct embedder *embedder, 
+        struct llama_context *context, 
+        size_t n_threads, 
+        size_t batch_size)
 {
     struct embedder_data *data = malloc(sizeof(struct embedder_data));
     if (data == NULL) {
@@ -437,6 +457,7 @@ int init_llama_embedder(struct embedder *embedder, struct llama_context *context
     }
     data->context = context;
     data->n_threads = n_threads;
+    data->batch_size = batch_size;
     embedder->data = data;
     embedder->get_embeddings = &get_embeddings;
     embedder->dispose = &dispose_embedder;

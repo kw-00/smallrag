@@ -1,3 +1,6 @@
+#ifndef SMALLRAG_EMBEDDER_CORE_H
+#define SMALLRAG_EMBEDDER_CORE_H
+
 #include <stddef.h>
 
 struct embeddings {
@@ -22,3 +25,5 @@ struct embedder {
     void (*dispose)(struct embedder *embedder);
     void *data;
 };
+
+#endif

@@ -46,3 +46,7 @@ dkms.conf
 *.dwo
 
 /build/
+
+/models/
+
+/build.sh

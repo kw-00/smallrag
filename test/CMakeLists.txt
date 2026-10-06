@@ -1,3 +1,4 @@
 
 enable_testing()
-add_subdirectory(chunking)
+add_subdirectory(chunker)
+add_subdirectory(embedder)
