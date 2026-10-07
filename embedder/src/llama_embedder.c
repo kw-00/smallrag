@@ -1,6 +1,7 @@
 #include "smallrag/llama_embedder.h"
 
 #include "smallrag/logging.h"
+#include "smallrag/allocation.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -92,14 +93,7 @@ static ssize_t tokenize(
     struct tokenize_task_context *contexts;
     llama_token *token_storage;
     {
-
-        size_t worker_alloc_size = sizeof(pthread_t) + sizeof(struct tokenize_task_context);
-        if (__builtin_mul_overflow(worker_alloc_size, n_workers, &worker_alloc_size)) {
-            LOG_ERROR("Number overflow");
-            return -1;
-        }
-
-        // Calculating memory for token_storage, assuming worst-case scenario where one byte of text
+         // Calculating memory for token_storage, assuming worst-case scenario where one byte of text
         // corresponds to one token
         size_t full_text_size = 0;
         for (size_t i = 0; i < text_count; i++) {
@@ -108,39 +102,33 @@ static ssize_t tokenize(
                 return -1;
             }
         }
+        if (allocate_spans(
+                3,
 
-        size_t token_alloc_size = sizeof(llama_token);
-        if (__builtin_mul_overflow(token_alloc_size, full_text_size, &token_alloc_size)) {
-            LOG_ERROR("Number overflow");
-            return -1;
-        }
+                &thread_handles, 
+                sizeof(pthread_t), 
+                n_workers,
 
-        size_t alloc_size = worker_alloc_size;
-        if (__builtin_add_overflow(alloc_size, token_alloc_size, &alloc_size)) {
-            LOG_ERROR("Number overflow");
-            return -1;
-        }
+                &contexts, 
+                sizeof(struct tokenize_task_context), 
+                n_workers, 
+                _Alignof(struct tokenize_task_context),
 
-        tokenization_memory = malloc(alloc_size);
-        if (tokenization_memory == NULL) {
+                &token_storage, 
+                sizeof(llama_token), 
+                full_text_size,
+                _Alignof(llama_token)) == -1) {
             LOG_ERROR("Allocation failed");
             return -1;
         }
-        thread_handles = tokenization_memory;
-        contexts = (void *)(thread_handles + n_workers);
-        token_storage = (void *)(contexts + n_workers);
-#define ERROR_CLEANUP() free(tokenization_memory)
+        // Memory handle for freeing
+        tokenization_memory = thread_handles;
+
+        #define ERROR_CLEANUP() free(tokenization_memory)
     }
     size_t *token_count_memory;
     {
-        size_t alloc_size = sizeof(size_t);
-        if (__builtin_mul_overflow(alloc_size, text_count, &alloc_size)) {
-            LOG_ERROR("Number overflow");
-            ERROR_CLEANUP();
-            return -1;
-        }
-        token_count_memory = malloc(alloc_size);
-        if (token_count_memory == NULL) {
+        if (allocate_spans(1, &token_count_memory, sizeof(size_t), text_count) == -1) {
             LOG_ERROR("Allocation failed");
             ERROR_CLEANUP();
             return -1;
@@ -164,6 +152,7 @@ static ssize_t tokenize(
             context->text_lengths = text_lengths + text_idx;
             context->text_count = texts_for_worker;
             context->tokens = token_storage + tokens_offset;
+            context->token_counts = token_count_memory + text_idx;
             if (pthread_create(
                         thread_handles + i,
                         NULL,
@@ -248,7 +237,7 @@ static ssize_t tokenize(
                 memcpy(
                         tokens_contiguous + destination_offset,
                         context->tokens + source_offset,
-                        context->token_counts[text_idx]);
+                        context->token_counts[text_idx] * sizeof(llama_token));
                 destination_offset += context->token_counts[text_idx];
                 source_offset += context->text_lengths[text_idx];
             }
@@ -316,16 +305,8 @@ static int get_embeddings(
 
     float *embedding_memory;
     {
-        size_t alloc_size;
-        if (__builtin_mul_overflow(sizeof(float), text_count, &alloc_size)) {
-            LOG_ERROR("Number overflow");
-            ERROR_CLEANUP();
-            return -1;
-        }
-        embedding_memory = malloc(alloc_size);
-        if (embeddings == NULL) {
+        if (allocate_spans(1, &embedding_memory, sizeof(float), text_count) == -1) {
             LOG_ERROR("Allocation failed");
-            ERROR_CLEANUP();
             return -1;
         }
 #undef ERROR_CLEANUP
@@ -377,7 +358,7 @@ static int get_embeddings(
             }
 
             // Move tokens into batch
-            memcpy(batch.token, tokens + token_idx, actual_batch_size);
+            memcpy(batch.token, tokens + token_idx, actual_batch_size * sizeof(llama_token));
 
             // This is the number of tokens in current batch that haven't had their seq ID set yet
             // (seq ID corresponds to the index of the sequence they belong do)
@@ -430,7 +411,7 @@ static int get_embeddings(
                 text_idx < text_count;
                 text_idx++, embedding_offset += dimension_count) {
             float *embedding = llama_get_embeddings_seq(context, text_idx);
-            memcpy(embedding_memory + embedding_offset, embedding, dimension_count);
+            memcpy(embedding_memory + embedding_offset, embedding, dimension_count * sizeof(float));
         }
         
         free(tokens);

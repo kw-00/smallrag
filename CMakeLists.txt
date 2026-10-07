@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 add_subdirectory(logging)
 add_subdirectory(chunker)
 add_subdirectory(embedder)
+add_subdirectory(allocation)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(test)

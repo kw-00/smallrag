@@ -1,5 +1,6 @@
-#include "smallrag/embedder.h"
 #include "smallrag/llama_embedder.h"
+#include "smallrag/embedder.h"
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>

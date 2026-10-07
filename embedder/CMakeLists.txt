@@ -13,4 +13,5 @@ target_include_directories(smallrag_embedder PUBLIC
 target_link_libraries(smallrag_embedder PRIVATE
     llama
     smallrag_logging
+    smallrag_allocation
 )
