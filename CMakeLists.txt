@@ -11,6 +11,7 @@ add_subdirectory(logging)
 add_subdirectory(chunker)
 add_subdirectory(embedder)
 add_subdirectory(allocation)
+add_subdirectory(data_structures)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(test)

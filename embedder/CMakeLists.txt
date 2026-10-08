@@ -1,5 +1,4 @@
 include(FetchLlama)
-fetch_llama(llama)
 
 add_library(smallrag_embedder STATIC
     src/embedder_wrapper_functions.c
@@ -15,3 +14,4 @@ target_link_libraries(smallrag_embedder PRIVATE
     smallrag_logging
     smallrag_allocation
 )
+use_llama(smallrag_embedder)

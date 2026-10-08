@@ -336,7 +336,8 @@ static int get_embeddings(
         size_t token_pos = 0;
 
         // Number of tokens in current sequence that haven't been batched yet
-        size_t sequence_tokens_left = token_counts[sequence_idx];
+        //// TODO - the size of this gets way too large in test - investigate
+        size_t sequence_tokens_left = token_counts[sequence_idx]; 
 
         if (batch_size > INT32_MAX) {
             LOG_ERROR("Number overflow");
@@ -390,9 +391,15 @@ static int get_embeddings(
                     sequence_tokens_left -= batch_tokens_left;
                     break;
                 } else {
-                    // If both sequence and batch have been exhausted, decode and move on to the 
-                    // next batch and sequence
-                    sequence_tokens_left = token_counts[++sequence_idx];
+                    // The bounds check is performed so as not to access memory outside of valid 
+                    // token_counts, avoiding UB. It does not affect correctness of the 
+                    // sequence_tokens_left value, as that value is never used after
+                    // sequence_idx == text_count (assuming the function is used correctly)
+                    if (sequence_idx < text_count - 1) {
+                        // If both sequence and batch have been exhausted, decode and move on to 
+                        // the next batch and sequence
+                        sequence_tokens_left = token_counts[++sequence_idx];
+                    }
                     token_pos = 0;
                     break;
                 }
