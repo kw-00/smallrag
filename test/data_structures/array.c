@@ -14,13 +14,6 @@ static int *beyond_src;
 
 static bool assertion_failed = false;
 
-// Redefine ARRAY_ASSERT, which is called by array functions for bounds checks, to pick up on
-// failed checks instead of exiting the program
-#undef ARRAY_ASSERT
-#define ARRAY_ASSERT(condition) \
-    do { \
-        if (!condition) assertion_failed = true; \
-    } while (false)
 
 #ifndef NDEBUG 
 #define ASSERT_ARRAY_ERROR() assert(assertion_failed)
@@ -34,8 +27,15 @@ static bool assertion_failed = false;
 #define RESET_ARRAY_ERROR()
 #endif
 
-DECLARE_ARRAY_TYPE(int_array, int);
 
+// Redefine ARRAY_ASSERT, which is called by array functions for bounds checks, to pick up on
+// failed checks instead of exiting the program
+#undef ARRAY_ASSERT
+#define ARRAY_ASSERT(condition) \
+    do { \
+        if (!condition) assertion_failed = true; \
+    } while (false)
+DECLARE_ARRAY_TYPE(int_array, int);
 DEFINE_ARRAY_TYPE(int_array, int);
 
 static void init_src(void)
@@ -130,7 +130,7 @@ static void test_offset_length(void)
     ASSERT_ARRAY_ERROR();
 }
 
-void main(void)
+int main(void)
 {
     test_access();
     test_mutation();
