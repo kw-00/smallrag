@@ -322,7 +322,7 @@ static int get_embeddings(
             ERROR_CLEANUP();
             return -1;
         }
-        if (allocate_spans(1, &embedding_memory, sizeof(float), text_count) == -1) {
+        if (allocate_spans(1, &embedding_memory, sizeof(float), total_vector_size) == -1) {
             LOG_ERROR("Allocation failed");
             ERROR_CLEANUP();
             return -1;
