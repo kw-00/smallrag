@@ -311,11 +311,20 @@ static int get_embeddings(
         } while (false)
     }
 
+    int32_t dimension_count = llama_model_n_embd_out(model);
+
     float *embedding_memory;
     /* Allocate memory for embeddings */
     {
+        size_t total_vector_size;
+        if (__builtin_mul_overflow(text_count, dimension_count, &total_vector_size)) {
+            LOG_ERROR("Number overflow");
+            ERROR_CLEANUP();
+            return -1;
+        }
         if (allocate_spans(1, &embedding_memory, sizeof(float), text_count) == -1) {
             LOG_ERROR("Allocation failed");
+            ERROR_CLEANUP();
             return -1;
         }
 #undef ERROR_CLEANUP
@@ -327,7 +336,6 @@ static int get_embeddings(
         } while (false)
     }
 
-    int32_t dimension_count = llama_model_n_embd_out(model);
 
     /* Batch and decode */
     {
@@ -336,7 +344,6 @@ static int get_embeddings(
             ERROR_CLEANUP();
             return -1;
         }
-        LOG_INFO("Text count: %d", text_count);
         struct llama_batch batch = llama_batch_init(batch_size, 0, text_count);
         batch.logits = NULL;
         batch.pos = NULL;
@@ -400,6 +407,13 @@ static int get_embeddings(
         }
         /* Free batch */
         llama_batch_free(batch);
+#undef ERROR_CLEANUP
+#define ERROR_CLEANUP() \
+        do { \
+            free(tokens); \
+            free(token_counts); \
+            free(embedding_memory); \
+        } while (false)
     }
         
     /* Copy embeddings */

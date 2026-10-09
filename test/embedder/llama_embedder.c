@@ -19,6 +19,7 @@ static struct llama_context *get_context(char *model_path)
     context_params.n_ctx = 65536;
     context_params.n_batch = 512;
     context_params.embeddings = true;
+    context_params.n_seq_max = 256;
     struct llama_context *context = llama_init_from_model(model, context_params);
     return context;
 }
