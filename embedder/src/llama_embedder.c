@@ -457,4 +457,5 @@ int init_llama_embedder(
     embedder->data = data;
     embedder->get_embeddings = &get_embeddings;
     embedder->dispose = &dispose_embedder;
+    return 0;
 }
