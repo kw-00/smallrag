@@ -93,8 +93,8 @@ static ssize_t tokenize(
     struct tokenize_task_context *contexts;
     llama_token *token_storage;
     {
-         // Calculating memory for token_storage, assuming worst-case scenario where one byte of text
-        // corresponds to one token
+        /* Calculating memory for token_storage, assuming worst-case scenario where one byte of text
+         * corresponds to one token */
         size_t full_text_size = 0;
         for (size_t i = 0; i < text_count; i++) {
             if (__builtin_add_overflow(full_text_size, text_lengths[i], &full_text_size)) {
@@ -278,32 +278,41 @@ static int get_embeddings(
         n_threads = _SC_NPROCESSORS_ONLN;
     }
     const struct llama_model *model = llama_get_model(context);
-    const enum llama_pooling_type pooling_type = llama_pooling_type(context);
-    if (pooling_type == LLAMA_POOLING_TYPE_NONE) {
-        LOG_ERROR("LLAMA_POOLING_TYPE_NONE not supported");
-        return -1;
+    /* Check pooling type */
+    {
+        const enum llama_pooling_type pooling_type = llama_pooling_type(context);
+        if (pooling_type == LLAMA_POOLING_TYPE_NONE) {
+            LOG_ERROR("LLAMA_POOLING_TYPE_NONE not supported");
+            return -1;
+        }
+        if (pooling_type == LLAMA_POOLING_TYPE_RANK) {
+            LOG_ERROR("LLAMA_POOLING_TYPE_RANK not supported");
+            return -1;
+        }
     }
-    if (pooling_type == LLAMA_POOLING_TYPE_RANK) {
-        LOG_ERROR("LLAMA_POOLING_TYPE_RANK not supported");
-        return -1;
-    }
-    const struct llama_vocab *vocab = llama_model_get_vocab(model);
 
     llama_token *tokens;
     size_t *token_counts;
-    ssize_t total_token_count = tokenize(
-            vocab, texts, text_lengths, text_count, n_threads, &tokens, &token_counts);
-    if (total_token_count == -1) {
-        LOG_ERROR("Tokenization failed");
-        return -1;
-    }
+    ssize_t total_token_count;
+    /* Tokenize */
+    {
+        const struct llama_vocab *vocab = llama_model_get_vocab(model);
+
+        total_token_count = tokenize(
+                vocab, texts, text_lengths, text_count, n_threads, &tokens, &token_counts);
+        if (total_token_count == -1) {
+            LOG_ERROR("Tokenization failed");
+            return -1;
+        }
 #define ERROR_CLEANUP() \
-    do { \
-        free(tokens); \
-        free(token_counts); \
-    } while (false)
+        do { \
+            free(tokens); \
+            free(token_counts); \
+        } while (false)
+    }
 
     float *embedding_memory;
+    /* Allocate memory for embeddings */
     {
         if (allocate_spans(1, &embedding_memory, sizeof(float), text_count) == -1) {
             LOG_ERROR("Allocation failed");
@@ -319,116 +328,90 @@ static int get_embeddings(
     }
 
     int32_t dimension_count = llama_model_n_embd_out(model);
+
+    /* Batch and decode */
     {
-
-        const size_t batch_count 
-            = total_token_count / batch_size + (total_token_count % batch_size > 0);
-       
-        // NOTE: a single text corresponds to a single sequence
-
-        // Index of currently processed sequence
-        size_t sequence_idx = 0;
-
-        // The absolute index of the currently processed token
-        size_t token_idx = 0;
-
-        // The position of the currently processed token in the currently processed sequence/sequence
-        size_t token_pos = 0;
-
-        // Number of tokens in current sequence that haven't been batched yet
-        //// TODO - the size of this gets way too large in test - investigate
-        size_t sequence_tokens_left = token_counts[sequence_idx]; 
-
         if (batch_size > INT32_MAX) {
             LOG_ERROR("Number overflow");
             ERROR_CLEANUP();
             return -1;
         }
         struct llama_batch batch = llama_batch_init(batch_size, 0, 1);
-        // One sequence ID per token
+
+#undef ERROR_CLEANUP
+#define ERROR_CLEANUP() \
+        do { \
+            free(tokens); \
+            free(token_counts); \
+            free(embedding_memory); \
+            llama_batch_free(batch); \
+        } while (false)
+
+        const bool remainder_present = total_token_count % batch_size > 0;
+        const size_t batch_count 
+            = total_token_count / batch_size + remainder_present;
+
+        size_t token_idx = 0;
+
+        size_t sequence_idx = 0;
+        size_t sequence_end = token_counts[sequence_idx];
+
         for (size_t i = 0; i < batch_count; i++) {
-            batch.n_seq_id[i] = 1;
-        }
-        for (size_t i = 0; i < batch_count; i++) {
-            // Calculate batch size (may be smaller than usual if it's the last batch)
-            size_t actual_batch_size;
-            if (i < batch_count - 1) {
-                actual_batch_size = batch_size;
+            size_t current_batch_size;
+            if (!remainder_present || i < batch_count - 1) {
+                current_batch_size = batch_size;
             } else {
-                actual_batch_size = total_token_count % batch_size;
+                current_batch_size = total_token_count % batch_size;
             }
+            const size_t batch_start = token_idx;
+            const size_t batch_end = batch_start + current_batch_size;
 
-            // Move tokens into batch
-            memcpy(batch.token, tokens + token_idx, actual_batch_size * sizeof(llama_token));
+            memcpy(tokens + batch_start, batch.token, current_batch_size * sizeof(llama_token));
 
-            // This is the number of tokens in current batch that haven't had their seq ID set yet
-            // (seq ID corresponds to the index of the sequence they belong do)
-            size_t batch_tokens_left = actual_batch_size;
-            
-            // Assign the right seq IDs and position info to the tokens in the current batch
-            while (batch_tokens_left > 0) {
-                // This is the number of tokens belonging both to current batch and current sequence
-                size_t shared_token_count = MIN(batch_tokens_left, sequence_tokens_left);
-                
-                // Assign seq ID matching the current sequence to those tokens and also assign their
-                // sequence-relative position
-                while (shared_token_count-- > 0) {
-                    batch.seq_id[token_idx][0] = sequence_idx;
-                    batch.pos[token_idx] = token_pos;
-                    token_idx++;
-                    token_pos++;
+            while (token_idx < batch_end) {
+                if (token_idx == sequence_end) {
+                    sequence_idx++;
+                    sequence_end += token_counts[sequence_idx];
                 }
-                if (batch_tokens_left > sequence_tokens_left) {
-                    // If all tokens from current sequence were batched, but not all tokens in the
-                    // current batch where assigned to a sequence, move on to the next sequence
-                    batch_tokens_left -= sequence_tokens_left;
-                    sequence_tokens_left = token_counts[++sequence_idx];
-                    token_pos = 0;
-                } else if (batch_tokens_left < sequence_tokens_left) {
-                    // If all tokens in the batch were assigned to a sequence, but not all tokens
-                    // that should belong to the current sequence have been batched, decode and 
-                    // move on to the next batch
-                    sequence_tokens_left -= batch_tokens_left;
-                    break;
-                } else {
-                    // The bounds check is performed so as not to access memory outside of valid 
-                    // token_counts, avoiding UB. It does not affect correctness of the 
-                    // sequence_tokens_left value, as that value is never used after
-                    // sequence_idx == text_count (assuming the function is used correctly)
-                    if (sequence_idx < text_count - 1) {
-                        // If both sequence and batch have been exhausted, decode and move on to 
-                        // the next batch and sequence
-                        sequence_tokens_left = token_counts[++sequence_idx];
-                    }
-                    token_pos = 0;
-                    break;
+                if (sequence_idx > INT32_MAX) {
+                    LOG_ERROR("Number overflow");
+                    ERROR_CLEANUP();
+                    return -1;
                 }
+                /* Current token position within batch */
+                size_t relative_token_idx = token_idx - batch_start;
+                batch.seq_id[relative_token_idx][0] = sequence_idx;
+                token_idx++;
             }
-            batch.n_tokens = actual_batch_size;
             if (llama_decode(context, batch) != 0) {
                 LOG_ERROR("Decode failed");
                 ERROR_CLEANUP();
                 return -1;
             }
         }
-        // Free batch
+        /* Free batch */
         llama_batch_free(batch);
-        for (
-                size_t text_idx = 0, embedding_offset = 0; 
-                text_idx < text_count;
-                text_idx++, embedding_offset += dimension_count) {
-            float *embedding = llama_get_embeddings_seq(context, text_idx);
-            memcpy(embedding_memory + embedding_offset, embedding, dimension_count * sizeof(float));
-        }
-        
-        free(tokens);
-        free(token_counts);
-        embeddings->embeddings = embedding_memory;
-        embeddings->dimension_count = dimension_count;
-        embeddings->embedding_count = text_count;
-#undef ERROR_CLEANUP
-        return 0;
     }
+        
+    /* Copy embeddings */
+    {
+        size_t sequence_idx = 0;
+        size_t embedding_offset = 0;
+        while (sequence_idx < text_count) {
+            float *embedding = llama_get_embeddings_seq(context, sequence_idx);
+            memcpy(embedding_memory + embedding_offset, embedding, dimension_count * sizeof(float));
+            sequence_idx++;
+            embedding_offset += dimension_count;
+        }
+    }
+    
+    free(tokens);
+    free(token_counts);
+    embeddings->embeddings = embedding_memory;
+    embeddings->dimension_count = dimension_count;
+    embeddings->embedding_count = text_count;
+#undef ERROR_CLEANUP
+    return 0;
 }
 
 

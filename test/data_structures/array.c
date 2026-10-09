@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <assert.h>
+#include <stdio.h>
 
 
 #define SRC_SIZE (1 << 8)
@@ -33,7 +34,9 @@ static bool assertion_failed = false;
 #undef ARRAY_ASSERT
 #define ARRAY_ASSERT(condition) \
     do { \
-        if (!condition) assertion_failed = true; \
+        if (!(condition)) { \
+            assertion_failed = true; \
+        } \
     } while (false)
 DECLARE_ARRAY_TYPE(int_array, int);
 DEFINE_ARRAY_TYPE(int_array, int);

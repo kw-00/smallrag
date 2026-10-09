@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <assert.h>
-
 #define ARRAY_ASSERT(condition) assert(condition)
 
 /* Macros for declaring and defining a special struct that represents an array, together with
@@ -145,6 +144,5 @@
         return array.elements; \
     }
 #endif
-
 
 #endif
