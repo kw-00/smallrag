@@ -336,7 +336,13 @@ static int get_embeddings(
             ERROR_CLEANUP();
             return -1;
         }
-        struct llama_batch batch = llama_batch_init(batch_size, 0, 1);
+        LOG_INFO("Text count: %d", text_count);
+        struct llama_batch batch = llama_batch_init(batch_size, 0, text_count);
+        batch.logits = NULL;
+        batch.pos = NULL;
+        for (size_t i = 0; i < batch_size; i++) {
+            batch.n_seq_id[i] = 1;
+        }
 
 #undef ERROR_CLEANUP
 #define ERROR_CLEANUP() \
@@ -363,10 +369,13 @@ static int get_embeddings(
             } else {
                 current_batch_size = total_token_count % batch_size;
             }
+            batch.n_tokens = current_batch_size;
+
+
             const size_t batch_start = token_idx;
             const size_t batch_end = batch_start + current_batch_size;
 
-            memcpy(tokens + batch_start, batch.token, current_batch_size * sizeof(llama_token));
+            memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
 
             while (token_idx < batch_end) {
                 if (token_idx == sequence_end) {
@@ -403,6 +412,8 @@ static int get_embeddings(
             sequence_idx++;
             embedding_offset += dimension_count;
         }
+        llama_memory_t context_memory = llama_get_memory(context);
+        llama_memory_clear(context_memory, true);
     }
     
     free(tokens);
