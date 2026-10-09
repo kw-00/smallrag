@@ -11,8 +11,7 @@
 
 struct embedder_data {
     struct llama_context *context;
-    size_t n_threads;
-    size_t batch_size;
+    struct llama_embedder_params params;
 };
 
 static void dispose_embedder(struct embedder *embedder)
@@ -272,10 +271,13 @@ static int get_embeddings(
     }
     struct embedder_data *embedder_data = (struct embedder_data *)embedder->data;
     struct llama_context *context = embedder_data->context;
-    size_t n_threads = embedder_data->n_threads;
-    size_t batch_size = embedder_data->batch_size;
-    if (n_threads == 0) {
-        n_threads = _SC_NPROCESSORS_ONLN;
+    struct llama_embedder_params params = embedder_data->params;
+
+    size_t batch_size = params.batch_size;
+    size_t n_seq_max = params.n_seq_max;
+    size_t n_tokenizer_threads = params.n_tokenizer_threads;
+    if (n_tokenizer_threads == 0) {
+        n_tokenizer_threads = _SC_NPROCESSORS_ONLN;
     }
     const struct llama_model *model = llama_get_model(context);
     /* Check pooling type */
@@ -299,7 +301,7 @@ static int get_embeddings(
         const struct llama_vocab *vocab = llama_model_get_vocab(model);
 
         total_token_count = tokenize(
-                vocab, texts, text_lengths, text_count, n_threads, &tokens, &token_counts);
+                vocab, texts, text_lengths, text_count, n_tokenizer_threads, &tokens, &token_counts);
         if (total_token_count == -1) {
             LOG_ERROR("Tokenization failed");
             return -1;
@@ -443,8 +445,7 @@ static int get_embeddings(
 int init_llama_embedder(
         struct embedder *embedder, 
         struct llama_context *context, 
-        size_t n_threads, 
-        size_t batch_size)
+        struct llama_embedder_params params)
 {
     struct embedder_data *data = malloc(sizeof(struct embedder_data));
     if (data == NULL) {
@@ -452,8 +453,7 @@ int init_llama_embedder(
         return -1;
     }
     data->context = context;
-    data->n_threads = n_threads;
-    data->batch_size = batch_size;
+    data->params = params;
     embedder->data = data;
     embedder->get_embeddings = &get_embeddings;
     embedder->dispose = &dispose_embedder;

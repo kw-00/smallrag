@@ -27,7 +27,12 @@ static struct llama_context *get_context(char *model_path)
 static void get_embedder(char *model_path, struct embedder* embedder)
 {
     struct llama_context *context = get_context(model_path);
-    assert(init_llama_embedder(embedder, context, 2, 512) != -1);
+    struct llama_embedder_params params = {
+        .n_tokenizer_threads = 2,
+        .batch_size = 512,
+        .n_seq_max = 256
+    };
+    assert(init_llama_embedder(embedder, context, params) != -1);
 }
 
 
