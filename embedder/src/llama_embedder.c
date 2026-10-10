@@ -19,6 +19,15 @@ static void dispose_embedder(struct embedder *embedder)
     free(embedder->data);
 }
 
+static int get_max_token_count(size_t text_length, size_t *max_token_count)
+{
+    if (__builtin_add_overflow(text_length, 2, max_token_count)) {
+        LOG_ERROR("Number overflow");
+        return -1;
+    }
+    return 0;
+}
+
 /* For each text from texts, tokens are produced.
  *
  * To get tokens for texts[i], use tokens[offset], where offset is the sum of all text_lenghts[j],
@@ -42,7 +51,12 @@ static void *tokenize_task(void *args)
     {
         size_t token_offset = 0;
         for (size_t i = 0; i < context->text_count; i++) {
-            if (context->text_lengths[i] > INT32_MAX) {
+            size_t max_token_count;
+            if (get_max_token_count(context->text_lengths[i], &max_token_count) == -1) {
+                LOG_ERROR("Number overflow");
+                return &fail;
+            } 
+            if (max_token_count > INT32_MAX) {
                 LOG_ERROR("Number overflow");
                 return &fail;
             }
@@ -51,7 +65,7 @@ static void *tokenize_task(void *args)
                     context->texts[i],
                     context->text_lengths[i],
                     context->tokens + token_offset,
-                    context->text_lengths[i],
+                    max_token_count,
                     true,
                     true);
             if (token_count < 0) {
@@ -59,7 +73,7 @@ static void *tokenize_task(void *args)
                 return &fail;
             }
             context->token_counts[i] = token_count;
-            token_offset += context->text_lengths[i];
+            token_offset += max_token_count; 
         }
     }
     return &success;
@@ -94,9 +108,15 @@ static ssize_t tokenize(
     {
         /* Calculating memory for token_storage, assuming worst-case scenario where one byte of text
          * corresponds to one token */
-        size_t full_text_size = 0;
+        size_t max_total_token_count = 0;
         for (size_t i = 0; i < text_count; i++) {
-            if (__builtin_add_overflow(full_text_size, text_lengths[i], &full_text_size)) {
+            size_t max_token_count;
+            if (get_max_token_count(text_lengths[i], &max_token_count) == -1) {
+                LOG_ERROR("Number overflow");
+                return -1;
+            }
+            if (__builtin_add_overflow(
+                        max_total_token_count, max_token_count, &max_total_token_count)) {
                 LOG_ERROR("Number overflow");
                 return -1;
             }
@@ -115,7 +135,7 @@ static ssize_t tokenize(
 
                 &token_storage, 
                 sizeof(llama_token), 
-                full_text_size,
+                max_total_token_count,
                 _Alignof(llama_token)) == -1) {
             LOG_ERROR("Allocation failed");
             return -1;
@@ -167,7 +187,13 @@ static ssize_t tokenize(
                     relative_text_idx < texts_for_worker; 
                     relative_text_idx++)
             {
-                tokens_offset += context->text_lengths[relative_text_idx];
+                size_t max_token_count;
+                if (get_max_token_count(context->text_lengths[i], &max_token_count) == -1) {
+                    LOG_ERROR("Number overflow");
+                    ERROR_CLEANUP();
+                    return -1;
+                }
+                tokens_offset += max_token_count;
             }
         }
     }
@@ -177,9 +203,11 @@ static ssize_t tokenize(
         int *worker_return;
         if (pthread_join(thread_handles[i], (void **)&worker_return) != 0) {
             LOG_ERROR("Joining worker ended in an error");
+            ERROR_CLEANUP();
             error_occurred = true;
         } else if (*worker_return == -1) {
             LOG_ERROR("Worker thread ended with an error");
+            ERROR_CLEANUP();
             error_occurred = true;
         }
     }
@@ -238,7 +266,12 @@ static ssize_t tokenize(
                         context->tokens + source_offset,
                         context->token_counts[text_idx] * sizeof(llama_token));
                 destination_offset += context->token_counts[text_idx];
-                source_offset += context->text_lengths[text_idx];
+                size_t offset_delta;
+                if (get_max_token_count(context->text_lengths[text_idx], &offset_delta) == -1) {
+                    LOG_ERROR("Number overflow");
+                    return -1;
+                }
+                source_offset += offset_delta; 
             }
         }
     }

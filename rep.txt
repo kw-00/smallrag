@@ -1,0 +1,2227 @@
+==34100== Memcheck, a memory error detector
+==34100== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==34100== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==34100== Command: build/test/embedder/smallrag_test_llama_embedder
+==34100== 
+==34100== Warning: set address range perms: large range [0xea39000, 0x425c1000) (defined)
+==34100== Warning: set address range perms: large range [0x59c93000, 0x159e94000) (noaccess)
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 24560 MiB):
+  Device 0: Radeon RX 7900 XTX, gfx1100 (0x1100), VMM: no, Wave Size: 32, VRAM: 24560 MiB
+llama_model_loader: loaded meta data with 38 key-value pairs and 110 tensors from /home/krzysztof/Projects/smallrag/models/v5-nano-retrieval-F16.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = eurobert
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Jina Embeddings v5 Text Nano Retrieval
+llama_model_loader: - kv   3:                         general.size_label str              = 212M
+llama_model_loader: - kv   4:                            general.license str              = cc-by-nc-4.0
+llama_model_loader: - kv   5:                   general.base_model.count u32              = 1
+llama_model_loader: - kv   6:                  general.base_model.0.name str              = Jina Embeddings v5 Text Nano
+llama_model_loader: - kv   7:          general.base_model.0.organization str              = Jinaai
+llama_model_loader: - kv   8:              general.base_model.0.repo_url str              = https://huggingface.co/jinaai/jina-em...
+llama_model_loader: - kv   9:                               general.tags arr[str,10]      = ["gguf", "embedding", "eurobert", "ll...
+llama_model_loader: - kv  10:                          general.languages arr[str,1]       = ["multilingual"]
+llama_model_loader: - kv  11:                       eurobert.block_count u32              = 12
+llama_model_loader: - kv  12:                    eurobert.context_length u32              = 8192
+llama_model_loader: - kv  13:                  eurobert.embedding_length u32              = 768
+llama_model_loader: - kv  14:               eurobert.feed_forward_length u32              = 3072
+llama_model_loader: - kv  15:              eurobert.attention.head_count u32              = 12
+llama_model_loader: - kv  16:           eurobert.attention.head_count_kv u32              = 12
+llama_model_loader: - kv  17:                    eurobert.rope.freq_base f32              = 1000000.000000
+llama_model_loader: - kv  18:  eurobert.attention.layer_norm_rms_epsilon f32              = 0.000010
+llama_model_loader: - kv  19:              eurobert.attention.key_length u32              = 64
+llama_model_loader: - kv  20:            eurobert.attention.value_length u32              = 64
+llama_model_loader: - kv  21:                          general.file_type u32              = 1
+llama_model_loader: - kv  22:                  eurobert.attention.causal bool             = false
+llama_model_loader: - kv  23:                 eurobert.rope.scaling.type str              = none
+llama_model_loader: - kv  24:                      eurobert.pooling_type u32              = 3
+llama_model_loader: - kv  25:               general.quantization_version u32              = 2
+llama_model_loader: - kv  26:               tokenizer.ggml.add_bos_token bool             = false
+llama_model_loader: - kv  27:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  28:                         tokenizer.ggml.pre str              = jina-v5-nano
+llama_model_loader: - kv  29:                      tokenizer.ggml.tokens arr[str,128256]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  30:                  tokenizer.ggml.token_type arr[i32,128256]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  31:                      tokenizer.ggml.merges arr[str,280147]  = ["Ġ Ġ", "Ġ ĠĠĠ", "ĠĠ ĠĠ", "...
+llama_model_loader: - kv  32:                tokenizer.ggml.bos_token_id u32              = 128000
+llama_model_loader: - kv  33:                tokenizer.ggml.eos_token_id u32              = 128001
+llama_model_loader: - kv  34:            tokenizer.ggml.padding_token_id u32              = 128004
+llama_model_loader: - kv  35:               tokenizer.ggml.mask_token_id u32              = 128002
+llama_model_loader: - kv  36:               tokenizer.ggml.add_eos_token bool             = true
+llama_model_loader: - kv  37:               tokenizer.ggml.add_sep_token bool             = false
+llama_model_loader: - type  f32:   25 tensors
+llama_model_loader: - type  f16:   85 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = F16
+print_info: file size   = 403.95 MiB (16.00 BPW) 
+llama_prepare_model_devices: using device ROCm0 (Radeon RX 7900 XTX) (0000:03:00.0) - 3296 MiB free
+init_tokenizer: initializing tokenizer for type 2
+load: 0 unused tokens
+load: control token: 128254 '<|reserved_special_token_246|>' is not marked as EOG
+load: control token: 128249 '<|reserved_special_token_241|>' is not marked as EOG
+load: control token: 128246 '<|reserved_special_token_238|>' is not marked as EOG
+load: control token: 128243 '<|reserved_special_token_235|>' is not marked as EOG
+load: control token: 128242 '<|reserved_special_token_234|>' is not marked as EOG
+load: control token: 128241 '<|reserved_special_token_233|>' is not marked as EOG
+load: control token: 128240 '<|reserved_special_token_232|>' is not marked as EOG
+load: control token: 128235 '<|reserved_special_token_227|>' is not marked as EOG
+load: control token: 128231 '<|reserved_special_token_223|>' is not marked as EOG
+load: control token: 128230 '<|reserved_special_token_222|>' is not marked as EOG
+load: control token: 128228 '<|reserved_special_token_220|>' is not marked as EOG
+load: control token: 128225 '<|reserved_special_token_217|>' is not marked as EOG
+load: control token: 128218 '<|reserved_special_token_210|>' is not marked as EOG
+load: control token: 128214 '<|reserved_special_token_206|>' is not marked as EOG
+load: control token: 128213 '<|reserved_special_token_205|>' is not marked as EOG
+load: control token: 128207 '<|reserved_special_token_199|>' is not marked as EOG
+load: control token: 128206 '<|reserved_special_token_198|>' is not marked as EOG
+load: control token: 128204 '<|reserved_special_token_196|>' is not marked as EOG
+load: control token: 128200 '<|reserved_special_token_192|>' is not marked as EOG
+load: control token: 128199 '<|reserved_special_token_191|>' is not marked as EOG
+load: control token: 128198 '<|reserved_special_token_190|>' is not marked as EOG
+load: control token: 128196 '<|reserved_special_token_188|>' is not marked as EOG
+load: control token: 128194 '<|reserved_special_token_186|>' is not marked as EOG
+load: control token: 128193 '<|reserved_special_token_185|>' is not marked as EOG
+load: control token: 128188 '<|reserved_special_token_180|>' is not marked as EOG
+load: control token: 128187 '<|reserved_special_token_179|>' is not marked as EOG
+load: control token: 128185 '<|reserved_special_token_177|>' is not marked as EOG
+load: control token: 128184 '<|reserved_special_token_176|>' is not marked as EOG
+load: control token: 128180 '<|reserved_special_token_172|>' is not marked as EOG
+load: control token: 128179 '<|reserved_special_token_171|>' is not marked as EOG
+load: control token: 128178 '<|reserved_special_token_170|>' is not marked as EOG
+load: control token: 128177 '<|reserved_special_token_169|>' is not marked as EOG
+load: control token: 128176 '<|reserved_special_token_168|>' is not marked as EOG
+load: control token: 128175 '<|reserved_special_token_167|>' is not marked as EOG
+load: control token: 128171 '<|reserved_special_token_163|>' is not marked as EOG
+load: control token: 128170 '<|reserved_special_token_162|>' is not marked as EOG
+load: control token: 128169 '<|reserved_special_token_161|>' is not marked as EOG
+load: control token: 128168 '<|reserved_special_token_160|>' is not marked as EOG
+load: control token: 128165 '<|reserved_special_token_157|>' is not marked as EOG
+load: control token: 128162 '<|reserved_special_token_154|>' is not marked as EOG
+load: control token: 128158 '<|reserved_special_token_150|>' is not marked as EOG
+load: control token: 128156 '<|reserved_special_token_148|>' is not marked as EOG
+load: control token: 128155 '<|reserved_special_token_147|>' is not marked as EOG
+load: control token: 128154 '<|reserved_special_token_146|>' is not marked as EOG
+load: control token: 128151 '<|reserved_special_token_143|>' is not marked as EOG
+load: control token: 128149 '<|reserved_special_token_141|>' is not marked as EOG
+load: control token: 128147 '<|reserved_special_token_139|>' is not marked as EOG
+load: control token: 128146 '<|reserved_special_token_138|>' is not marked as EOG
+load: control token: 128144 '<|reserved_special_token_136|>' is not marked as EOG
+load: control token: 128142 '<|reserved_special_token_134|>' is not marked as EOG
+load: control token: 128141 '<|reserved_special_token_133|>' is not marked as EOG
+load: control token: 128138 '<|reserved_special_token_130|>' is not marked as EOG
+load: control token: 128136 '<|reserved_special_token_128|>' is not marked as EOG
+load: control token: 128135 '<|reserved_special_token_127|>' is not marked as EOG
+load: control token: 128134 '<|reserved_special_token_126|>' is not marked as EOG
+load: control token: 128133 '<|reserved_special_token_125|>' is not marked as EOG
+load: control token: 128131 '<|reserved_special_token_123|>' is not marked as EOG
+load: control token: 128128 '<|reserved_special_token_120|>' is not marked as EOG
+load: control token: 128124 '<|reserved_special_token_116|>' is not marked as EOG
+load: control token: 128123 '<|reserved_special_token_115|>' is not marked as EOG
+load: control token: 128122 '<|reserved_special_token_114|>' is not marked as EOG
+load: control token: 128119 '<|reserved_special_token_111|>' is not marked as EOG
+load: control token: 128115 '<|reserved_special_token_107|>' is not marked as EOG
+load: control token: 128112 '<|reserved_special_token_104|>' is not marked as EOG
+load: control token: 128110 '<|reserved_special_token_102|>' is not marked as EOG
+load: control token: 128109 '<|reserved_special_token_101|>' is not marked as EOG
+load: control token: 128108 '<|reserved_special_token_100|>' is not marked as EOG
+load: control token: 128106 '<|reserved_special_token_98|>' is not marked as EOG
+load: control token: 128103 '<|reserved_special_token_95|>' is not marked as EOG
+load: control token: 128102 '<|reserved_special_token_94|>' is not marked as EOG
+load: control token: 128101 '<|reserved_special_token_93|>' is not marked as EOG
+load: control token: 128097 '<|reserved_special_token_89|>' is not marked as EOG
+load: control token: 128091 '<|reserved_special_token_83|>' is not marked as EOG
+load: control token: 128090 '<|reserved_special_token_82|>' is not marked as EOG
+load: control token: 128089 '<|reserved_special_token_81|>' is not marked as EOG
+load: control token: 128087 '<|reserved_special_token_79|>' is not marked as EOG
+load: control token: 128085 '<|reserved_special_token_77|>' is not marked as EOG
+load: control token: 128081 '<|reserved_special_token_73|>' is not marked as EOG
+load: control token: 128078 '<|reserved_special_token_70|>' is not marked as EOG
+load: control token: 128076 '<|reserved_special_token_68|>' is not marked as EOG
+load: control token: 128075 '<|reserved_special_token_67|>' is not marked as EOG
+load: control token: 128073 '<|reserved_special_token_65|>' is not marked as EOG
+load: control token: 128068 '<|reserved_special_token_60|>' is not marked as EOG
+load: control token: 128067 '<|reserved_special_token_59|>' is not marked as EOG
+load: control token: 128065 '<|reserved_special_token_57|>' is not marked as EOG
+load: control token: 128063 '<|reserved_special_token_55|>' is not marked as EOG
+load: control token: 128062 '<|reserved_special_token_54|>' is not marked as EOG
+load: control token: 128060 '<|reserved_special_token_52|>' is not marked as EOG
+load: control token: 128059 '<|reserved_special_token_51|>' is not marked as EOG
+load: control token: 128057 '<|reserved_special_token_49|>' is not marked as EOG
+load: control token: 128054 '<|reserved_special_token_46|>' is not marked as EOG
+load: control token: 128046 '<|reserved_special_token_38|>' is not marked as EOG
+load: control token: 128045 '<|reserved_special_token_37|>' is not marked as EOG
+load: control token: 128044 '<|reserved_special_token_36|>' is not marked as EOG
+load: control token: 128043 '<|reserved_special_token_35|>' is not marked as EOG
+load: control token: 128038 '<|reserved_special_token_30|>' is not marked as EOG
+load: control token: 128036 '<|reserved_special_token_28|>' is not marked as EOG
+load: control token: 128035 '<|reserved_special_token_27|>' is not marked as EOG
+load: control token: 128032 '<|reserved_special_token_24|>' is not marked as EOG
+load: control token: 128028 '<|reserved_special_token_20|>' is not marked as EOG
+load: control token: 128027 '<|reserved_special_token_19|>' is not marked as EOG
+load: control token: 128024 '<|reserved_special_token_16|>' is not marked as EOG
+load: control token: 128023 '<|reserved_special_token_15|>' is not marked as EOG
+load: control token: 128022 '<|reserved_special_token_14|>' is not marked as EOG
+load: control token: 128021 '<|reserved_special_token_13|>' is not marked as EOG
+load: control token: 128018 '<|reserved_special_token_10|>' is not marked as EOG
+load: control token: 128016 '<|reserved_special_token_8|>' is not marked as EOG
+load: control token: 128015 '<|reserved_special_token_7|>' is not marked as EOG
+load: control token: 128013 '<|reserved_special_token_5|>' is not marked as EOG
+load: control token: 128011 '<|reserved_special_token_3|>' is not marked as EOG
+load: control token: 128005 '<|reserved_special_token_2|>' is not marked as EOG
+load: control token: 128004 '<|pad|>' is not marked as EOG
+load: control token: 128252 '<|reserved_special_token_244|>' is not marked as EOG
+load: control token: 128190 '<|reserved_special_token_182|>' is not marked as EOG
+load: control token: 128183 '<|reserved_special_token_175|>' is not marked as EOG
+load: control token: 128137 '<|reserved_special_token_129|>' is not marked as EOG
+load: control token: 128182 '<|reserved_special_token_174|>' is not marked as EOG
+load: control token: 128040 '<|reserved_special_token_32|>' is not marked as EOG
+load: control token: 128048 '<|reserved_special_token_40|>' is not marked as EOG
+load: control token: 128092 '<|reserved_special_token_84|>' is not marked as EOG
+load: control token: 128215 '<|reserved_special_token_207|>' is not marked as EOG
+load: control token: 128107 '<|reserved_special_token_99|>' is not marked as EOG
+load: control token: 128208 '<|reserved_special_token_200|>' is not marked as EOG
+load: control token: 128145 '<|reserved_special_token_137|>' is not marked as EOG
+load: control token: 128031 '<|reserved_special_token_23|>' is not marked as EOG
+load: control token: 128129 '<|reserved_special_token_121|>' is not marked as EOG
+load: control token: 128201 '<|reserved_special_token_193|>' is not marked as EOG
+load: control token: 128002 '<|mask|>' is not marked as EOG
+load: control token: 128074 '<|reserved_special_token_66|>' is not marked as EOG
+load: control token: 128095 '<|reserved_special_token_87|>' is not marked as EOG
+load: control token: 128186 '<|reserved_special_token_178|>' is not marked as EOG
+load: control token: 128143 '<|reserved_special_token_135|>' is not marked as EOG
+load: control token: 128229 '<|reserved_special_token_221|>' is not marked as EOG
+load: control token: 128007 '<|end_header_id|>' is not marked as EOG
+load: control token: 128055 '<|reserved_special_token_47|>' is not marked as EOG
+load: control token: 128056 '<|reserved_special_token_48|>' is not marked as EOG
+load: control token: 128061 '<|reserved_special_token_53|>' is not marked as EOG
+load: control token: 128153 '<|reserved_special_token_145|>' is not marked as EOG
+load: control token: 128152 '<|reserved_special_token_144|>' is not marked as EOG
+load: control token: 128212 '<|reserved_special_token_204|>' is not marked as EOG
+load: control token: 128172 '<|reserved_special_token_164|>' is not marked as EOG
+load: control token: 128160 '<|reserved_special_token_152|>' is not marked as EOG
+load: control token: 128041 '<|reserved_special_token_33|>' is not marked as EOG
+load: control token: 128181 '<|reserved_special_token_173|>' is not marked as EOG
+load: control token: 128094 '<|reserved_special_token_86|>' is not marked as EOG
+load: control token: 128118 '<|reserved_special_token_110|>' is not marked as EOG
+load: control token: 128236 '<|reserved_special_token_228|>' is not marked as EOG
+load: control token: 128148 '<|reserved_special_token_140|>' is not marked as EOG
+load: control token: 128042 '<|reserved_special_token_34|>' is not marked as EOG
+load: control token: 128139 '<|reserved_special_token_131|>' is not marked as EOG
+load: control token: 128173 '<|reserved_special_token_165|>' is not marked as EOG
+load: control token: 128239 '<|reserved_special_token_231|>' is not marked as EOG
+load: control token: 128157 '<|reserved_special_token_149|>' is not marked as EOG
+load: control token: 128052 '<|reserved_special_token_44|>' is not marked as EOG
+load: control token: 128026 '<|reserved_special_token_18|>' is not marked as EOG
+load: control token: 128019 '<|reserved_special_token_11|>' is not marked as EOG
+load: control token: 128116 '<|reserved_special_token_108|>' is not marked as EOG
+load: control token: 128161 '<|reserved_special_token_153|>' is not marked as EOG
+load: control token: 128226 '<|reserved_special_token_218|>' is not marked as EOG
+load: control token: 128159 '<|reserved_special_token_151|>' is not marked as EOG
+load: control token: 128012 '<|reserved_special_token_4|>' is not marked as EOG
+load: control token: 128088 '<|reserved_special_token_80|>' is not marked as EOG
+load: control token: 128163 '<|reserved_special_token_155|>' is not marked as EOG
+load: control token: 128113 '<|reserved_special_token_105|>' is not marked as EOG
+load: control token: 128250 '<|reserved_special_token_242|>' is not marked as EOG
+load: control token: 128125 '<|reserved_special_token_117|>' is not marked as EOG
+load: control token: 128053 '<|reserved_special_token_45|>' is not marked as EOG
+load: control token: 128224 '<|reserved_special_token_216|>' is not marked as EOG
+load: control token: 128247 '<|reserved_special_token_239|>' is not marked as EOG
+load: control token: 128251 '<|reserved_special_token_243|>' is not marked as EOG
+load: control token: 128216 '<|reserved_special_token_208|>' is not marked as EOG
+load: control token: 128006 '<|start_header_id|>' is not marked as EOG
+load: control token: 128211 '<|reserved_special_token_203|>' is not marked as EOG
+load: control token: 128077 '<|reserved_special_token_69|>' is not marked as EOG
+load: control token: 128237 '<|reserved_special_token_229|>' is not marked as EOG
+load: control token: 128086 '<|reserved_special_token_78|>' is not marked as EOG
+load: control token: 128227 '<|reserved_special_token_219|>' is not marked as EOG
+load: control token: 128058 '<|reserved_special_token_50|>' is not marked as EOG
+load: control token: 128100 '<|reserved_special_token_92|>' is not marked as EOG
+load: control token: 128209 '<|reserved_special_token_201|>' is not marked as EOG
+load: control token: 128084 '<|reserved_special_token_76|>' is not marked as EOG
+load: control token: 128071 '<|reserved_special_token_63|>' is not marked as EOG
+load: control token: 128070 '<|reserved_special_token_62|>' is not marked as EOG
+load: control token: 128049 '<|reserved_special_token_41|>' is not marked as EOG
+load: control token: 128197 '<|reserved_special_token_189|>' is not marked as EOG
+load: control token: 128072 '<|reserved_special_token_64|>' is not marked as EOG
+load: control token: 128000 '<|begin_of_text|>' is not marked as EOG
+load: control token: 128223 '<|reserved_special_token_215|>' is not marked as EOG
+load: control token: 128217 '<|reserved_special_token_209|>' is not marked as EOG
+load: control token: 128111 '<|reserved_special_token_103|>' is not marked as EOG
+load: control token: 128203 '<|reserved_special_token_195|>' is not marked as EOG
+load: control token: 128051 '<|reserved_special_token_43|>' is not marked as EOG
+load: control token: 128030 '<|reserved_special_token_22|>' is not marked as EOG
+load: control token: 128117 '<|reserved_special_token_109|>' is not marked as EOG
+load: control token: 128010 '<|python_tag|>' is not marked as EOG
+load: control token: 128238 '<|reserved_special_token_230|>' is not marked as EOG
+load: control token: 128255 '<|reserved_special_token_247|>' is not marked as EOG
+load: control token: 128202 '<|reserved_special_token_194|>' is not marked as EOG
+load: control token: 128132 '<|reserved_special_token_124|>' is not marked as EOG
+load: control token: 128248 '<|reserved_special_token_240|>' is not marked as EOG
+load: control token: 128167 '<|reserved_special_token_159|>' is not marked as EOG
+load: control token: 128127 '<|reserved_special_token_119|>' is not marked as EOG
+load: control token: 128105 '<|reserved_special_token_97|>' is not marked as EOG
+load: control token: 128039 '<|reserved_special_token_31|>' is not marked as EOG
+load: control token: 128232 '<|reserved_special_token_224|>' is not marked as EOG
+load: control token: 128166 '<|reserved_special_token_158|>' is not marked as EOG
+load: control token: 128130 '<|reserved_special_token_122|>' is not marked as EOG
+load: control token: 128114 '<|reserved_special_token_106|>' is not marked as EOG
+load: control token: 128234 '<|reserved_special_token_226|>' is not marked as EOG
+load: control token: 128191 '<|reserved_special_token_183|>' is not marked as EOG
+load: control token: 128064 '<|reserved_special_token_56|>' is not marked as EOG
+load: control token: 128140 '<|reserved_special_token_132|>' is not marked as EOG
+load: control token: 128096 '<|reserved_special_token_88|>' is not marked as EOG
+load: control token: 128098 '<|reserved_special_token_90|>' is not marked as EOG
+load: control token: 128192 '<|reserved_special_token_184|>' is not marked as EOG
+load: control token: 128093 '<|reserved_special_token_85|>' is not marked as EOG
+load: control token: 128003 '<|parallel_sep|>' is not marked as EOG
+load: control token: 128150 '<|reserved_special_token_142|>' is not marked as EOG
+load: control token: 128222 '<|reserved_special_token_214|>' is not marked as EOG
+load: control token: 128233 '<|reserved_special_token_225|>' is not marked as EOG
+load: control token: 128220 '<|reserved_special_token_212|>' is not marked as EOG
+load: control token: 128034 '<|reserved_special_token_26|>' is not marked as EOG
+load: control token: 128033 '<|reserved_special_token_25|>' is not marked as EOG
+load: control token: 128253 '<|reserved_special_token_245|>' is not marked as EOG
+load: control token: 128195 '<|reserved_special_token_187|>' is not marked as EOG
+load: control token: 128099 '<|reserved_special_token_91|>' is not marked as EOG
+load: control token: 128189 '<|reserved_special_token_181|>' is not marked as EOG
+load: control token: 128210 '<|reserved_special_token_202|>' is not marked as EOG
+load: control token: 128174 '<|reserved_special_token_166|>' is not marked as EOG
+load: control token: 128083 '<|reserved_special_token_75|>' is not marked as EOG
+load: control token: 128080 '<|reserved_special_token_72|>' is not marked as EOG
+load: control token: 128104 '<|reserved_special_token_96|>' is not marked as EOG
+load: control token: 128082 '<|reserved_special_token_74|>' is not marked as EOG
+load: control token: 128219 '<|reserved_special_token_211|>' is not marked as EOG
+load: control token: 128017 '<|reserved_special_token_9|>' is not marked as EOG
+load: control token: 128050 '<|reserved_special_token_42|>' is not marked as EOG
+load: control token: 128205 '<|reserved_special_token_197|>' is not marked as EOG
+load: control token: 128047 '<|reserved_special_token_39|>' is not marked as EOG
+load: control token: 128164 '<|reserved_special_token_156|>' is not marked as EOG
+load: control token: 128020 '<|reserved_special_token_12|>' is not marked as EOG
+load: control token: 128069 '<|reserved_special_token_61|>' is not marked as EOG
+load: control token: 128245 '<|reserved_special_token_237|>' is not marked as EOG
+load: control token: 128121 '<|reserved_special_token_113|>' is not marked as EOG
+load: control token: 128079 '<|reserved_special_token_71|>' is not marked as EOG
+load: control token: 128037 '<|reserved_special_token_29|>' is not marked as EOG
+load: control token: 128244 '<|reserved_special_token_236|>' is not marked as EOG
+load: control token: 128029 '<|reserved_special_token_21|>' is not marked as EOG
+load: control token: 128221 '<|reserved_special_token_213|>' is not marked as EOG
+load: control token: 128066 '<|reserved_special_token_58|>' is not marked as EOG
+load: control token: 128120 '<|reserved_special_token_112|>' is not marked as EOG
+load: control token: 128014 '<|reserved_special_token_6|>' is not marked as EOG
+load: control token: 128025 '<|reserved_special_token_17|>' is not marked as EOG
+load: control token: 128126 '<|reserved_special_token_118|>' is not marked as EOG
+load: printing all EOG tokens:
+load:   - 128001 ('<|end_of_text|>')
+load:   - 128008 ('<|eom_id|>')
+load:   - 128009 ('<|eot_id|>')
+load: special tokens cache size = 256
+load: token to piece cache size = 0.7999 MB
+print_info: arch                  = eurobert
+print_info: vocab_only            = 0
+print_info: no_alloc              = 0
+print_info: n_ctx_train           = 8192
+print_info: n_embd_inp            = 768
+print_info: n_embd                = 768
+print_info: n_embd_out            = 768
+print_info: n_layer               = 12
+print_info: n_layer_all           = 12
+print_info: n_head                = 12
+print_info: n_head_kv             = 12
+print_info: n_rot                 = 64
+print_info: n_swa                 = 0
+print_info: is_swa_any            = 0
+print_info: non_causal_type       = 0
+print_info: n_embd_head_k         = 64
+print_info: n_embd_head_v         = 64
+print_info: n_gqa                 = 1
+print_info: n_embd_k_gqa          = 768
+print_info: n_embd_v_gqa          = 768
+print_info: f_norm_eps            = 0.0e+00
+print_info: f_norm_rms_eps        = 1.0e-05
+print_info: f_clamp_kqv           = 0.0e+00
+print_info: f_max_alibi_bias      = 0.0e+00
+print_info: f_logit_scale         = 0.0e+00
+print_info: f_attn_scale          = 0.0e+00
+print_info: f_attn_value_scale    = 0.0000
+print_info: n_ff                  = 3072
+print_info: n_expert              = 0
+print_info: n_expert_used         = 0
+print_info: n_expert_groups       = 0
+print_info: n_group_used          = 0
+print_info: causal attn           = 0
+print_info: pooling type          = 3
+print_info: rope type             = 2
+print_info: rope scaling          = none
+print_info: freq_base_train       = 1000000.0
+print_info: freq_scale_train      = 1
+print_info: n_ctx_orig_yarn       = 8192
+print_info: rope_yarn_log_mul     = 0.0000
+print_info: rope_finetuned        = unknown
+print_info: model type            = 0.1B
+print_info: model params          = 211.77 M
+print_info: general.name          = Jina Embeddings v5 Text Nano Retrieval
+print_info: vocab type            = BPE
+print_info: n_vocab               = 128256
+print_info: n_merges              = 280147
+print_info: BOS token             = 128000 '<|begin_of_text|>'
+print_info: EOS token             = 128001 '<|end_of_text|>'
+print_info: EOT token             = 128009 '<|eot_id|>'
+print_info: EOM token             = 128008 '<|eom_id|>'
+print_info: PAD token             = 128004 '<|pad|>'
+print_info: MASK token            = 128002 '<|mask|>'
+print_info: LF token              = 198 'Ċ'
+print_info: EOG token             = 128001 '<|end_of_text|>'
+print_info: EOG token             = 128008 '<|eom_id|>'
+print_info: EOG token             = 128009 '<|eot_id|>'
+print_info: max token length      = 256
+load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+load_tensors: layer   0 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   1 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   2 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   3 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   4 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   5 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   6 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   7 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   8 assigned to device ROCm0, is_swa = 0
+load_tensors: layer   9 assigned to device ROCm0, is_swa = 0
+load_tensors: layer  10 assigned to device ROCm0, is_swa = 0
+load_tensors: layer  11 assigned to device ROCm0, is_swa = 0
+load_tensors: layer  12 assigned to device ROCm0, is_swa = 0
+create_tensor: loading tensor token_embd.weight
+create_tensor: loading tensor output_norm.weight
+create_tensor: loading tensor blk.0.attn_norm.weight
+create_tensor: loading tensor blk.0.attn_qkv.weight
+create_tensor: loading tensor blk.0.attn_q.weight
+create_tensor: loading tensor blk.0.attn_k.weight
+create_tensor: loading tensor blk.0.attn_v.weight
+create_tensor: loading tensor blk.0.attn_q.bias
+create_tensor: loading tensor blk.0.attn_k.bias
+create_tensor: loading tensor blk.0.attn_v.bias
+create_tensor: loading tensor blk.0.attn_output.weight
+create_tensor: loading tensor blk.0.ffn_norm.weight
+create_tensor: loading tensor blk.0.ffn_gate.weight
+create_tensor: loading tensor blk.0.ffn_up.weight
+create_tensor: loading tensor blk.0.ffn_down.weight
+create_tensor: loading tensor blk.1.attn_norm.weight
+create_tensor: loading tensor blk.1.attn_qkv.weight
+create_tensor: loading tensor blk.1.attn_q.weight
+create_tensor: loading tensor blk.1.attn_k.weight
+create_tensor: loading tensor blk.1.attn_v.weight
+create_tensor: loading tensor blk.1.attn_q.bias
+create_tensor: loading tensor blk.1.attn_k.bias
+create_tensor: loading tensor blk.1.attn_v.bias
+create_tensor: loading tensor blk.1.attn_output.weight
+create_tensor: loading tensor blk.1.ffn_norm.weight
+create_tensor: loading tensor blk.1.ffn_gate.weight
+create_tensor: loading tensor blk.1.ffn_up.weight
+create_tensor: loading tensor blk.1.ffn_down.weight
+create_tensor: loading tensor blk.2.attn_norm.weight
+create_tensor: loading tensor blk.2.attn_qkv.weight
+create_tensor: loading tensor blk.2.attn_q.weight
+create_tensor: loading tensor blk.2.attn_k.weight
+create_tensor: loading tensor blk.2.attn_v.weight
+create_tensor: loading tensor blk.2.attn_q.bias
+create_tensor: loading tensor blk.2.attn_k.bias
+create_tensor: loading tensor blk.2.attn_v.bias
+create_tensor: loading tensor blk.2.attn_output.weight
+create_tensor: loading tensor blk.2.ffn_norm.weight
+create_tensor: loading tensor blk.2.ffn_gate.weight
+create_tensor: loading tensor blk.2.ffn_up.weight
+create_tensor: loading tensor blk.2.ffn_down.weight
+create_tensor: loading tensor blk.3.attn_norm.weight
+create_tensor: loading tensor blk.3.attn_qkv.weight
+create_tensor: loading tensor blk.3.attn_q.weight
+create_tensor: loading tensor blk.3.attn_k.weight
+create_tensor: loading tensor blk.3.attn_v.weight
+create_tensor: loading tensor blk.3.attn_q.bias
+create_tensor: loading tensor blk.3.attn_k.bias
+create_tensor: loading tensor blk.3.attn_v.bias
+create_tensor: loading tensor blk.3.attn_output.weight
+create_tensor: loading tensor blk.3.ffn_norm.weight
+create_tensor: loading tensor blk.3.ffn_gate.weight
+create_tensor: loading tensor blk.3.ffn_up.weight
+create_tensor: loading tensor blk.3.ffn_down.weight
+create_tensor: loading tensor blk.4.attn_norm.weight
+create_tensor: loading tensor blk.4.attn_qkv.weight
+create_tensor: loading tensor blk.4.attn_q.weight
+create_tensor: loading tensor blk.4.attn_k.weight
+create_tensor: loading tensor blk.4.attn_v.weight
+create_tensor: loading tensor blk.4.attn_q.bias
+create_tensor: loading tensor blk.4.attn_k.bias
+create_tensor: loading tensor blk.4.attn_v.bias
+create_tensor: loading tensor blk.4.attn_output.weight
+create_tensor: loading tensor blk.4.ffn_norm.weight
+create_tensor: loading tensor blk.4.ffn_gate.weight
+create_tensor: loading tensor blk.4.ffn_up.weight
+create_tensor: loading tensor blk.4.ffn_down.weight
+create_tensor: loading tensor blk.5.attn_norm.weight
+create_tensor: loading tensor blk.5.attn_qkv.weight
+create_tensor: loading tensor blk.5.attn_q.weight
+create_tensor: loading tensor blk.5.attn_k.weight
+create_tensor: loading tensor blk.5.attn_v.weight
+create_tensor: loading tensor blk.5.attn_q.bias
+create_tensor: loading tensor blk.5.attn_k.bias
+create_tensor: loading tensor blk.5.attn_v.bias
+create_tensor: loading tensor blk.5.attn_output.weight
+create_tensor: loading tensor blk.5.ffn_norm.weight
+create_tensor: loading tensor blk.5.ffn_gate.weight
+create_tensor: loading tensor blk.5.ffn_up.weight
+create_tensor: loading tensor blk.5.ffn_down.weight
+create_tensor: loading tensor blk.6.attn_norm.weight
+create_tensor: loading tensor blk.6.attn_qkv.weight
+create_tensor: loading tensor blk.6.attn_q.weight
+create_tensor: loading tensor blk.6.attn_k.weight
+create_tensor: loading tensor blk.6.attn_v.weight
+create_tensor: loading tensor blk.6.attn_q.bias
+create_tensor: loading tensor blk.6.attn_k.bias
+create_tensor: loading tensor blk.6.attn_v.bias
+create_tensor: loading tensor blk.6.attn_output.weight
+create_tensor: loading tensor blk.6.ffn_norm.weight
+create_tensor: loading tensor blk.6.ffn_gate.weight
+create_tensor: loading tensor blk.6.ffn_up.weight
+create_tensor: loading tensor blk.6.ffn_down.weight
+create_tensor: loading tensor blk.7.attn_norm.weight
+create_tensor: loading tensor blk.7.attn_qkv.weight
+create_tensor: loading tensor blk.7.attn_q.weight
+create_tensor: loading tensor blk.7.attn_k.weight
+create_tensor: loading tensor blk.7.attn_v.weight
+create_tensor: loading tensor blk.7.attn_q.bias
+create_tensor: loading tensor blk.7.attn_k.bias
+create_tensor: loading tensor blk.7.attn_v.bias
+create_tensor: loading tensor blk.7.attn_output.weight
+create_tensor: loading tensor blk.7.ffn_norm.weight
+create_tensor: loading tensor blk.7.ffn_gate.weight
+create_tensor: loading tensor blk.7.ffn_up.weight
+create_tensor: loading tensor blk.7.ffn_down.weight
+create_tensor: loading tensor blk.8.attn_norm.weight
+create_tensor: loading tensor blk.8.attn_qkv.weight
+create_tensor: loading tensor blk.8.attn_q.weight
+create_tensor: loading tensor blk.8.attn_k.weight
+create_tensor: loading tensor blk.8.attn_v.weight
+create_tensor: loading tensor blk.8.attn_q.bias
+create_tensor: loading tensor blk.8.attn_k.bias
+create_tensor: loading tensor blk.8.attn_v.bias
+create_tensor: loading tensor blk.8.attn_output.weight
+create_tensor: loading tensor blk.8.ffn_norm.weight
+create_tensor: loading tensor blk.8.ffn_gate.weight
+create_tensor: loading tensor blk.8.ffn_up.weight
+create_tensor: loading tensor blk.8.ffn_down.weight
+create_tensor: loading tensor blk.9.attn_norm.weight
+create_tensor: loading tensor blk.9.attn_qkv.weight
+create_tensor: loading tensor blk.9.attn_q.weight
+create_tensor: loading tensor blk.9.attn_k.weight
+create_tensor: loading tensor blk.9.attn_v.weight
+create_tensor: loading tensor blk.9.attn_q.bias
+create_tensor: loading tensor blk.9.attn_k.bias
+create_tensor: loading tensor blk.9.attn_v.bias
+create_tensor: loading tensor blk.9.attn_output.weight
+create_tensor: loading tensor blk.9.ffn_norm.weight
+create_tensor: loading tensor blk.9.ffn_gate.weight
+create_tensor: loading tensor blk.9.ffn_up.weight
+create_tensor: loading tensor blk.9.ffn_down.weight
+create_tensor: loading tensor blk.10.attn_norm.weight
+create_tensor: loading tensor blk.10.attn_qkv.weight
+create_tensor: loading tensor blk.10.attn_q.weight
+create_tensor: loading tensor blk.10.attn_k.weight
+create_tensor: loading tensor blk.10.attn_v.weight
+create_tensor: loading tensor blk.10.attn_q.bias
+create_tensor: loading tensor blk.10.attn_k.bias
+create_tensor: loading tensor blk.10.attn_v.bias
+create_tensor: loading tensor blk.10.attn_output.weight
+create_tensor: loading tensor blk.10.ffn_norm.weight
+create_tensor: loading tensor blk.10.ffn_gate.weight
+create_tensor: loading tensor blk.10.ffn_up.weight
+create_tensor: loading tensor blk.10.ffn_down.weight
+create_tensor: loading tensor blk.11.attn_norm.weight
+create_tensor: loading tensor blk.11.attn_qkv.weight
+create_tensor: loading tensor blk.11.attn_q.weight
+create_tensor: loading tensor blk.11.attn_k.weight
+create_tensor: loading tensor blk.11.attn_v.weight
+create_tensor: loading tensor blk.11.attn_q.bias
+create_tensor: loading tensor blk.11.attn_k.bias
+create_tensor: loading tensor blk.11.attn_v.bias
+create_tensor: loading tensor blk.11.attn_output.weight
+create_tensor: loading tensor blk.11.ffn_norm.weight
+create_tensor: loading tensor blk.11.ffn_gate.weight
+create_tensor: loading tensor blk.11.ffn_up.weight
+create_tensor: loading tensor blk.11.ffn_down.weight
+create_tensor: loading tensor blk.0.attn_q.scale
+create_tensor: loading tensor blk.0.attn_k.scale
+create_tensor: loading tensor blk.0.attn_v.scale
+create_tensor: loading tensor blk.0.attn_output.scale
+create_tensor: loading tensor blk.0.ffn_gate.scale
+create_tensor: loading tensor blk.0.ffn_down.scale
+create_tensor: loading tensor blk.0.ffn_up.scale
+create_tensor: loading tensor blk.0.attn_q.input_scale
+create_tensor: loading tensor blk.0.attn_k.input_scale
+create_tensor: loading tensor blk.0.attn_v.input_scale
+create_tensor: loading tensor blk.0.attn_output.input_scale
+create_tensor: loading tensor blk.0.ffn_gate.input_scale
+create_tensor: loading tensor blk.0.ffn_down.input_scale
+create_tensor: loading tensor blk.0.ffn_up.input_scale
+create_tensor: loading tensor blk.1.attn_q.scale
+create_tensor: loading tensor blk.1.attn_k.scale
+create_tensor: loading tensor blk.1.attn_v.scale
+create_tensor: loading tensor blk.1.attn_output.scale
+create_tensor: loading tensor blk.1.ffn_gate.scale
+create_tensor: loading tensor blk.1.ffn_down.scale
+create_tensor: loading tensor blk.1.ffn_up.scale
+create_tensor: loading tensor blk.1.attn_q.input_scale
+create_tensor: loading tensor blk.1.attn_k.input_scale
+create_tensor: loading tensor blk.1.attn_v.input_scale
+create_tensor: loading tensor blk.1.attn_output.input_scale
+create_tensor: loading tensor blk.1.ffn_gate.input_scale
+create_tensor: loading tensor blk.1.ffn_down.input_scale
+create_tensor: loading tensor blk.1.ffn_up.input_scale
+create_tensor: loading tensor blk.2.attn_q.scale
+create_tensor: loading tensor blk.2.attn_k.scale
+create_tensor: loading tensor blk.2.attn_v.scale
+create_tensor: loading tensor blk.2.attn_output.scale
+create_tensor: loading tensor blk.2.ffn_gate.scale
+create_tensor: loading tensor blk.2.ffn_down.scale
+create_tensor: loading tensor blk.2.ffn_up.scale
+create_tensor: loading tensor blk.2.attn_q.input_scale
+create_tensor: loading tensor blk.2.attn_k.input_scale
+create_tensor: loading tensor blk.2.attn_v.input_scale
+create_tensor: loading tensor blk.2.attn_output.input_scale
+create_tensor: loading tensor blk.2.ffn_gate.input_scale
+create_tensor: loading tensor blk.2.ffn_down.input_scale
+create_tensor: loading tensor blk.2.ffn_up.input_scale
+create_tensor: loading tensor blk.3.attn_q.scale
+create_tensor: loading tensor blk.3.attn_k.scale
+create_tensor: loading tensor blk.3.attn_v.scale
+create_tensor: loading tensor blk.3.attn_output.scale
+create_tensor: loading tensor blk.3.ffn_gate.scale
+create_tensor: loading tensor blk.3.ffn_down.scale
+create_tensor: loading tensor blk.3.ffn_up.scale
+create_tensor: loading tensor blk.3.attn_q.input_scale
+create_tensor: loading tensor blk.3.attn_k.input_scale
+create_tensor: loading tensor blk.3.attn_v.input_scale
+create_tensor: loading tensor blk.3.attn_output.input_scale
+create_tensor: loading tensor blk.3.ffn_gate.input_scale
+create_tensor: loading tensor blk.3.ffn_down.input_scale
+create_tensor: loading tensor blk.3.ffn_up.input_scale
+create_tensor: loading tensor blk.4.attn_q.scale
+create_tensor: loading tensor blk.4.attn_k.scale
+create_tensor: loading tensor blk.4.attn_v.scale
+create_tensor: loading tensor blk.4.attn_output.scale
+create_tensor: loading tensor blk.4.ffn_gate.scale
+create_tensor: loading tensor blk.4.ffn_down.scale
+create_tensor: loading tensor blk.4.ffn_up.scale
+create_tensor: loading tensor blk.4.attn_q.input_scale
+create_tensor: loading tensor blk.4.attn_k.input_scale
+create_tensor: loading tensor blk.4.attn_v.input_scale
+create_tensor: loading tensor blk.4.attn_output.input_scale
+create_tensor: loading tensor blk.4.ffn_gate.input_scale
+create_tensor: loading tensor blk.4.ffn_down.input_scale
+create_tensor: loading tensor blk.4.ffn_up.input_scale
+create_tensor: loading tensor blk.5.attn_q.scale
+create_tensor: loading tensor blk.5.attn_k.scale
+create_tensor: loading tensor blk.5.attn_v.scale
+create_tensor: loading tensor blk.5.attn_output.scale
+create_tensor: loading tensor blk.5.ffn_gate.scale
+create_tensor: loading tensor blk.5.ffn_down.scale
+create_tensor: loading tensor blk.5.ffn_up.scale
+create_tensor: loading tensor blk.5.attn_q.input_scale
+create_tensor: loading tensor blk.5.attn_k.input_scale
+create_tensor: loading tensor blk.5.attn_v.input_scale
+create_tensor: loading tensor blk.5.attn_output.input_scale
+create_tensor: loading tensor blk.5.ffn_gate.input_scale
+create_tensor: loading tensor blk.5.ffn_down.input_scale
+create_tensor: loading tensor blk.5.ffn_up.input_scale
+create_tensor: loading tensor blk.6.attn_q.scale
+create_tensor: loading tensor blk.6.attn_k.scale
+create_tensor: loading tensor blk.6.attn_v.scale
+create_tensor: loading tensor blk.6.attn_output.scale
+create_tensor: loading tensor blk.6.ffn_gate.scale
+create_tensor: loading tensor blk.6.ffn_down.scale
+create_tensor: loading tensor blk.6.ffn_up.scale
+create_tensor: loading tensor blk.6.attn_q.input_scale
+create_tensor: loading tensor blk.6.attn_k.input_scale
+create_tensor: loading tensor blk.6.attn_v.input_scale
+create_tensor: loading tensor blk.6.attn_output.input_scale
+create_tensor: loading tensor blk.6.ffn_gate.input_scale
+create_tensor: loading tensor blk.6.ffn_down.input_scale
+create_tensor: loading tensor blk.6.ffn_up.input_scale
+create_tensor: loading tensor blk.7.attn_q.scale
+create_tensor: loading tensor blk.7.attn_k.scale
+create_tensor: loading tensor blk.7.attn_v.scale
+create_tensor: loading tensor blk.7.attn_output.scale
+create_tensor: loading tensor blk.7.ffn_gate.scale
+create_tensor: loading tensor blk.7.ffn_down.scale
+create_tensor: loading tensor blk.7.ffn_up.scale
+create_tensor: loading tensor blk.7.attn_q.input_scale
+create_tensor: loading tensor blk.7.attn_k.input_scale
+create_tensor: loading tensor blk.7.attn_v.input_scale
+create_tensor: loading tensor blk.7.attn_output.input_scale
+create_tensor: loading tensor blk.7.ffn_gate.input_scale
+create_tensor: loading tensor blk.7.ffn_down.input_scale
+create_tensor: loading tensor blk.7.ffn_up.input_scale
+create_tensor: loading tensor blk.8.attn_q.scale
+create_tensor: loading tensor blk.8.attn_k.scale
+create_tensor: loading tensor blk.8.attn_v.scale
+create_tensor: loading tensor blk.8.attn_output.scale
+create_tensor: loading tensor blk.8.ffn_gate.scale
+create_tensor: loading tensor blk.8.ffn_down.scale
+create_tensor: loading tensor blk.8.ffn_up.scale
+create_tensor: loading tensor blk.8.attn_q.input_scale
+create_tensor: loading tensor blk.8.attn_k.input_scale
+create_tensor: loading tensor blk.8.attn_v.input_scale
+create_tensor: loading tensor blk.8.attn_output.input_scale
+create_tensor: loading tensor blk.8.ffn_gate.input_scale
+create_tensor: loading tensor blk.8.ffn_down.input_scale
+create_tensor: loading tensor blk.8.ffn_up.input_scale
+create_tensor: loading tensor blk.9.attn_q.scale
+create_tensor: loading tensor blk.9.attn_k.scale
+create_tensor: loading tensor blk.9.attn_v.scale
+create_tensor: loading tensor blk.9.attn_output.scale
+create_tensor: loading tensor blk.9.ffn_gate.scale
+create_tensor: loading tensor blk.9.ffn_down.scale
+create_tensor: loading tensor blk.9.ffn_up.scale
+create_tensor: loading tensor blk.9.attn_q.input_scale
+create_tensor: loading tensor blk.9.attn_k.input_scale
+create_tensor: loading tensor blk.9.attn_v.input_scale
+create_tensor: loading tensor blk.9.attn_output.input_scale
+create_tensor: loading tensor blk.9.ffn_gate.input_scale
+create_tensor: loading tensor blk.9.ffn_down.input_scale
+create_tensor: loading tensor blk.9.ffn_up.input_scale
+create_tensor: loading tensor blk.10.attn_q.scale
+create_tensor: loading tensor blk.10.attn_k.scale
+create_tensor: loading tensor blk.10.attn_v.scale
+create_tensor: loading tensor blk.10.attn_output.scale
+create_tensor: loading tensor blk.10.ffn_gate.scale
+create_tensor: loading tensor blk.10.ffn_down.scale
+create_tensor: loading tensor blk.10.ffn_up.scale
+create_tensor: loading tensor blk.10.attn_q.input_scale
+create_tensor: loading tensor blk.10.attn_k.input_scale
+create_tensor: loading tensor blk.10.attn_v.input_scale
+create_tensor: loading tensor blk.10.attn_output.input_scale
+create_tensor: loading tensor blk.10.ffn_gate.input_scale
+create_tensor: loading tensor blk.10.ffn_down.input_scale
+create_tensor: loading tensor blk.10.ffn_up.input_scale
+create_tensor: loading tensor blk.11.attn_q.scale
+create_tensor: loading tensor blk.11.attn_k.scale
+create_tensor: loading tensor blk.11.attn_v.scale
+create_tensor: loading tensor blk.11.attn_output.scale
+create_tensor: loading tensor blk.11.ffn_gate.scale
+create_tensor: loading tensor blk.11.ffn_down.scale
+create_tensor: loading tensor blk.11.ffn_up.scale
+create_tensor: loading tensor blk.11.attn_q.input_scale
+create_tensor: loading tensor blk.11.attn_k.input_scale
+create_tensor: loading tensor blk.11.attn_v.input_scale
+create_tensor: loading tensor blk.11.attn_output.input_scale
+create_tensor: loading tensor blk.11.ffn_gate.input_scale
+create_tensor: loading tensor blk.11.ffn_down.input_scale
+create_tensor: loading tensor blk.11.ffn_up.input_scale
+done_getting_tensors: tensor 'token_embd.weight' (f16) (and 0 others) cannot be used with preferred buffer type ROCm_Host, using CPU instead
+==34100== Warning: set address range perms: large range [0x15c6e5000, 0x17624f000) (defined)
+load_tensors: offloading output layer to GPU
+load_tensors: offloading 11 repeating layers to GPU
+load_tensors: offloaded 13/13 layers to GPU
+load_tensors:   CPU_Mapped model buffer size =   187.88 MiB
+load_tensors:        ROCm0 model buffer size =   216.07 MiB
+..................................................
+llama_context: constructing llama_context
+llama_context: n_seq_max             = 256
+llama_context: n_ctx                 = 65536
+llama_context: n_ctx_seq             = 256
+llama_context: n_batch               = 512
+llama_context: n_ubatch              = 512
+llama_context: causal_attn           = 0
+llama_context: flash_attn            = auto
+llama_context: kv_unified            = false
+llama_context: freq_base             = 1000000.0
+llama_context: freq_scale            = 1
+llama_context: n_rs_seq              = 0
+llama_context: n_outputs_max         = 512
+llama_context: n_outputs_max_per_seq = 1
+llama_context: n_ctx_seq (256) < n_ctx_train (8192) -- the full capacity of the model will not be utilized
+set_abort_callback: call
+llama_context:  ROCm_Host  output buffer size =   126.00 MiB
+llama_context: enumerating backends
+llama_context: backend_ptrs.size() = 2
+sched_reserve: reserving ...
+sched_reserve: max_nodes = 1024
+sched_reserve: worst-case: n_tokens = 512, n_seqs = 256, n_outputs = 256
+graph_reserve: reserving a graph for ubatch with n_tokens =  256, n_seqs = 256, n_outputs =  256
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   256,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   256,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+resolve_fused_ops: Flash Attention enabled
+resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+graph_reserve: reserving a graph for ubatch with n_tokens =  256, n_seqs = 256, n_outputs =  256
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   256,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   256,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+graph_reserve: reserving a graph for ubatch with n_tokens =  256, n_seqs = 256, n_outputs =  256
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   256,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   256,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+graph_reserve: reserving a graph for ubatch with n_tokens =  256, n_seqs = 256, n_outputs =  256
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   256,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   256,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+resolve_fused_ops: fused DeepSeek V4 HC post enabled
+graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs = 256, n_outputs =  512
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   512,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   512,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   512,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+graph_reserve: reserving a graph for ubatch with n_tokens =  256, n_seqs = 256, n_outputs =  256
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   256,   256,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   256,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   256,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   256,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   256,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+graph_reserve: reserving a graph for ubatch with n_tokens =  512, n_seqs = 256, n_outputs =  512
+llama_graph_n_input_tensors: input tensor '                             cls' [i32, ne = {   256,     1,     1,     1 }] is used by node 'result_embd_pooled' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_320' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_321' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_20' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_47' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_74' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_101' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_128' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_155' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_182' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_209' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_236' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_263' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_290' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                    self_kq_mask' [f16, ne = {   512,   512,     1,     1 }] is used by node 'node_317' (FLASH_ATTN_EXT)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-2' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-3' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-4' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-5' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-6' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-7' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-8' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-9' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-10' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Qcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {   512,     1,     1,     1 }] is used by node 'Kcur-11' (ROPE)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {   512,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {   768,   512,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {   512,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {   512,     1,     1,     1 }] is used by node 'inp_embd' (GET_ROWS)
+sched_reserve:      ROCm0 compute buffer size =    24.51 MiB
+sched_reserve:  ROCm_Host compute buffer size =     6.51 MiB
+sched_reserve: graph: nodes = 333, splits = 2, input objects = 5, input tensors = 8
+sched_reserve: reserve took 356.67 ms, sched copies = 1
+==34100== Invalid read of size 8
+==34100==    at 0x10A201: tokenize (llama_embedder.c:191)
+==34100==    by 0x10AD11: get_embeddings (llama_embedder.c:344)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  Address 0x53a68018 is 0 bytes after a block of size 24 alloc'd
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x109788: test_embedding_counts (llama_embedder.c:45)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== Use of uninitialised value of size 8
+==34100==    at 0x4A5C4B7: llama_batch_compat::init(llama_batch_ext&, llama_batch const&, unsigned long) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BD5F: llama_context::decode(llama_batch const&) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BDAE: llama_decode (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B345: get_embeddings (llama_embedder.c:458)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  Uninitialised value was created by a heap allocation
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4A54E1B: llama_batch_init (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B087: get_embeddings (llama_embedder.c:395)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== Use of uninitialised value of size 8
+==34100==    at 0x4A5C56B: llama_batch_compat::init(llama_batch_ext&, llama_batch const&, unsigned long) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BD5F: llama_context::decode(llama_batch const&) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BDAE: llama_decode (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B345: get_embeddings (llama_embedder.c:458)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  Uninitialised value was created by a heap allocation
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4A54E1B: llama_batch_init (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B087: get_embeddings (llama_embedder.c:395)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== Use of uninitialised value of size 8
+==34100==    at 0x4A5C5FC: llama_batch_compat::init(llama_batch_ext&, llama_batch const&, unsigned long) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BD5F: llama_context::decode(llama_batch const&) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BDAE: llama_decode (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B345: get_embeddings (llama_embedder.c:458)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  Uninitialised value was created by a heap allocation
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4A54E1B: llama_batch_init (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B087: get_embeddings (llama_embedder.c:395)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== Invalid read of size 4
+==34100==    at 0x4A5C5FC: llama_batch_compat::init(llama_batch_ext&, llama_batch const&, unsigned long) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BD5F: llama_context::decode(llama_batch const&) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BDAE: llama_decode (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B345: get_embeddings (llama_embedder.c:458)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  Address 0x1e5265fa8 is not stack'd, malloc'd or (recently) free'd
+==34100== 
+==34100== 
+==34100== Process terminating with default action of signal 11 (SIGSEGV)
+==34100==  Access not within mapped region at address 0x1E5265FA8
+==34100==    at 0x4A5C5FC: llama_batch_compat::init(llama_batch_ext&, llama_batch const&, unsigned long) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BD5F: llama_context::decode(llama_batch const&) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x4A7BDAE: llama_decode (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B345: get_embeddings (llama_embedder.c:458)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100==  If you believe this happened as a result of a stack
+==34100==  overflow in your program's main thread (unlikely but
+==34100==  possible), you can try to increase the size of the
+==34100==  main thread stack using the --main-stacksize= flag.
+==34100==  The main thread stack size used in this run was 8388608.
+==34100== 
+==34100== HEAP SUMMARY:
+==34100==     in use at exit: 89,995,745 bytes in 579,257 blocks
+==34100==   total heap usage: 963,924 allocs, 384,667 frees, 173,140,969 bytes allocated
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 7 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6E72C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6F242: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7CE4E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5B92B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8B665: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC755A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 8 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CE2314: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CE2689: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F30B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 9 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6E72C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D771CA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D69294: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F155: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F22E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F39D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9ADBD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8ACF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBE87F: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC757E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 10 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C71C64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C730CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7B83C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 11 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C27E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C881CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98F2B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD491554: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49FA5F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49882D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48138C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 12 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A08D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 13 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7714E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 14 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7714E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77D45: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 15 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6E72C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77BC1: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A324: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 16 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6E57E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C237: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C76B7C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83DE9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A324: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 17 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83EB3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 18 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8515A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8564B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CEEBB7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CF402E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 19 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8518E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8564B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CEEBB7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CF402E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 20 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C64130: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72610: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72A65: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 21 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6AD40: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C724B5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C727EB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 4 bytes in 1 blocks are possibly lost in loss record 22 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7714E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6AEBF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C724B5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C727EB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C77051: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 95 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC28AF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC2B60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC2C89: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 96 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86CEC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5D4CF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CC86: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98E69: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 97 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A08D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 98 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7714E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 99 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7714E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77D45: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 100 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83EB3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 101 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C27E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C881CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98F2B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD491554: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A3689: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B095C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 8 bytes in 2 blocks are possibly lost in loss record 102 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C27E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C881CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98F2B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD491554: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A3689: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0BBD: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 12 bytes in 3 blocks are possibly lost in loss record 103 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C27E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C881CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98F2B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD491554: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49FC22: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49882D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48138C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 12 bytes in 3 blocks are possibly lost in loss record 104 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8074D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83921: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 12 bytes in 3 blocks are possibly lost in loss record 105 of 97,555
+==34100==    at 0x484DB80: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6C2E7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D716DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D747FF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D74F54: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CB83: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C71C64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C64268: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72610: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 72 bytes in 1 blocks are definitely lost in loss record 71,529 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8ACF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBE87F: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC757E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48804D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD0A49C5: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x4D8CFB2: __pthread_once_slow (pthread_once.c:116)
+==34100== 
+==34100== 72 bytes in 1 blocks are definitely lost in loss record 71,530 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8ACF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBE87F: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC75F4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48804D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD0A49C5: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x4D8CFB2: __pthread_once_slow (pthread_once.c:116)
+==34100== 
+==34100== 72 bytes in 1 blocks are definitely lost in loss record 71,531 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C83BF5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A324: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B093F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 72 bytes in 1 blocks are definitely lost in loss record 71,532 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C83BF5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B093F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378495: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378544: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 72 bytes in 1 blocks are definitely lost in loss record 71,533 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C83BF5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD497701: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B093F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD385AA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B66AF: ggml_backend_cuda_synchronize(ggml_backend*) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100== 
+==34100== 120 (72 direct, 48 indirect) bytes in 1 blocks are definitely lost in loss record 88,079 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD49639C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4996EE: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48804D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD0A49C5: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x4D8CFB2: __pthread_once_slow (pthread_once.c:116)
+==34100==    by 0xD0BFC91: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B0B52: ggml_cuda_init() (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x94B2634: ggml_backend_cuda_reg (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x4F02310: get_reg() (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml.so.0.26.0)
+==34100== 
+==34100== 120 (72 direct, 48 indirect) bytes in 1 blocks are definitely lost in loss record 88,080 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C64082: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72610: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72A65: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6FF79: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C85055: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CEB8D1: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CECA4A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C942BA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A18D2: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD44ED34: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 224 bytes in 4 blocks are definitely lost in loss record 96,661 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A36DF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0BBD: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378495: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378544: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD25078D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD262CF8: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 224 bytes in 4 blocks are definitely lost in loss record 96,662 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A36DF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0BBD: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD385AA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B66AF: ggml_backend_cuda_synchronize(ggml_backend*) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x4F4838D: ggml_backend_sched_synchronize (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100==    by 0x4F4B8E7: ggml_backend_sched_reserve (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,676 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6F2DB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7CE4E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5B92B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8B665: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC755A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,677 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CE2314: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CE2689: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,678 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7710C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D69294: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F155: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F22E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9F39D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C9ADBD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8ACF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,679 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C71C64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C730CB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7B83C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,680 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98E69: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4914C4: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49FA5F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49882D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,681 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A08D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,682 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7710C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,683 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6CD1A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D771FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77D45: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,684 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6D70A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77B99: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,685 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6E508: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5C237: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C76B7C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83DE9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C723FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A324: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,686 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83EB3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72340: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,687 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6CD1A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73983: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8515A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8564B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CEEBB7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,688 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8518E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8564B: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CEEBB7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CF402E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,689 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C64130: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72610: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72A65: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,690 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6AD40: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C724B5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C727EB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 240 bytes in 1 blocks are possibly lost in loss record 96,691 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7710C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6AEBF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C724B5: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C727EB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 464 bytes in 1 blocks are possibly lost in loss record 96,963 of 97,555
+==34100==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x40145AB: calloc (rtld-malloc.h:44)
+==34100==    by 0x40145AB: allocate_dtv (dl-tls.c:370)
+==34100==    by 0x40145AB: _dl_allocate_tls (dl-tls.c:629)
+==34100==    by 0x4D886F6: allocate_stack (allocatestack.c:429)
+==34100==    by 0x4D886F6: pthread_create@@GLIBC_2.34 (pthread_create.c:655)
+==34100==    by 0x42D228FB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D20EA8: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8B19: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBE92C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC757E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 464 bytes in 1 blocks are possibly lost in loss record 96,964 of 97,555
+==34100==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x40145AB: calloc (rtld-malloc.h:44)
+==34100==    by 0x40145AB: allocate_dtv (dl-tls.c:370)
+==34100==    by 0x40145AB: _dl_allocate_tls (dl-tls.c:629)
+==34100==    by 0x4D886F6: allocate_stack (allocatestack.c:429)
+==34100==    by 0x4D886F6: pthread_create@@GLIBC_2.34 (pthread_create.c:655)
+==34100==    by 0x42D228FB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D20EA8: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CB8B19: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBE92C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC75F4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 464 bytes in 1 blocks are possibly lost in loss record 96,965 of 97,555
+==34100==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x40145AB: calloc (rtld-malloc.h:44)
+==34100==    by 0x40145AB: allocate_dtv (dl-tls.c:370)
+==34100==    by 0x40145AB: _dl_allocate_tls (dl-tls.c:629)
+==34100==    by 0x4D886F6: allocate_stack (allocatestack.c:429)
+==34100==    by 0x4D886F6: pthread_create@@GLIBC_2.34 (pthread_create.c:655)
+==34100==    by 0x42D228FB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D20EA8: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CE305F: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC76C4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC78F3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8EF4D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4993EC: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4480C1: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD48804D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,970 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC28AF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CC2B60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,971 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6CD1A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73983: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86CEC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5D4CF: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CC86: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,972 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB6E9: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A08D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,973 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DB64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D7710C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77559: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,974 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6AA60: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6CD1A: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D771FC: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D77D45: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D784BD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5BAAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83D59: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,975 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83EB3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C90892: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,976 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98E69: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4914C4: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A3689: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B095C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 480 bytes in 2 blocks are possibly lost in loss record 96,977 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98E69: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4914C4: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A3689: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0BBD: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 512 bytes in 1 blocks are definitely lost in loss record 97,086 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4A54E37: llama_batch_init (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B087: get_embeddings (llama_embedder.c:395)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== 600 (360 direct, 240 indirect) bytes in 5 blocks are definitely lost in loss record 97,101 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A31FE: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A7CCB: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0B0B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378495: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378544: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD25078D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 600 (360 direct, 240 indirect) bytes in 5 blocks are definitely lost in loss record 97,102 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ADAB: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A31FE: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A7CCB: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0B0B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD385AA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B66AF: ggml_backend_cuda_synchronize(ggml_backend*) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x4F4838D: ggml_backend_sched_synchronize (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100== 
+==34100== 720 bytes in 3 blocks are possibly lost in loss record 97,116 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C98E69: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4914C4: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49FC22: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD49882D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 720 bytes in 3 blocks are possibly lost in loss record 97,117 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C8074D: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C83921: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C7A0E4: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 720 bytes in 3 blocks are possibly lost in loss record 97,118 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42D6A557: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6A7CD: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D6DABA: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42D73A16: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C5CAF7: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C86901: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42CBB55E: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C6EA6C: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C71C64: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C64268: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0x42C72610: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100== 
+==34100== 896 bytes in 16 blocks are definitely lost in loss record 97,140 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A36DF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B095C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378495: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378544: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD25078D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD262CF8: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 896 bytes in 16 blocks are definitely lost in loss record 97,141 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A36DF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B095C: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD385AA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B66AF: ggml_backend_cuda_synchronize(ggml_backend*) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x4F4838D: ggml_backend_sched_synchronize (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100==    by 0x4F4B8E7: ggml_backend_sched_reserve (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100== 
+==34100== 928 bytes in 2 blocks are possibly lost in loss record 97,142 of 97,555
+==34100==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x40145AB: calloc (rtld-malloc.h:44)
+==34100==    by 0x40145AB: allocate_dtv (dl-tls.c:370)
+==34100==    by 0x40145AB: _dl_allocate_tls (dl-tls.c:629)
+==34100==    by 0x4D886F6: allocate_stack (allocatestack.c:429)
+==34100==    by 0x4D886F6: pthread_create@@GLIBC_2.34 (pthread_create.c:655)
+==34100==    by 0x10A145: tokenize (llama_embedder.c:175)
+==34100==    by 0x10AD11: get_embeddings (llama_embedder.c:344)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== 2,048 bytes in 1 blocks are definitely lost in loss record 97,385 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4A54DD1: llama_batch_init (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libllama.so.0.6.0)
+==34100==    by 0x10B087: get_embeddings (llama_embedder.c:395)
+==34100==    by 0x109936: get_embeddings (embedder_wrapper_functions.c:10)
+==34100==    by 0x109828: test_embedding_counts (llama_embedder.c:52)
+==34100==    by 0x1098D7: main (llama_embedder.c:69)
+==34100== 
+==34100== 3,584 bytes in 64 blocks are definitely lost in loss record 97,441 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A31BF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A7BA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0B0B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378495: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD378544: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD25078D: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100== 
+==34100== 3,584 bytes in 64 blocks are definitely lost in loss record 97,442 of 97,555
+==34100==    at 0x4846FA3: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x42C9ABE3: ??? (in /opt/rocm-7.2.4/lib/libhsa-runtime64.so.1.18.70204)
+==34100==    by 0xD4A31BF: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4A7BA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD4B0B0B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD492F02: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD47853F: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD37810B: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD3783A9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0xD385AA9: ??? (in /opt/rocm-7.2.4/lib/libamdhip64.so.7.2.70204)
+==34100==    by 0x94B66AF: ggml_backend_cuda_synchronize(ggml_backend*) (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-hip.so.0.26.0)
+==34100==    by 0x4F4838D: ggml_backend_sched_synchronize (in /home/krzysztof/Projects/smallrag/installations/llama.cpp/lib/libggml-base.so.0.26.0)
+==34100== 
+==34100== 4,608 bytes in 2 blocks are possibly lost in loss record 97,472 of 97,555
+==34100==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==34100==    by 0x4004EDC: malloc (rtld-malloc.h:56)
+==34100==    by 0x4004EDC: _dlfo_mappings_segment_allocate (dl-find_object.c:217)
+==34100==    by 0x4004EDC: _dl_find_object_update_1 (dl-find_object.c:671)
+==34100==    by 0x4004EDC: _dl_find_object_update (dl-find_object.c:805)
+==34100==    by 0x400DC37: dl_open_worker_begin (dl-open.c:756)
+==34100==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==34100==    by 0x400CD1F: dl_open_worker (dl-open.c:803)
+==34100==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==34100==    by 0x400D163: _dl_open (dl-open.c:905)
+==34100==    by 0x4D83283: dlopen_doit (dlopen.c:56)
+==34100==    by 0x400151B: _dl_catch_exception (dl-catch.c:237)
+==34100==    by 0x4001668: _dl_catch_error (dl-catch.c:256)
+==34100==    by 0x4D82D62: _dlerror_run (dlerror.c:138)
+==34100==    by 0x4D8333E: dlopen_implementation (dlopen.c:71)
+==34100==    by 0x4D8333E: dlopen@@GLIBC_2.34 (dlopen.c:81)
+==34100== 
+==34100== LEAK SUMMARY:
+==34100==    definitely lost: 13,192 bytes in 187 blocks
+==34100==    indirectly lost: 576 bytes in 12 blocks
+==34100==      possibly lost: 16,932 bytes in 89 blocks
+==34100==    still reachable: 89,965,045 bytes in 578,969 blocks
+==34100==                       of which reachable via heuristic:
+==34100==                         multipleinheritance: 112 bytes in 1 blocks
+==34100==         suppressed: 0 bytes in 0 blocks
+==34100== Reachable blocks (those to which a pointer was found) are not shown.
+==34100== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==34100== 
+==34100== For lists of detected and suppressed errors, rerun with: -s
+==34100== ERROR SUMMARY: 81 errors from 81 contexts (suppressed: 0 from 0)
