@@ -274,7 +274,15 @@ static int get_embeddings(
     struct llama_embedder_params params = embedder_data->params;
 
     size_t batch_size = params.batch_size;
+    if (batch_size == 0) {
+        LOG_ERROR("llama_embedder params.batch_size must be a positive integer");
+        return -1;
+    }
     size_t n_seq_max = params.n_seq_max;
+    if (n_seq_max == 0) {
+        LOG_ERROR("llama_embedder params.n_seq_max must be a positive integer");
+        return -1;
+    }
     size_t n_tokenizer_threads = params.n_tokenizer_threads;
     if (n_tokenizer_threads == 0) {
         n_tokenizer_threads = _SC_NPROCESSORS_ONLN;
@@ -341,6 +349,11 @@ static int get_embeddings(
 
     /* Batch and decode */
     {
+        if (total_token_count > INT32_MAX) {
+            LOG_ERROR("Number overflow");
+            ERROR_CLEANUP();
+            return -1;
+        }
         if (batch_size > INT32_MAX) {
             LOG_ERROR("Number overflow");
             ERROR_CLEANUP();
@@ -361,50 +374,61 @@ static int get_embeddings(
             free(embedding_memory); \
             llama_batch_free(batch); \
         } while (false)
-
-        const bool remainder_present = total_token_count % batch_size > 0;
-        const size_t batch_count 
-            = total_token_count / batch_size + remainder_present;
-
+        
         size_t token_idx = 0;
-
         size_t sequence_idx = 0;
         size_t sequence_end = token_counts[sequence_idx];
 
-        for (size_t i = 0; i < batch_count; i++) {
-            size_t current_batch_size;
-            if (!remainder_present || i < batch_count - 1) {
-                current_batch_size = batch_size;
-            } else {
-                current_batch_size = total_token_count % batch_size;
-            }
-            batch.n_tokens = current_batch_size;
-
-
+        while(true) {
             const size_t batch_start = token_idx;
-            const size_t batch_end = batch_start + current_batch_size;
+            const size_t batch_end_max = batch_start + batch_size;
+            size_t batch_end = batch_end_max;
 
-            memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
+            size_t sequence_count = 1;
 
-            while (token_idx < batch_end) {
-                if (token_idx == sequence_end) {
+            bool end_reached = false;
+            while (true) {
+                end_reached = token_idx == total_token_count - 1;
+                if (end_reached) {
+                    batch_end = total_token_count;
+                    break;
+                }
+
+                bool batch_end_reached = token_idx == batch_end_max - 1;
+                bool sequence_end_reached = token_idx == sequence_end - 1;
+
+                if (batch_end_reached && !sequence_end_reached) {
+                    token_idx++;
+                    break;
+                } else if (sequence_end_reached && !batch_end_reached) {
+                    batch_end = sequence_end;
+                    token_idx++;
                     sequence_idx++;
                     sequence_end += token_counts[sequence_idx];
+                    if (sequence_count == n_seq_max) {
+                        break;
+                    } else {
+                        sequence_count++;
+                    }
+                } else if (batch_end_reached && sequence_end_reached) {
+                    token_idx++;
+                    sequence_idx++;
+                    sequence_end += token_counts[sequence_idx];
+                    break;
+                } else {
+                    token_idx++;
                 }
-                if (sequence_idx > INT32_MAX) {
-                    LOG_ERROR("Number overflow");
-                    ERROR_CLEANUP();
-                    return -1;
-                }
-                /* Current token position within batch */
-                size_t relative_token_idx = token_idx - batch_start;
-                batch.seq_id[relative_token_idx][0] = sequence_idx;
-                token_idx++;
             }
+            size_t current_batch_size = batch_end - batch_start;
+            batch.n_tokens = current_batch_size;
+            memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
             if (llama_decode(context, batch) != 0) {
                 LOG_ERROR("Decode failed");
                 ERROR_CLEANUP();
                 return -1;
+            }
+            if (end_reached) {
+                break;
             }
         }
         /* Free batch */
