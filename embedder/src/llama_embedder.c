@@ -188,7 +188,7 @@ static ssize_t tokenize(
                     relative_text_idx++)
             {
                 size_t max_token_count;
-                if (get_max_token_count(context->text_lengths[i], &max_token_count) == -1) {
+                if (get_max_token_count(context->text_lengths[relative_text_idx], &max_token_count) == -1) {
                     LOG_ERROR("Number overflow");
                     ERROR_CLEANUP();
                     return -1;
