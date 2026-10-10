@@ -421,6 +421,11 @@ static int get_embeddings(
 
             bool end_reached = false;
             while (true) {
+                {
+                    const size_t relative_token_idx = token_idx - batch_start;
+                    batch.seq_id[relative_token_idx][0] = sequence_idx;
+                }
+
                 end_reached = token_idx == total_token_count - 1;
                 if (end_reached) {
                     batch_end = total_token_count;
@@ -455,6 +460,8 @@ static int get_embeddings(
             size_t current_batch_size = batch_end - batch_start;
             batch.n_tokens = current_batch_size;
             memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
+            llama_memory_t context_memory = llama_get_memory(context);
+            llama_memory_clear(context_memory, true);
             if (llama_decode(context, batch) != 0) {
                 LOG_ERROR("Decode failed");
                 ERROR_CLEANUP();
