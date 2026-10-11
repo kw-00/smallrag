@@ -284,6 +284,10 @@ static ssize_t tokenize(
     return total_token_count;
 }
 
+static void dispose_embeddings(struct embeddings *embeddings)
+{
+    free(embeddings);
+}
 
 static int get_embeddings(
         struct embedder *embedder,
@@ -462,7 +466,7 @@ static int get_embeddings(
             memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
             llama_memory_t context_memory = llama_get_memory(context);
             llama_memory_clear(context_memory, true);
-            if (llama_decode(context, batch) != 0) {
+            if (llama_encode(context, batch) != 0) {
                 LOG_ERROR("Decode failed");
                 ERROR_CLEANUP();
                 return -1;
@@ -501,6 +505,7 @@ static int get_embeddings(
     embeddings->embeddings = embedding_memory;
     embeddings->dimension_count = dimension_count;
     embeddings->embedding_count = text_count;
+    embeddings->dispose = &dispose_embeddings;
 #undef ERROR_CLEANUP
     return 0;
 }
