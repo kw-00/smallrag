@@ -1,3 +1,6 @@
+#ifndef SMALLRAG_POSTPROCESSING_EMBEDDER_H
+#define SMALLRAG_POSTPROCESSING_EMBEDDER_H
+
 #include "smallrag/embedder_core.h"
 
 /* Initializes postprocessing_embedder as a wrapper of wrapped_embedder. postprocessing_embedder
@@ -15,3 +18,5 @@ int init_postprocessing_embedder(
         struct embedder *restrict postprocessing_embedder, 
         struct embedder *restrict wrapped_embedder, 
         int (*postprocessing_function)(struct embeddings *));
+
+#endif

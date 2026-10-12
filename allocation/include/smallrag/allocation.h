@@ -1,3 +1,7 @@
+#ifndef SMALLRAG_ALLOCATION_H
+#define SMALLRAG_ALLOCATION_H
+
+
 #include <stddef.h>
 
 
@@ -26,3 +30,5 @@
  *
  */
 int allocate_spans(size_t n_spans, void *pointer_1, size_t sizeof_1, size_t count_1, ...);
+
+#endif

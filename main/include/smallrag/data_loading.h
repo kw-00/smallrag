@@ -1,3 +1,6 @@
+#ifndef SMALLRAG_DATA_LOADING_H
+#define SMALLRAG_DATA_LOADING_H
+
 #include "smallrag/chunker.h"
 #include "smallrag/embedder.h"
 
@@ -29,3 +32,5 @@ int load_embeddings(
         struct chunks *chunks,
         struct embedder *embedder,
         struct embeddings *embeddings);
+
+#endif
