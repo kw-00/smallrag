@@ -1,8 +1,11 @@
+#include "smallrag/data_loading.h"
 #include "smallrag/normalization.h"
 #include "smallrag/dot_product.h"
 #include "smallrag/embedder.h"
 #include "smallrag/llama_embedder.h"
 #include "smallrag/postprocessing_embedder.h"
+#include "smallrag/chunker.h"
+#include "smallrag/char_chunker.h"
 #include "smallrag/logging.h"
 
 #include "llama.h"
@@ -13,17 +16,18 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <sys/mman.h>
 
 /* -m — model path
- * -d — source texts path
- * -e — embedding path
+ * -d — source text path
+ * -e — embeddings path
  * -t — number of tokenizer threads
  * -c — context size
  * -b — batch size
  * -u — ubatch size
  * -s — max sequences per batch 
  */
-static char *optstring = "msetcbus";
+static char *optstring = "mdetcbus";
 
 static size_t parse_size_t_arg()
 {
@@ -54,8 +58,8 @@ static int embedding_postprocessing(struct embeddings *embeddings)
 int main(int argc, char *argv[])
 {
     char *model_path = NULL;
-    char *source_texts_path = NULL;
-    char *embedding_path = NULL;
+    char *source_text_path = NULL;
+    char *embeddings_path = NULL;
     size_t n_tokenizer_threads = 0;
     size_t context_size = 65536;
     size_t batch_size = 2048;
@@ -70,10 +74,10 @@ int main(int argc, char *argv[])
                 model_path = optarg;
                 break;
             case 'd':
-                source_texts_path = optarg;
+                source_text_path = optarg;
                 break;
             case 'e':
-                embedding_path = optarg;
+                embeddings_path = optarg;
                 break;
             case 't': 
                 n_tokenizer_threads = parse_size_t_arg();
@@ -97,20 +101,45 @@ int main(int argc, char *argv[])
         print_required_option_message("m", "model path");
         exit(1);
     }
-    if (source_texts_path == NULL) {
-        print_required_option_message("d", "source texts path");
+    if (source_text_path == NULL) {
+        print_required_option_message("d", "source text path");
         exit(1);
     }
-    if (embedding_path == NULL) {
-        print_required_option_message("e", "embedding path");
+    if (embeddings_path == NULL) {
+        print_required_option_message("e", "embeddings path");
         exit(1);
     }
-    
+
+    /* Map source text */
+    char *full_source_text;
+    size_t full_text_length;
+    if (map_text(source_text_path, &full_source_text, &full_text_length) == -1) {
+        LOG_ERROR("Failed to map text");
+        exit(1);
+    }
+
+    /* Split source text into chunks */
+    struct chunks chunks;
+    {
+        struct chunker chunker;
+        if (init_char_chunker(&chunker, '\0') == -1) {
+            LOG_ERROR("Failed to initialize chunker");
+            exit(1);
+        }
+
+        if (get_chunks(&chunker, full_source_text, full_text_length, &chunks) == -1) {
+            LOG_ERROR("Failed to split text into chunks");
+            exit(1);
+        }
+        dispose_chunker(&chunker);
+    }
+
     struct llama_model *model;
     {
         struct llama_model_params params = llama_model_default_params();
         model = llama_model_load_from_file(model_path, params);
     }
+    /* Initialize embedder */ 
     struct embedder embedder;
     {
         struct llama_embedder_params params = {
@@ -131,7 +160,18 @@ int main(int argc, char *argv[])
             exit(1);
         }
     }
-    
+
+    /* Prepare and cache embeddings */
+    struct embeddings embeddings;
+    if (load_embeddings(embeddings_path, &chunks, &embedder, &embeddings) == -1) {
+        LOG_ERROR("Failed to load or compute embeddings");
+        exit(1);
+    }
+
+    /* Cleanup */
+    dispose_chunks(&chunks);
+    munmap(full_source_text, full_text_length);
+
     dispose_embedder(&embedder);
     llama_model_free(model); 
 }
