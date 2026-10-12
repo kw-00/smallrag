@@ -13,6 +13,7 @@ add_subdirectory(embedder)
 add_subdirectory(allocation)
 add_subdirectory(data_structures)
 add_subdirectory(main)
+add_subdirectory(vectors)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(test)

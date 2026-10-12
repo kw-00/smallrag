@@ -10,29 +10,21 @@
 #error "MODEL_PATH not defined, though required for tests"
 #endif
 
-static struct llama_context *get_context(char *model_path) 
+
+static void get_embedder(char *model_path, struct embedder* embedder)
 {
     struct llama_model_params model_params = llama_model_default_params();
     struct llama_model *model = llama_model_load_from_file(
             model_path, model_params); 
-    struct llama_context_params context_params = llama_context_default_params();
-    context_params.n_ctx = 65536;
-    context_params.n_batch = 512;
-    context_params.embeddings = true;
-    context_params.n_seq_max = 256;
-    struct llama_context *context = llama_init_from_model(model, context_params);
-    return context;
-}
 
-static void get_embedder(char *model_path, struct embedder* embedder)
-{
-    struct llama_context *context = get_context(model_path);
     struct llama_embedder_params params = {
         .n_tokenizer_threads = 2,
+        .context_size = 65536,
         .batch_size = 512,
-        .n_seq_max = 256
+        .ubatch_size = 512,
+        .max_sequences_per_batch = 256
     };
-    assert(init_llama_embedder(embedder, context, params) != -1);
+    assert(init_llama_embedder(embedder, model, &params) != -1);
 }
 
 

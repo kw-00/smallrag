@@ -16,6 +16,8 @@ struct embedder_data {
 
 static void dispose_embedder(struct embedder *embedder)
 {
+    struct embedder_data *embedder_data = (struct embedder_data *)embedder->data;
+    llama_free(embedder_data->context);
     free(embedder->data);
 }
 
@@ -315,9 +317,9 @@ static int get_embeddings(
         LOG_ERROR("llama_embedder params.batch_size must be a positive integer");
         return -1;
     }
-    size_t n_seq_max = params.n_seq_max;
-    if (n_seq_max == 0) {
-        LOG_ERROR("llama_embedder params.n_seq_max must be a positive integer");
+    size_t max_sequences_per_batch = params.max_sequences_per_batch;
+    if (max_sequences_per_batch == 0) {
+        LOG_ERROR("llama_embedder params.max_sequences_per_batch must be a positive integer");
         return -1;
     }
     size_t n_tokenizer_threads = params.n_tokenizer_threads;
@@ -447,7 +449,7 @@ static int get_embeddings(
                     token_idx++;
                     sequence_idx++;
                     sequence_end += token_counts[sequence_idx];
-                    if (sequence_count == n_seq_max) {
+                    if (sequence_count == max_sequences_per_batch) {
                         break;
                     } else {
                         sequence_count++;
@@ -513,17 +515,29 @@ static int get_embeddings(
 
 int init_llama_embedder(
         struct embedder *embedder, 
-        struct llama_context *context, 
-        struct llama_embedder_params params)
+        const struct llama_model *model, 
+        const struct llama_embedder_params *params)
 {
     struct embedder_data *data = malloc(sizeof(struct embedder_data));
     if (data == NULL) {
         LOG_ERROR("Allocation failed");
         return -1;
     }
+
+    struct llama_context_params context_params = llama_context_default_params();
+    context_params.n_ctx = params->context_size;
+    context_params.n_batch = params->batch_size;
+    context_params.n_ubatch = params->ubatch_size;
+    context_params.n_seq_max = params->max_sequences_per_batch;
+    context_params.embeddings = true;
+
+    struct llama_context *context = llama_init_from_model(model, context_params);
+    
+    data->params = *params;
     data->context = context;
-    data->params = params;
+
     embedder->data = data;
+
     embedder->get_embeddings = &get_embeddings;
     embedder->dispose = &dispose_embedder;
     return 0;
