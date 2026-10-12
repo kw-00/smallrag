@@ -3,6 +3,7 @@ include(FetchLlama)
 add_library(smallrag_embedder STATIC
     src/embedder_wrapper_functions.c
     src/llama_embedder.c
+    src/postprocessing_embedder.c
 )
 
 target_include_directories(smallrag_embedder PUBLIC

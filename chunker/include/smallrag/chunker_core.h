@@ -1,3 +1,6 @@
+/* Structs for polymorphic text chunking.
+ */
+
 #ifndef SMALLRAG_CHUNKER_CORE_H
 #define SMALLRAG_CHUNKER_CORE_H
 
@@ -7,8 +10,8 @@
 /* Represents a collection of text chunks. texts[i] is the text of the i-th chunk and sizes[i] is
  * the length of that text.
  *
- * Running the dispose() method on texts releases resources owned by the struct. This may 
- * be as simple as freeing memory used for texts and sizes.
+ * Running an instance's dispose() method with that instance as its parameter must release
+ * resources owned by that instance.
  */
 struct chunks {
     char **texts;
@@ -18,20 +21,24 @@ struct chunks {
 };
 
 
-/* Polymorphic struct used by get_chunks() for splitting text into chunks. Use get_chunks() to
- * split text into chunks, and dispose_chunker() to dispose of the chunker after its use.
+/* Struct used for polymorphic text chunking.
  *
- * The goal of get_chunks()/struct chunker is to enable polymorphic use of various implementations
- * of text chunking.
+ * Has two methods. Always call a chunker instance's methods with that instance as its first 
+ * parameter.
  *
- * An implementation should contain a function that initializes struct chunker in a way that then
- * allows chunking text by calling get_chunks() with the chunker as a parameter.
+ * The get_chunks() method can be used to split text into chunks. 
  *
- * It should give the chunker a working get_chunks() method and a dispose() method, which can be
- * a no-op.
+ * The text parameter is the text being split into chunks.
  *
- * The data member is there to allow a chunker to carry data that can then be used by its
- * get_chunks() method.
+ * text_length denotes that text's length. It must be greater than 0.
+ *
+ * chunks is an out parameter.
+ *
+ * It must not modify text, though the chunks out parameter may be a mutable view over text.
+ *
+ * 0 is returned on success and -1 on error. The out parameter is undefined after error.
+ *
+ * The dispose() method can be used to release resources associated with a chunker.
  */
 struct chunker {
     int (*get_chunks)(

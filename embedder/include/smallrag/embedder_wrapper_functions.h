@@ -1,18 +1,13 @@
+/* Functions for polymorphic text embedding using embedders. For more information about embedders
+ * themselves, check embedder_core.h.
+ */
+
 #ifndef SMALLRAG_EMBEDDER_WRAPPER_FUNCTIONS_H
 #define SMALLRAG_EMBEDDER_WRAPPER_FUNCTIONS_H
 
 #include "smallrag/embedder_core.h"
 
-/* Uses an embedder to provide vector embeddings for a given set of text chunks.
- * Calls the embedder's get_embeddings() method to achieve this.
- *
- * texts[i] is the i-th text chunk.
- * text_lengths[i] is that chunk's size in bytes.
- * text_count is the number of chunks.
- *
- * embeddings is an out parameter that provides the resulting embeddings.
- *
- * Returns 0 on success, -1 on error.
+/* Function wrapper for embedder's get_embeddings() method.
  */
 int get_embeddings(
         struct embedder *embedder,
