@@ -1,4 +1,4 @@
-include(FetchLlama)
+include(UseLlama)
 
 add_compile_definitions(MODEL_PATH="${CMAKE_SOURCE_DIR}/models/v5-nano-retrieval-F16.gguf")
 

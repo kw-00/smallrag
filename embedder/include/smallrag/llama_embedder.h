@@ -21,7 +21,7 @@ struct llama_embedder_params {
  */
 int init_llama_embedder(
         struct embedder *embedder, 
-        const struct llama_model *model, 
+        struct llama_model *model, 
         const struct llama_embedder_params *params);
 
 #endif

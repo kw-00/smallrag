@@ -1,4 +1,4 @@
-include(FetchLlama)
+include(UseLlama)
 
 add_library(smallrag_embedder STATIC
     src/embedder_wrapper_functions.c

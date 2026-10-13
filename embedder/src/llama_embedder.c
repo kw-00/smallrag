@@ -515,7 +515,7 @@ static int get_embeddings(
 
 int init_llama_embedder(
         struct embedder *embedder, 
-        const struct llama_model *model, 
+        struct llama_model *model, 
         const struct llama_embedder_params *params)
 {
     struct embedder_data *data = malloc(sizeof(struct embedder_data));

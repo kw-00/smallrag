@@ -1,4 +1,5 @@
-
+include(UseCThreadPool)
+include(UseLlama)
 
 
 add_library(smallrag_main STATIC
@@ -23,4 +24,5 @@ target_link_libraries(smallrag PRIVATE
     smallrag_main
     smallrag_vectors
 )
+use_c_thread_pool(smallrag)
 use_llama(smallrag)
