@@ -1,0 +1,9 @@
+prefix=@PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: logging
+Description: smallrag logging library
+Version: 1.0
+Libs: -L${libdir} -llogging
+Cflags: -I${includedir}
