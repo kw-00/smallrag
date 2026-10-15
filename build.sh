@@ -5,7 +5,7 @@ export MAKE="make"
 export CC="gcc"
 export AR="ar"
 export BUILD_DIR="$(pwd -P)/build"
-export PKG_CONFIG_PATH=pkgconfig
+export PKG_CONFIG_PATH="$BUILD_DIR/pkgconfig"
 export C_STD_FLAG="-std=gnu11"
 export CFLAGS="$C_STD_FLAG -Wall -Wextra -Werror"
 export PICFLAGS="-fPIC"
