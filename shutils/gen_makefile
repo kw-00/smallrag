@@ -84,6 +84,17 @@ source_count=$i
 
 target_path="$BUILD_DIR/$MODULE_NAME/lib/$MODULE_NAME.$TARGET_TYPE"
 
+CFLAGS="$CFLAGS $(pkg-config --cflags "$MODULE_NAME")"
+LIBS="$LIBS $(pkg-config --libs "$MODULE_NAME")"
+
+dependency_include_stamps=$(pkg-config \
+    --cflags "$MODULE_NAME" \
+    | tr ' ' '\n' | grep '^-I.*include$' \
+    | sed 's/^-I//g' \
+    | sed 's/$/\/\.stamp/g' \
+    | sed 's|'"$BUILD_DIR/$MODULE_NAME/include/\.stamp||g" \
+    | tr '\n' ' ')
+
 echo "all: $BUILD_DIR/$MODULE_NAME/lib/.stamp $BUILD_DIR/$MODULE_NAME/include/.stamp"
 echo
 echo "$BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
@@ -103,7 +114,7 @@ i=0
 while [ $i -lt $source_count ]; do
     source=$(cat "$sources_dir/$i")
     object=$(cat "$objects_dir/$i")
-    echo "$object: $source $headers"
+    echo "$object: $source $headers $dependency_include_stamps"
     echo -e "\tmkdir -p $(dirname "$object")"
     if $is_so; then
         echo -e "\t$CC -c -Iinclude $CFLAGS -fPIC -o \$@ $source"
