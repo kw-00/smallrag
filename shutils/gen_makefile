@@ -117,8 +117,10 @@ while [ $i -lt $source_count ]; do
     echo "$object: $source $headers $dependency_include_stamps"
     echo -e "\tmkdir -p $(dirname "$object")"
     if $is_so; then
-        echo -e "\t$CC -c -Iinclude $CFLAGS -fPIC -o \$@ $source"
-    else
+        echo -e "\t$CC -c -Iinclude $CFLAGS $PICFLAGS -o \$@ $source"
+    elif $is_a; then
+        echo -e "\t$CC -c $VISIBILITY_HIDDEN_FLAG -Iinclude $CFLAGS -o \$@ $source"
+	else
         echo -e "\t$CC -c -Iinclude $CFLAGS -o \$@ $source"
     fi
     i=$((i + 1))

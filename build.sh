@@ -7,6 +7,8 @@ export AR="${AR:-ar}"
 export BUILD_DIR="$(pwd -P)/${BUILD_DIR:-build}"
 export PKG_CONFIG_PATH="$BUILD_DIR/pkgconfig"
 export CFLAGS="-Wall -Wextra -Werror -std=gnu11"
+export PICFLAGS="${PICFLAGS:--fPIC}"
+export VISIBILITY_HIDDEN_FLAG="${VISIBILITY_HIDDEN_FLAG:--fvisibility=hidden}"
 
 mkdir -p "$BUILD_DIR/pkgconfig"
 
