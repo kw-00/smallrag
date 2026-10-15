@@ -13,6 +13,6 @@ sed \
     logging.pc.in \
     > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
 
-TARGET_TYPE="a" gen_makefile > Makefile
+TARGET_TYPE="a" gen_makefile > Makefile.generated
 
-"$MAKE" -f Makefile
+"$MAKE" -f Makefile.generated

@@ -50,3 +50,5 @@ dkms.conf
 /models/
 
 /installations/
+
+*.generated
