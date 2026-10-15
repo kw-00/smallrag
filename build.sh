@@ -1,14 +1,15 @@
 
 export PATH="$PATH:$(pwd -P)/shutils"
 
-export MAKE="${MAKE:-make}"
-export CC="${CC:-gcc}"
-export AR="${AR:-ar}"
-export BUILD_DIR="$(pwd -P)/${BUILD_DIR:-build}"
-export PKG_CONFIG_PATH="$BUILD_DIR/pkgconfig"
-export CFLAGS="-Wall -Wextra -Werror -std=gnu11"
-export PICFLAGS="${PICFLAGS:--fPIC}"
-export VISIBILITY_HIDDEN_FLAG="${VISIBILITY_HIDDEN_FLAG:--fvisibility=hidden}"
+export MAKE="make"
+export CC="gcc"
+export AR="ar"
+export BUILD_DIR="$(pwd -P)/build"
+export PKG_CONFIG_PATH=pkgconfig
+export C_STD_FLAG="-std=gnu11"
+export CFLAGS="i$C_STD_FLAG -Wall -Wextra -Werror"
+export PICFLAGS="-fPIC"
+export VISIBILITY_HIDDEN_FLAG="-fvisibility=hidden"
 
 mkdir -p "$BUILD_DIR/pkgconfig"
 
