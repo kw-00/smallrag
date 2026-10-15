@@ -7,4 +7,7 @@ vectors: logging
 logging:
 	cd logging && ./build.sh
 
+data_structures:
+	cd data_structures && ./build.sh
+
 
