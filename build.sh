@@ -13,10 +13,14 @@ export VISIBILITY_HIDDEN_FLAG="-fvisibility=hidden"
 
 mkdir -p "$BUILD_DIR/pkgconfig"
 
+relative_build_dir=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
+relative_build_dir="${relative_build_dir#/}"
 
-stamps=$(grep -o '.*/\.stamp:' Makefile.in | sed 's/.$//g' | tr '\n' ' ')
+sed 's|@STAMP>\([-a-zA-Z0-9_/]\+\)@|'"$relative_build_dir/\\1/.stamp"'|g' Makefile.in > Makefile.generated
 
-sed 's|@STAMPS@|'"$stamps"'|g' Makefile.in > Makefile.generated
+stamps=$(grep -o '.*\.stamp:' Makefile.generated | sed 's/.$//g' | tr '\n' ' ')
+
+sed -i 's|@STAMPS@|'"$stamps"'|g' Makefile.generated
 
 "$MAKE" -f Makefile.generated
 

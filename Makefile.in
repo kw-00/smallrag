@@ -2,23 +2,23 @@
 all: @STAMPS@
 	printf ''
 
-vectors/.stamp: logging/.stamp
+@STAMP>vectors@: @STAMP>logging@
 	cd vectors && ./build.sh
 	touch $@
 
-allocation/.stamp: logging/.stamp
+@STAMP>allocation@: @STAMP>logging@
 	cd allocation && ./build.sh
 	touch $@
 
-chunker/.stamp: logging/.stamp
+@STAMP>chunker@: @STAMP>logging@
 	cd chunker && ./build.sh
 	touch $@
 
-logging/.stamp:
+@STAMP>logging@:
 	cd logging && ./build.sh
 	touch $@
 
-data_structures/.stamp:
+@STAMP>data_structures@:
 	cd data_structures && ./build.sh
 	touch $@
 
