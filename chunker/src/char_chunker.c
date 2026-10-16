@@ -90,6 +90,7 @@ static int get_chunks(
 static void dispose(struct chunker *chunker) 
 {
     // No op
+    (void)chunker;
 }
 
 

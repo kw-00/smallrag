@@ -1,10 +1,10 @@
 
 
-export BUILD_DIR=$(relpath "$(pwd -P)" "$BUILD_DIR")
+export BUILD_DIR=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
 export MODULE_NAME=vectors
 
-prepare_build_dirs
+prepare_build_dirs.sh
 
-TARGET_TYPE="a" gen_makefile > Makefile.generated
+TARGET_TYPE="a" gen_makefile.sh > Makefile.generated
 
 "$MAKE" -f Makefile.generated

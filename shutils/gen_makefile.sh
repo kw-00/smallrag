@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+
 USAGE=$(cat << EOF
 Usage:
 BUILD_DIR='build_dir_relative_to_module_root' \
@@ -55,6 +56,15 @@ fi
 headers=$(find include -type f -regex '.*\.h$' -exec printf '%s ' {} \;)
 sources=$(find src -type f -regex '.*\.c$' -exec printf '%s ' {} \;) 
 
+if [ -z "$sources" ]; then
+    echo "Expected at least one .c source file in src/"
+    exit 1
+fi
+if [ -z "$headers" ]; then
+    echo "Expected at least one .h header file in include/"
+    exit 1
+fi
+
 temp=tmp
 mkdir "$temp"
 sources_dir="$temp/sources"
@@ -74,10 +84,21 @@ source_count=$i
 
 target_path="$BUILD_DIR/$MODULE_NAME/lib/$MODULE_NAME.$TARGET_TYPE"
 
+CFLAGS="$CFLAGS $(pkg-config --cflags "$MODULE_NAME")"
+LIBS="$LIBS $(pkg-config --libs "$MODULE_NAME")"
+
+dependency_include_stamps=$(pkg-config \
+    --cflags "$MODULE_NAME" \
+    | tr ' ' '\n' | grep '^-I.*include$' \
+    | sed 's/^-I//g' \
+    | sed 's/$/\/\.stamp/g' \
+    | sed 's|'"$BUILD_DIR/$MODULE_NAME/include/\.stamp||g" \
+    | tr '\n' ' ')
+
 echo "all: $BUILD_DIR/$MODULE_NAME/lib/.stamp $BUILD_DIR/$MODULE_NAME/include/.stamp"
 echo
 echo "$BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
-echo "touch \$@"
+echo -e "\ttouch \$@"
 echo
 echo "$target_path: $objects"
 if $is_a; then
@@ -91,12 +112,15 @@ fi
 echo
 i=0
 while [ $i -lt $source_count ]; do
-    source=$(cat "$sources_dir/$i)"
-    object=$(cat "$objects_dir/$i)"
-    echo "$object: $source $headers"
+    source=$(cat "$sources_dir/$i")
+    object=$(cat "$objects_dir/$i")
+    echo "$object: $source $headers $dependency_include_stamps"
+    echo -e "\tmkdir -p $(dirname "$object")"
     if $is_so; then
-        echo -e "\t$CC -c -Iinclude $CFLAGS -fPIC -o \$@ $source"
-    else
+        echo -e "\t$CC -c -Iinclude $CFLAGS $PICFLAGS -o \$@ $source"
+    elif $is_a; then
+        echo -e "\t$CC -c $VISIBILITY_HIDDEN_FLAG -Iinclude $CFLAGS -o \$@ $source"
+	else
         echo -e "\t$CC -c -Iinclude $CFLAGS -o \$@ $source"
     fi
     i=$((i + 1))
@@ -104,7 +128,8 @@ done
 echo
 echo "$BUILD_DIR/$MODULE_NAME/include/.stamp: $headers"
 echo -e "\tcp -R include/. $BUILD_DIR/$MODULE_NAME/include"
+echo -e "\ttouch \$@"
 echo
 
-
+rm -rf "$temp"
 

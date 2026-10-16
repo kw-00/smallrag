@@ -13,5 +13,10 @@ export VISIBILITY_HIDDEN_FLAG="-fvisibility=hidden"
 
 mkdir -p "$BUILD_DIR/pkgconfig"
 
-"$MAKE" -f Makefile
+
+stamps=$(grep -o '.*/\.stamp:' Makefile.in | sed 's/.$//g' | tr '\n' ' ')
+
+sed 's|@STAMPS@|'"$stamps"'|g' Makefile.in > Makefile.generated
+
+"$MAKE" -f Makefile.generated
 

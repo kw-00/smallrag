@@ -2,9 +2,9 @@ prefix=@PREFIX@
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
-Name: allocation 
+Name: chunker 
 Description: smallrag utility library for allocating memory 
 Version: 1.0
 Requires.private: logging
-Libs: -L${libdir} -lallocation
+Libs: -L${libdir} -lchunker
 Cflags: -I${includedir}

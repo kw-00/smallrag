@@ -1,0 +1,25 @@
+
+all: @STAMPS@
+	printf ''
+
+vectors/.stamp: logging/.stamp
+	cd vectors && ./build.sh
+	touch $@
+
+allocation/.stamp: logging/.stamp
+	cd allocation && ./build.sh
+	touch $@
+
+chunker/.stamp: logging/.stamp
+	cd chunker && ./build.sh
+	touch $@
+
+logging/.stamp:
+	cd logging && ./build.sh
+	touch $@
+
+data_structures/.stamp:
+	cd data_structures && ./build.sh
+	touch $@
+
+
