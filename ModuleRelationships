@@ -1,6 +1,8 @@
+embedder: allocation logging llama.cpp
 vectors: logging
 allocation: logging
 chunker: logging
 logging:
 data_structures:
+llama.cpp:
 

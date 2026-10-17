@@ -4,8 +4,7 @@
 
 USAGE=$(cat << EOF
 Usage:
-BUILD_DIR='build_dir_relative_to_module_root' \
-    MODULE_NAME='module_name' \
+BUILD_DIR='absolute_path_to_build_dir' \
     TARGET_TYPE='a_so_or_elf' \
     CC='compiler_program' \
     AR='archive_program' \
@@ -21,10 +20,6 @@ if [ -z "$BUILD_DIR" ]; then
     echo "BUILD_DIR required" >&2
     exit 1
 fi
-if [ -z "$MODULE_NAME" ]; then
-    echo "MODULE_NAME required" >&2
-    exit 1
-fi
 if [ -z "$TARGET_TYPE" ]; then
     echo "TARGET_TYPE required" >&2
     exit 1
@@ -37,6 +32,10 @@ if [ -z "$AR" ]; then
     echo "AR required" >&2
     exit 1
 fi
+
+MODULE_NAME=$(basename "$(pwd -P)")
+
+RELATIVE_BUILD_DIR=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
 
 is_a=false
 is_so=false
@@ -80,24 +79,27 @@ for source in $sources; do
     i=$((i + 1))
 done
 source_count=$i
-
-
-target_path="$BUILD_DIR/$MODULE_NAME/lib/$MODULE_NAME.$TARGET_TYPE"
-
+if $is_elf; then
+    target_path="$RELATIVE_BUILD_DIR/$MODULE_NAME/executable/$MODULE_NAME.$TARGET_TYPE"
+else
+    target_path="$RELATIVE_BUILD_DIR/$MODULE_NAME/lib/lib$MODULE_NAME.$TARGET_TYPE"
+fi
 CFLAGS="$CFLAGS $(pkg-config --cflags "$MODULE_NAME")"
 LIBS="$LIBS $(pkg-config --libs "$MODULE_NAME")"
-
 dependency_include_stamps=$(pkg-config \
     --cflags "$MODULE_NAME" \
     | tr ' ' '\n' | grep '^-I.*include$' \
     | sed 's/^-I//g' \
     | sed 's/$/\/\.stamp/g' \
     | sed 's|'"$BUILD_DIR/$MODULE_NAME/include/\.stamp||g" \
-    | tr '\n' ' ')
+    | grep -s '[^\s]' \
+    | xargs -r -d '\n' -n 1 bash -c 'printf '"'"'%s '"'"' "$(relpath.sh "$(pwd -P)" $1)"' _)
 
-echo "all: $BUILD_DIR/$MODULE_NAME/lib/.stamp $BUILD_DIR/$MODULE_NAME/include/.stamp"
+echo "DEPS: $dependency_include_stamps" >&2
+
+echo "all: $RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/$MODULE_NAME/include/.stamp"
 echo
-echo "$BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
+echo "$RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
 echo -e "\ttouch \$@"
 echo
 echo "$target_path: $objects"
@@ -126,8 +128,8 @@ while [ $i -lt $source_count ]; do
     i=$((i + 1))
 done
 echo
-echo "$BUILD_DIR/$MODULE_NAME/include/.stamp: $headers"
-echo -e "\tcp -R include/. $BUILD_DIR/$MODULE_NAME/include"
+echo "$RELATIVE_BUILD_DIR/$MODULE_NAME/include/.stamp: $headers"
+echo -e "\tcp -R include/. $RELATIVE_BUILD_DIR/$MODULE_NAME/include"
 echo -e "\ttouch \$@"
 echo
 

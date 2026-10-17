@@ -1,4 +1,3 @@
-
 export PATH="$PATH:$(pwd -P)/shutils"
 
 export MAKE="make"
@@ -36,6 +35,17 @@ grep ':' ModuleRelationships | while IFS= read -r entry; do
         fi
         i=$((i + 1))
     done
+    target_path=$(find . -type f -regex ".*$target/MODULE_MARKER$" -exec printf '%s ' {} \;)
+    i=0
+    for path in $target_path; do
+        if [ $i -gt 0 ]; then
+            echo "Conflict: found two candidate modules for name \"$target\"" >&2
+            exit 1
+        fi
+        target_path=$(dirname "$path")
+        i=$((i + 1))
+    done
+
     target_stamp="$relative_build_dir/$target/.stamp"
     printf '%s ' "$target_stamp" >> "$targets"
 
@@ -44,7 +54,7 @@ grep ':' ModuleRelationships | while IFS= read -r entry; do
         printf ' %s' "$relative_build_dir/$prerequisite/.stamp" >> "$recipes"
     done
     echo >> "$recipes"
-    echo -e "\tcd $target && ./build.sh" >> "$recipes"
+    echo -e "\tcd $target_path && ./build.sh" >> "$recipes"
     echo -e "\ttouch $target_stamp" >> "$recipes"
     echo >> "$recipes"
 done
