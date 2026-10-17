@@ -13,7 +13,7 @@ fi
 MODULE_NAME=$(basename "$(pwd -P)")
 
 MODULE_BUILD_DIR="$BUILD_DIR/$MODULE_NAME"
-if ! echo "$TARGET_TYPE" | grep -s 'a\|so\|elf'; then
+if ! echo "$TARGET_TYPE" | grep -s 'a\|so\|elf' > /dev/null; then
     echo "TARGET_TYPE must be one of a, so or elf"
     exit 1
 fi

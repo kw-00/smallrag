@@ -165,7 +165,7 @@ static ssize_t tokenize(
     {    
         size_t text_idx = 0;
         size_t tokens_offset = 0;
-        for (int i = 0; i < n_workers; i++) {
+        for (size_t i = 0; i < n_workers; i++) {
             size_t texts_for_worker = texts_per_thread + (i < excess);
             struct tokenize_task_context *context = contexts + i;
             context->tokenizer = tokenizer;
@@ -201,7 +201,7 @@ static ssize_t tokenize(
     }
 
     bool error_occurred = false;
-    for (int i = 0; i < n_workers; i++) {
+    for (size_t i = 0; i < n_workers; i++) {
         int *worker_return;
         if (pthread_join(thread_handles[i], (void **)&worker_return) != 0) {
             LOG_ERROR("Joining worker ended in an error");
@@ -432,7 +432,7 @@ static int get_embeddings(
                     batch.seq_id[relative_token_idx][0] = sequence_idx;
                 }
 
-                end_reached = token_idx == total_token_count - 1;
+                end_reached = token_idx == (size_t)total_token_count - 1;
                 if (end_reached) {
                     batch_end = total_token_count;
                     break;

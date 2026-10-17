@@ -95,8 +95,6 @@ dependency_include_stamps=$(pkg-config \
     | grep -s '[^\s]' \
     | xargs -r -d '\n' -n 1 bash -c 'printf '"'"'%s '"'"' "$(relpath.sh "$(pwd -P)" $1)"' _)
 
-echo "DEPS: $dependency_include_stamps" >&2
-
 echo "all: $RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/$MODULE_NAME/include/.stamp"
 echo
 echo "$RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
