@@ -54,3 +54,4 @@ dkms.conf
 *.generated
 
 .stamp
+*.swp
