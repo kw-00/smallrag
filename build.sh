@@ -4,13 +4,13 @@ export MAKE="make"
 export CC="gcc"
 export AR="ar"
 export BUILD_DIR="$(pwd -P)/build"
-export PKG_CONFIG_PATH="$BUILD_DIR/pkgconfig"
+export PKG_CONFIG_PATH="$BUILD_DIR/libraries/pkgconfig"
 export C_STD_FLAG="-std=gnu11"
 export CFLAGS="$C_STD_FLAG -Wall -Wextra -Werror"
 export PICFLAGS="-fPIC"
 export VISIBILITY_HIDDEN_FLAG="-fvisibility=hidden"
 
-mkdir -p "$BUILD_DIR/pkgconfig"
+mkdir -p "$BUILD_DIR/libraries/pkgconfig"
 
 relative_build_dir=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
 relative_build_dir="${relative_build_dir#/}"
@@ -46,12 +46,12 @@ grep ':' ModuleRelationships | while IFS= read -r entry; do
         i=$((i + 1))
     done
 
-    target_stamp="$relative_build_dir/$target/.stamp"
+    target_stamp="$relative_build_dir/libraries/$target/.stamp"
     printf '%s ' "$target_stamp" >> "$targets"
 
     printf "$target_stamp:" >> "$recipes"
     for prerequisite in $prerequisites; do
-        printf ' %s' "$relative_build_dir/$prerequisite/.stamp" >> "$recipes"
+        printf ' %s' "$relative_build_dir/libraries/$prerequisite/.stamp" >> "$recipes"
     done
     echo >> "$recipes"
     echo -e "\tcd $target_path && ./build.sh" >> "$recipes"

@@ -5,7 +5,7 @@
 USAGE=$(cat << EOF
 Usage:
 BUILD_DIR='absolute_path_to_build_dir' \
-    TARGET_TYPE='a_so_or_elf' \
+    TARGET_TYPE='a_or_so' \
     CC='compiler_program' \
     AR='archive_program' \
     [ CFLAGS='cflags_as_from_pkg-config' ] \
@@ -39,18 +39,14 @@ RELATIVE_BUILD_DIR=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
 
 is_a=false
 is_so=false
-is_elf=false
 if [ "$TARGET_TYPE" = "a" ]; then
     is_a=true
 elif [ "$TARGET_TYPE" = "so" ]; then
     is_so=true
-elif [ "$TARGET_TYPE" = "elf" ]; then
-    is_elf=true
 else
-    echo "TARGET_TYPE must be one of a, so and elf" >&2
+    echo "TARGET_TYPE must be one of a or so" >&2
     exit 1
 fi
-
 
 headers=$(find include -type f -regex '.*\.h$' -exec printf '%s ' {} \;)
 sources=$(find src -type f -regex '.*\.c$' -exec printf '%s ' {} \;) 
@@ -79,11 +75,7 @@ for source in $sources; do
     i=$((i + 1))
 done
 source_count=$i
-if $is_elf; then
-    target_path="$RELATIVE_BUILD_DIR/$MODULE_NAME/executable/$MODULE_NAME.$TARGET_TYPE"
-else
-    target_path="$RELATIVE_BUILD_DIR/$MODULE_NAME/lib/lib$MODULE_NAME.$TARGET_TYPE"
-fi
+target_path="$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/lib$MODULE_NAME.$TARGET_TYPE"
 CFLAGS="$CFLAGS $(pkg-config --cflags "$MODULE_NAME")"
 LIBS="$LIBS $(pkg-config --libs "$MODULE_NAME")"
 dependency_include_stamps=$(pkg-config \
@@ -95,9 +87,9 @@ dependency_include_stamps=$(pkg-config \
     | grep -s '[^\s]' \
     | xargs -r -d '\n' -n 1 bash -c 'printf '"'"'%s '"'"' "$(relpath.sh "$(pwd -P)" $1)"' _)
 
-echo "all: $RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/$MODULE_NAME/include/.stamp"
+echo "all: $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include/.stamp"
 echo
-echo "$RELATIVE_BUILD_DIR/$MODULE_NAME/lib/.stamp: $target_path"
+echo "$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp: $target_path"
 echo -e "\ttouch \$@"
 echo
 echo "$target_path: $objects"
@@ -118,16 +110,15 @@ while [ $i -lt $source_count ]; do
     echo -e "\tmkdir -p $(dirname "$object")"
     if $is_so; then
         echo -e "\t$CC -c -Iinclude $CFLAGS $PICFLAGS -o \$@ $source"
-    elif $is_a; then
+    else
+        # .a
         echo -e "\t$CC -c $VISIBILITY_HIDDEN_FLAG -Iinclude $CFLAGS -o \$@ $source"
-	else
-        echo -e "\t$CC -c -Iinclude $CFLAGS -o \$@ $source"
     fi
     i=$((i + 1))
 done
 echo
-echo "$RELATIVE_BUILD_DIR/$MODULE_NAME/include/.stamp: $headers"
-echo -e "\tcp -R include/. $RELATIVE_BUILD_DIR/$MODULE_NAME/include"
+echo "$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include/.stamp: $headers"
+echo -e "\tcp -R include/. $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include"
 echo -e "\ttouch \$@"
 echo
 

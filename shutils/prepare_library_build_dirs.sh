@@ -12,16 +12,12 @@ fi
 
 MODULE_NAME=$(basename "$(pwd -P)")
 
-MODULE_BUILD_DIR="$BUILD_DIR/$MODULE_NAME"
-if ! echo "$TARGET_TYPE" | grep 'a\|so\|elf' > /dev/null; then
-    echo "TARGET_TYPE must be one of a, so or elf"
+MODULE_BUILD_DIR="$BUILD_DIR/libraries/$MODULE_NAME"
+if ! echo "$TARGET_TYPE" | grep 'a\|so' > /dev/null; then
+    echo "TARGET_TYPE must be one of a or so"
     exit 1
 fi
-if [ "$TARGET_TYPE" = elf ]; then
-    mkdir -p "$MODULE_BUILD_DIR/executable"
-else
-    mkdir -p "$MODULE_BUILD_DIR/lib"
-fi
+mkdir -p "$MODULE_BUILD_DIR/lib"
 mkdir -p "$MODULE_BUILD_DIR/include"
 mkdir -p "$MODULE_BUILD_DIR/obj"
 
@@ -29,5 +25,5 @@ sed \
     -e 's|@PREFIX@|'"$MODULE_BUILD_DIR"'|g' \
     -e 's|@NAME@|'"$MODULE_NAME"'|g' \
     "$MODULE_NAME.pc.in" \
-    > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
+    > "$BUILD_DIR/libraries/pkgconfig/$MODULE_NAME.pc"
 

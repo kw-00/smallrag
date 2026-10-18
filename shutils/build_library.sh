@@ -5,12 +5,12 @@ if [ -z "$TARGET_TYPE" ]; then
     exit 1
 fi
 
-if ! echo "$TARGET_TYPE" | grep 'a\|so\|elf' > /dev/null; then
-    echo "TARGET_TYPE must be one of a, so or elf"
+if ! echo "$TARGET_TYPE" | grep 'a\|so' > /dev/null; then
+    echo "TARGET_TYPE must be one of a or so"
     exit 1
 fi
 
-prepare_build_dirs.sh
+prepare_library_build_dirs.sh
 
 gen_makefile.sh > Makefile.generated
 

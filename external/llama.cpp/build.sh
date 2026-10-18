@@ -2,7 +2,7 @@
 
 export MODULE_NAME=llama.cpp
 
-TARGET_TYPE="so" prepare_build_dirs.sh
+TARGET_TYPE="so" prepare_library_build_dirs.sh
 
 if [ -z "$LLAMA_CPP_PATH" ]; then
     echo "LLAMA_CPP_PATH required; must point to a llama.cpp repository root" >&2
@@ -18,8 +18,8 @@ if [ ! -f "$LIBLLAMA_PATH" ]; then
     exit 1
 fi
 
-ln -s "$LIBLLAMA_PATH" "$BUILD_DIR/$MODULE_NAME/lib/libllama.so"
-touch -r "$LIBLLAMA_PATH" "$BUILD_DIR/$MODULE_NAME/lib/.stamp"
+ln -s "$LIBLLAMA_PATH" "$BUILD_DIR/libraries/$MODULE_NAME/lib/libllama.so"
+touch -r "$LIBLLAMA_PATH" "$BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp"
 
 
 LLAMA_HEADER_PATH="$LLAMA_CPP_PATH/include"
@@ -41,19 +41,18 @@ if [ -z "$recently_modified_header" ]; then
     exit 1
 fi
 
-cp -R "$LLAMA_HEADER_PATH/." "$BUILD_DIR/llama.cpp/include"
-cp -R "$GGML_HEADER_PATH/." "$BUILD_DIR/llama.cpp/include"
+cp -R "$LLAMA_HEADER_PATH/." "$BUILD_DIR/libraries/$MODULE_NAME/include"
+cp -R "$GGML_HEADER_PATH/." "$BUILD_DIR/libraries/$MODULE_NAME/include"
 
-INCLUDE_STAMP="$BUILD_DIR/$MODULE_NAME/include/.stamp"
+INCLUDE_STAMP="$BUILD_DIR/libraries/$MODULE_NAME/include/.stamp"
 touch -r "$recently_modified_header" "$INCLUDE_STAMP"
 
-echo "==== $INCLUDE_STAMP"
 if [ $(stat -c '%Y' "$LLAMA_HEADER_PATH") -gt $(stat -c '%Y' "$GGML_HEADER_PATH") ]; then
     touch -r "$LLAMA_HEADER_PATH" "$INCLUDE_STAMP"
 else
     touch -r "$GGML_HEADER_PATH" "$INCLUDE_STAMP"
 fi
 
-sed 's|@PREFIX@|'"$BUILD_DIR/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
+sed 's|@PREFIX@|'"$BUILD_DIR/libraries/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" > "$BUILD_DIR/libraries/pkgconfig/$MODULE_NAME.pc"
 
 

@@ -1,4 +1,4 @@
 export TARGET_TYPE="a"
 
-prepare_module.sh
+build_library.sh
 
