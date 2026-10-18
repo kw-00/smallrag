@@ -103,9 +103,6 @@ if $is_a; then
     echo -e "\t$AR rcs \$@ \$^"
 elif $is_so; then
     echo -e "\t$CC -shared -o \$@ \$^ $LIBS"
-else
-    # Executable
-    echo -e "\t$CC -o \$@ \$^ $LIBS"
 fi
 echo
 i=0
