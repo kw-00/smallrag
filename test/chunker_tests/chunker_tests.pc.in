@@ -1,0 +1,4 @@
+Name: chunker_tests
+Description: test programs for chunker implementations
+Version: 1.0
+Requires.private: chunker

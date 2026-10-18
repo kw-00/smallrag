@@ -6,3 +6,5 @@ logging:
 data_structures:
 llama.cpp:
 
+chunker_tests: chunker
+

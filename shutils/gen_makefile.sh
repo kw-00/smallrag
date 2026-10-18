@@ -69,15 +69,21 @@ i=0
 objects=
 for source in $sources; do
     echo "$source" > "$sources_dir/$i"
-    object="$BUILD_DIR/$MODULE_NAME/obj/${source%??}.o"
+    object="$RELATIVE_BUILD_DIR/modules/$MODULE_NAME/obj/${source%??}.o"
     echo "$object" > "$objects_dir/$i"
     objects+="$object "
     i=$((i + 1))
 done
 source_count=$i
-target_path="$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/lib$MODULE_NAME.$TARGET_TYPE"
-CFLAGS="$CFLAGS $(pkg-config --cflags "$MODULE_NAME")"
-LIBS="$LIBS $(pkg-config --libs "$MODULE_NAME")"
+target_path="$RELATIVE_BUILD_DIR/modules/$MODULE_NAME/lib/lib$MODULE_NAME.$TARGET_TYPE"
+
+if $is_so; then
+    linking_type_option="--shared"
+else
+    linking_type_option="--static"
+fi
+CFLAGS="$CFLAGS $(pkg-config --cflags "$linking_type_option" "$MODULE_NAME")"
+LIBS="$LIBS $(pkg-config --libs "$linking_type_option" "$MODULE_NAME")"
 dependency_include_stamps=$(pkg-config \
     --cflags "$MODULE_NAME" \
     | tr ' ' '\n' | grep '^-I.*include$' \
@@ -87,9 +93,9 @@ dependency_include_stamps=$(pkg-config \
     | grep -s '[^\s]' \
     | xargs -r -d '\n' -n 1 bash -c 'printf '"'"'%s '"'"' "$(relpath.sh "$(pwd -P)" $1)"' _)
 
-echo "all: $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include/.stamp"
+echo "all: $RELATIVE_BUILD_DIR/modules/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/modules/$MODULE_NAME/include/.stamp"
 echo
-echo "$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp: $target_path"
+echo "$RELATIVE_BUILD_DIR/modules/$MODULE_NAME/lib/.stamp: $target_path"
 echo -e "\ttouch \$@"
 echo
 echo "$target_path: $objects"
@@ -117,8 +123,8 @@ while [ $i -lt $source_count ]; do
     i=$((i + 1))
 done
 echo
-echo "$RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include/.stamp: $headers"
-echo -e "\tcp -R include/. $RELATIVE_BUILD_DIR/libraries/$MODULE_NAME/include"
+echo "$RELATIVE_BUILD_DIR/modules/$MODULE_NAME/include/.stamp: $headers"
+echo -e "\tcp -R include/. $RELATIVE_BUILD_DIR/modules/$MODULE_NAME/include"
 echo -e "\ttouch \$@"
 echo
 

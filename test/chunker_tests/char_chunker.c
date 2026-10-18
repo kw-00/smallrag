@@ -22,7 +22,7 @@ static void expect_split(
     dispose_chunks(&chunks);
 }
 
-void main(void)
+int main(void)
 {
     struct chunker chunker;
     init_char_chunker(&chunker, '|');

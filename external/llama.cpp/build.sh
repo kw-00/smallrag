@@ -18,8 +18,8 @@ if [ ! -f "$LIBLLAMA_PATH" ]; then
     exit 1
 fi
 
-ln -s "$LIBLLAMA_PATH" "$BUILD_DIR/libraries/$MODULE_NAME/lib/libllama.so"
-touch -r "$LIBLLAMA_PATH" "$BUILD_DIR/libraries/$MODULE_NAME/lib/.stamp"
+ln -s "$LIBLLAMA_PATH" "$BUILD_DIR/modules/$MODULE_NAME/lib/libllama.so"
+touch -r "$LIBLLAMA_PATH" "$BUILD_DIR/modules/$MODULE_NAME/lib/.stamp"
 
 
 LLAMA_HEADER_PATH="$LLAMA_CPP_PATH/include"
@@ -41,10 +41,10 @@ if [ -z "$recently_modified_header" ]; then
     exit 1
 fi
 
-cp -R "$LLAMA_HEADER_PATH/." "$BUILD_DIR/libraries/$MODULE_NAME/include"
-cp -R "$GGML_HEADER_PATH/." "$BUILD_DIR/libraries/$MODULE_NAME/include"
+cp -R "$LLAMA_HEADER_PATH/." "$BUILD_DIR/modules/$MODULE_NAME/include"
+cp -R "$GGML_HEADER_PATH/." "$BUILD_DIR/modules/$MODULE_NAME/include"
 
-INCLUDE_STAMP="$BUILD_DIR/libraries/$MODULE_NAME/include/.stamp"
+INCLUDE_STAMP="$BUILD_DIR/modules/$MODULE_NAME/include/.stamp"
 touch -r "$recently_modified_header" "$INCLUDE_STAMP"
 
 if [ $(stat -c '%Y' "$LLAMA_HEADER_PATH") -gt $(stat -c '%Y' "$GGML_HEADER_PATH") ]; then
@@ -53,6 +53,6 @@ else
     touch -r "$GGML_HEADER_PATH" "$INCLUDE_STAMP"
 fi
 
-sed 's|@PREFIX@|'"$BUILD_DIR/libraries/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" > "$BUILD_DIR/libraries/pkgconfig/$MODULE_NAME.pc"
+sed 's|@PREFIX@|'"$BUILD_DIR/modules/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
 
 
