@@ -5,5 +5,5 @@ includedir=${prefix}/include
 Name: data_structures
 Description: smallrag data structure library
 Version: 1.0
-Libs: -L${libdir} -ldata_structures
-Cflags: -I${includedir}
+Libs: -L"${libdir}" -ldata_structures
+Cflags: -I"${includedir}"

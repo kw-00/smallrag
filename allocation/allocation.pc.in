@@ -6,5 +6,5 @@ Name: allocation
 Description: smallrag utility library for allocating memory 
 Version: 1.0
 Requires.private: logging
-Libs: -L${libdir} -lallocation
-Cflags: -I${includedir}
+Libs: -L"${libdir}" -lallocation
+Cflags: -I"${includedir}"

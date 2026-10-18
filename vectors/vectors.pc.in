@@ -6,5 +6,5 @@ Name: vectors
 Description: smallrag library for vector operations
 Version: 1.0
 Requires.private: logging
-Libs: -L${libdir} -lvectors
-Cflags: -I${includedir}
+Libs: -L"${libdir}" -lvectors
+Cflags: -I"${includedir}"

@@ -6,5 +6,5 @@ Name: embedder
 Description: smallrag utility library for allocating memory 
 Version: 1.0
 Requires.private: logging, allocation, llama.cpp
-Libs: -L${libdir} -lembedder
-Cflags: -I${includedir}
+Libs: -L"${libdir}" -lembedder
+Cflags: -I"${includedir}"
