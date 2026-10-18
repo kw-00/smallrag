@@ -73,7 +73,7 @@ static void test_mutation(void)
         int_array_set(array, i, i * factor);
     }
     for (size_t i = 0;  i < SRC_SIZE; i++) {
-        assert(int_array_get(array, i) == i * factor);
+        assert(int_array_get(array, i) == (int)i * factor);
     }
     RESET_ARRAY_ERROR();
     int_array_set(array, SRC_SIZE + 1, 0);

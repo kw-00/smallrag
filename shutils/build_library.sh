@@ -11,6 +11,7 @@ if ! echo "$TARGET_TYPE" | grep 'a\|so' > /dev/null; then
 fi
 
 prepare_library_build_dirs.sh
+prepare_library_pc.sh
 
 gen_makefile.sh > Makefile.generated
 

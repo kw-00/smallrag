@@ -7,4 +7,6 @@ data_structures:
 llama.cpp:
 
 chunker_tests: chunker
+data_structures_tests: data_structures
+embedder_tests: embedder llama.cpp
 

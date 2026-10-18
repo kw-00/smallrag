@@ -11,48 +11,40 @@ if [ -z "$LLAMA_CPP_PATH" ]; then
     exit 1
 fi
 
-LIBLLAMA_PATH="$LLAMA_CPP_PATH/build/bin/libllama.so"
+LLAMA_CPP_PATH=$(abspath.sh "$LLAMA_CPP_PATH")
+echo "$LLAMA_CPP_PATH ====="
 
-if [ ! -f "$LIBLLAMA_PATH" ]; then
-    echo "Expected llama.cpp shared library at $LIBLLAMA_PATH, but missing" >&2
-    exit 1
-fi
+LIB_DIR="$LLAMA_CPP_PATH/build/bin"
+LLAMA_INCLUDE_DIR="$LLAMA_CPP_PATH/include"
+GGML_INCLUDE_DIR="$LLAMA_CPP_PATH/ggml/include"
 
-ln -s "$LIBLLAMA_PATH" "$BUILD_DIR/modules/$MODULE_NAME/lib/libllama.so"
-touch -r "$LIBLLAMA_PATH" "$BUILD_DIR/modules/$MODULE_NAME/lib/.stamp"
+MODULE_BUILD_DIR="$BUILD_DIR/modules/$MODULE_NAME"
+cp -p -R "$LLAMA_INCLUDE_DIR/." "$MODULE_BUILD_DIR/include"
+cp -p -R "$GGML_INCLUDE_DIR/." "$MODULE_BUILD_DIR/include"
 
-
-LLAMA_HEADER_PATH="$LLAMA_CPP_PATH/include"
-GGML_HEADER_PATH="$LLAMA_CPP_PATH/ggml/include"
-
-max_timestamp=0
-recently_modified_header=
-for file in \
-    $(find "$LLAMA_HEADER_PATH" -type f -regex '.*\.h') \
-    $(find "$GGML_HEADER_PATH" -type f -regex '.*\.h'); do
-    timestamp=$(stat -c '%Y' "$file") 
-    if [ $timestamp -gt $max_timestamp ]; then
-        max_timestamp=$timestamp
-        recently_modified_header="$file"
+last_mod_header=
+last_mod_time=
+for header in \
+    $(find "$LLAMA_INCLUDE_DIR" -type f -name '*.h') \
+    $(find "$GGML_INCLUDE_DIR" -type f -name '*.h'); do
+    mod_time=$(stat -c '%Y' "$header")
+    if [ -z $last_mod_time ] || [ $mod_time -gt $last_mod_time ]; then
+        last_mod_time=$mod_time
+        last_mod_header="$header"
     fi
 done
-if [ -z "$recently_modified_header" ]; then
-    echo "No llama.cpp headers found" >&2
+
+if [ -z "$last_mod_header" ]; then
+    echo "No headers found, unexpectedly" >&2
     exit 1
 fi
 
-cp -R "$LLAMA_HEADER_PATH/." "$BUILD_DIR/modules/$MODULE_NAME/include"
-cp -R "$GGML_HEADER_PATH/." "$BUILD_DIR/modules/$MODULE_NAME/include"
+touch -r "$last_mod_header" "$MODULE_BUILD_DIR/include/.stamp"
 
-INCLUDE_STAMP="$BUILD_DIR/modules/$MODULE_NAME/include/.stamp"
-touch -r "$recently_modified_header" "$INCLUDE_STAMP"
-
-if [ $(stat -c '%Y' "$LLAMA_HEADER_PATH") -gt $(stat -c '%Y' "$GGML_HEADER_PATH") ]; then
-    touch -r "$LLAMA_HEADER_PATH" "$INCLUDE_STAMP"
-else
-    touch -r "$GGML_HEADER_PATH" "$INCLUDE_STAMP"
-fi
-
-sed 's|@PREFIX@|'"$BUILD_DIR/modules/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
+sed \
+    -e 's|@LIB_DIR@|'"$LIB_DIR"'|g' \
+    -e 's|@INCLUDE_DIR@|'"$MODULE_BUILD_DIR/include"'|g' \
+    "$MODULE_NAME.pc.in" \
+    > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
 
 

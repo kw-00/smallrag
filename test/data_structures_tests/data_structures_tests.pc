@@ -1,0 +1,5 @@
+Name: data_structures_tests
+Description: test programs for data_structures
+Version: 1.0
+Requires.private: data_structures
+

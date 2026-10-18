@@ -21,9 +21,3 @@ mkdir -p "$MODULE_BUILD_DIR/lib"
 mkdir -p "$MODULE_BUILD_DIR/include"
 mkdir -p "$MODULE_BUILD_DIR/obj"
 
-sed \
-    -e 's|@PREFIX@|'"$MODULE_BUILD_DIR"'|g' \
-    -e 's|@NAME@|'"$MODULE_NAME"'|g' \
-    "$MODULE_NAME.pc.in" \
-    > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
-

@@ -1,9 +1,8 @@
-prefix=@PREFIX@
-libdir=${prefix}/lib
-includedir=${prefix}/include
+libdir=@LIB_DIR@
+includedir=@INCLUDE_DIR@
 
 Name: llama.cpp
 Description: module integrating llama.cpp with smallrag build system
 Version: 0
-Libs: -L${libdir} -lllama
-Cflags: -I${includedir}
+Libs: -L"${libdir}" -lllama
+Cflags: -I"${includedir}" 
