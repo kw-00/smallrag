@@ -74,7 +74,7 @@ while [ $i -lt $source_count ]; do
     executable=$(cat "$executables_dir/$i")
     echo "$executable: $source $headers $dependency_include_stamps"
     echo -e "\tmkdir -p $(dirname "$executable")"
-    echo -e "\t$CC -Iinclude $CFLAGS $LIBS -o \$@ $source"
+    echo -e "\t$CC $source -Iinclude $CFLAGS $LIBS -o \$@"
     i=$((i + 1))
 done
 echo
