@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: infrastructure
+Description: high-level functions for integrating libraries with smallrag programs
+Version: 1.0
+Requires.private: chunker, embedder, logging
+Lib: -L"${libdir}" -linfrastructure
+Cflags: -I"${includedir}"

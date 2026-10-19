@@ -40,7 +40,7 @@ int map_text(char *text_path, char **text, size_t *text_length)
         }
         file_size = statbuf.st_size;
     }
-    if (file_size > SIZE_MAX) {
+    if (file_size < 0 || (uintmax_t)file_size > SIZE_MAX) {
         LOG_ERROR("Number overflow");
         CLOSE_OR_EXIT(fd);
         return -1;
@@ -55,6 +55,8 @@ int map_text(char *text_path, char **text, size_t *text_length)
     *text = mapping;
     *text_length = file_size;
     CLOSE_OR_EXIT(fd);
+    /* Not strictly necessary to return, as we already exit; this is to satisfy compiler */
+    return 0; 
 }
 
 static void dispose_mapped_embeddings(struct embeddings *embeddings)
@@ -94,7 +96,7 @@ int load_embeddings(
 
     bool embeddings_cached = file_size > 0;
     if (embeddings_cached) {
-        if (file_size > SIZE_MAX) {
+        if (file_size < 0 || (uintmax_t)file_size > SIZE_MAX) {
             LOG_ERROR("Number overflow");
             CLOSE_OR_EXIT(fd);
             return -1;

@@ -1,0 +1,9 @@
+prefix=/home/krzysztof/Projects/smallrag/build/targets/cJSON
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: cJSON
+Description: external JSON library. Version is a placeholder
+Version: 1.0
+Libs: -L"${libdir}" -lcJSON
+Cflags: -I"${includedir}"

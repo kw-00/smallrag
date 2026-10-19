@@ -4,9 +4,15 @@ allocation: logging
 chunker: logging
 logging:
 data_structures:
+infrastructure: chunker embedder logging
+
+
 llama.cpp:
+cJSON:
 
 chunker_tests: chunker
 data_structures_tests: data_structures
 embedder_tests: embedder llama.cpp
+
+main: infrastructure chunker embedder logging cJSON
 

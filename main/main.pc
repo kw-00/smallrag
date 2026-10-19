@@ -1,0 +1,4 @@
+Name: main
+Description: main smallrag programs
+Version: 1.0
+Requires.private: logging, chunker, embedder, infrastructure, vectors

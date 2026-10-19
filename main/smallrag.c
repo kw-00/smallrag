@@ -53,6 +53,7 @@ static int embedding_postprocessing(struct embeddings *embeddings)
             return -1;
         }
     }
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -174,4 +175,5 @@ int main(int argc, char *argv[])
 
     dispose_embedder(&embedder);
     llama_model_free(model); 
+    exit(EXIT_SUCCESS);
 }
