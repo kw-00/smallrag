@@ -159,8 +159,9 @@ int load_embeddings(
         }
         if (fwrite(
                     embeddings->embeddings, 
+                    sizeof(float),
                     total_vector_size, 
-                    sizeof(float), stream) < total_vector_size) {
+                    stream) < total_vector_size) {
             perror("fwrite");
             LOG_ERROR("Write failed");
             CLOSE_OR_EXIT(fd);
