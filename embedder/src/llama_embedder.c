@@ -288,7 +288,7 @@ static ssize_t tokenize(
 
 static void dispose_embeddings(struct embeddings *embeddings)
 {
-    free(embeddings);
+    free(embeddings->embeddings);
 }
 
 static int get_embeddings(
