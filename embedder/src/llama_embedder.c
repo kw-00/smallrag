@@ -413,69 +413,99 @@ static int get_embeddings(
             free(embedding_memory); \
             llama_batch_free(batch); \
         } while (false)
+
+
+        size_t embedding_offset = 0;
         
         size_t token_idx = 0;
         size_t sequence_idx = 0;
         size_t sequence_end = token_counts[sequence_idx];
+        size_t seqbatch_idx = 0;
 
-        while(true) {
-            const size_t batch_start = token_idx;
-            const size_t batch_end_max = batch_start + batch_size;
-            size_t batch_end = batch_end_max;
-
-            size_t sequence_count = 1;
-
+        while (true) {
+            size_t seqbatch_start = seqbatch_idx * max_sequences_per_batch;
+            size_t relative_sequence_idx = seqbatch_start + sequence_idx;
             bool end_reached = false;
-            while (true) {
-                {
-                    const size_t relative_token_idx = token_idx - batch_start;
-                    batch.seq_id[relative_token_idx][0] = sequence_idx;
-                }
+            while(true) {
+                const size_t batch_start = token_idx;
+                const size_t batch_end_max = batch_start + batch_size;
+                size_t batch_end = batch_end_max;
 
-                end_reached = token_idx == (size_t)total_token_count - 1;
-                if (end_reached) {
-                    batch_end = total_token_count;
-                    break;
-                }
+                bool seqbatch_end_reached = false;
+                while (true) {
+                    {
+                        const size_t relative_token_idx = token_idx - batch_start;
+                        batch.seq_id[relative_token_idx][0] = relative_sequence_idx;
+                    }
 
-                bool batch_end_reached = token_idx == batch_end_max - 1;
-                bool sequence_end_reached = token_idx == sequence_end - 1;
+                    end_reached = token_idx == (size_t)total_token_count - 1;
+                    /* Note: sequence_idx and relative_sequence_idx are incremented together,
+                     * to preserve the invariant of
+                     * relative_sequence_idx = seqbatch_start + sequence_idx.
+                     * The two are incremented whenever a sequence end is reached.
+                     */
+                    if (end_reached) {
+                        sequence_idx++;
+                        relative_sequence_idx++;
+                        batch_end = total_token_count;
+                        break;
+                    }
 
-                if (batch_end_reached && !sequence_end_reached) {
-                    token_idx++;
-                    break;
-                } else if (sequence_end_reached && !batch_end_reached) {
-                    batch_end = sequence_end;
-                    token_idx++;
-                    sequence_idx++;
-                    sequence_end += token_counts[sequence_idx];
-                    if (sequence_count == max_sequences_per_batch) {
+                    bool batch_end_reached = token_idx == batch_end_max - 1;
+                    bool sequence_end_reached = token_idx == sequence_end - 1;
+
+                    if (batch_end_reached && !sequence_end_reached) {
+                        token_idx++;
+                        break;
+                    } else if (sequence_end_reached && !batch_end_reached) {
+                        batch_end = sequence_end;
+                        token_idx++;
+                        sequence_idx++;
+                        relative_sequence_idx++;
+                        sequence_end += token_counts[sequence_idx];
+                        if (relative_sequence_idx == max_sequences_per_batch - 1) {
+                            seqbatch_end_reached = true;
+                            seqbatch_idx++;
+                            break;
+                        }
+                    } else if (batch_end_reached && sequence_end_reached) {
+                        token_idx++;
+                        sequence_idx++;
+                        relative_sequence_idx++;
+                        sequence_end += token_counts[sequence_idx];
                         break;
                     } else {
-                        sequence_count++;
+                        token_idx++;
                     }
-                } else if (batch_end_reached && sequence_end_reached) {
-                    token_idx++;
-                    sequence_idx++;
-                    sequence_end += token_counts[sequence_idx];
+                }
+                size_t current_batch_size = batch_end - batch_start;
+                batch.n_tokens = current_batch_size;
+                memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
+                llama_memory_t context_memory = llama_get_memory(context);
+                llama_memory_clear(context_memory, true);
+                if (llama_encode(context, batch) != 0) {
+                    LOG_ERROR("Decode failed");
+                    ERROR_CLEANUP();
+                    return -1;
+                }
+                if (end_reached || seqbatch_end_reached) {
                     break;
-                } else {
-                    token_idx++;
                 }
             }
-            size_t current_batch_size = batch_end - batch_start;
-            batch.n_tokens = current_batch_size;
-            memcpy(batch.token, tokens + batch_start, current_batch_size * sizeof(llama_token));
-            llama_memory_t context_memory = llama_get_memory(context);
-            llama_memory_clear(context_memory, true);
-            if (llama_encode(context, batch) != 0) {
-                LOG_ERROR("Decode failed");
-                ERROR_CLEANUP();
-                return -1;
+            /* Copy embeddings */
+            {
+                size_t current_idx = 0;
+                while (current_idx < relative_sequence_idx) {
+
+                    float *embedding = llama_get_embeddings_seq(context, current_idx);
+                    memcpy(embedding_memory + embedding_offset, embedding, dimension_count * sizeof(float));
+                    current_idx++;
+                    embedding_offset += dimension_count;
+                }
+                llama_memory_t context_memory = llama_get_memory(context);
+                llama_memory_clear(context_memory, true);
             }
-            if (end_reached) {
-                break;
-            }
+            if (end_reached) break;
         }
         /* Free batch */
         llama_batch_free(batch);
@@ -488,19 +518,6 @@ static int get_embeddings(
         } while (false)
     }
         
-    /* Copy embeddings */
-    {
-        size_t sequence_idx = 0;
-        size_t embedding_offset = 0;
-        while (sequence_idx < text_count) {
-            float *embedding = llama_get_embeddings_seq(context, sequence_idx);
-            memcpy(embedding_memory + embedding_offset, embedding, dimension_count * sizeof(float));
-            sequence_idx++;
-            embedding_offset += dimension_count;
-        }
-        llama_memory_t context_memory = llama_get_memory(context);
-        llama_memory_clear(context_memory, true);
-    }
     
     free(tokens);
     free(token_counts);
