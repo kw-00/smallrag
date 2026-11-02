@@ -1,4 +1,4 @@
-prefix=/home/krzysztof/Projects/smallrag/build/targets/cJSON
+prefix=@PREFIX@
 libdir=${prefix}/lib
 includedir=${prefix}/include
 

@@ -6,7 +6,7 @@ prepare_library_build_dirs.sh
 
 MODULE_NAME=$(basename "$(pwd -P)")
 
-INCLUDE_DIR="$BUILD_DIR/targets/$MODULE_NAME/include"
+INCLUDE_DIR="$BUILD_DIR/modules/$MODULE_NAME/include"
 if [ ! -d "$INCLUDE_DIR" ]; then
     mkdir -p "$INCLUDE_DIR"
 fi
@@ -15,7 +15,7 @@ if [ ! -f "$INCLUDE_DIR/.stamp" ]; then
     touch "$INCLUDE_DIR/.stamp"
 fi
 
-LIB_DIR="$BUILD_DIR/targets/$MODULE_NAME/lib"
+LIB_DIR="$BUILD_DIR/modules/$MODULE_NAME/lib"
 if [ ! -d "$LIB_DIR" ]; then
     mkdir -p "$LIB_DIR"
 fi
@@ -27,7 +27,7 @@ if [ ! -f "$LIB_DIR/.stamp" ]; then
     rm cJSON.o cJSON.c
 fi
 
-sed -i 's|@PREFIX@|'"$BUILD_DIR/targets/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" \
+sed 's|@PREFIX@|'"$BUILD_DIR/modules/$MODULE_NAME"'|g' "$MODULE_NAME.pc.in" \
     > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
 
 

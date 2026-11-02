@@ -9,7 +9,9 @@
 #include "smallrag/logging.h"
 
 #include "llama.h"
+#include "cJSON.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -54,6 +56,18 @@ static int embedding_postprocessing(struct embeddings *embeddings)
         }
     }
     return 0;
+}
+
+static int compare_similarity(void *size_t index_x, void *size_t index_y, void *similarity_scores)
+{
+    double *double_scores = similarity_scores;
+    double score_x = double_scores[index_x];
+    double score_y = double_scores[index_y];
+    if (score_x > score_y) {
+        return 1;
+    } else {
+        return -1;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -118,6 +132,10 @@ int main(int argc, char *argv[])
         LOG_ERROR("Failed to map text");
         exit(1);
     }
+#define CLEANUP() \
+    do { \
+        munmap(full_source_text); \
+    } while (false)
 
     /* Split source text into chunks */
     struct chunks chunks;
@@ -130,6 +148,8 @@ int main(int argc, char *argv[])
 
         if (get_chunks(&chunker, full_source_text, full_text_length, &chunks) == -1) {
             LOG_ERROR("Failed to split text into chunks");
+            CLEANUP();
+            dispose_chunker(&chunker);
             exit(1);
         }
         dispose_chunker(&chunker);
@@ -140,6 +160,14 @@ int main(int argc, char *argv[])
         struct llama_model_params params = llama_model_default_params();
         model = llama_model_load_from_file(model_path, params);
     }
+#undef CLEANUP
+#define CLEANUP() \
+    do { \
+        dispose_chunks(chunks); \
+        munmap(full_source_text); \
+        llama_model_free(model); \
+    } while (false)
+
     /* Initialize embedder */ 
     struct embedder embedder;
     {
@@ -153,27 +181,225 @@ int main(int argc, char *argv[])
         struct embedder llama_embedder;
         if (init_llama_embedder(&llama_embedder, model, &params) == -1) {
             LOG_ERROR("Failed to initialize embedder");
+            CLEANUP();
             exit(1);
         }
         if (init_postprocessing_embedder(
                     &embedder, &llama_embedder, &embedding_postprocessing) == -1) {
             LOG_ERROR("Failed to wrap llama embedder with postprocessing");
+            dispose_embedder(llama_embedder);
+            CLEANUP();
             exit(1);
         }
     }
+#undef CLEANUP
+#define CLEANUP() \
+    do { \
+        dispose_chunks(chunks); \
+        munmap(full_source_text); \
+        llama_model_free(model); \
+        dispose_embedder(embedder); \
+    } while (false)
 
     /* Prepare and cache embeddings */
     struct embeddings embeddings;
     if (load_embeddings(embeddings_path, &chunks, &embedder, &embeddings) == -1) {
         LOG_ERROR("Failed to load or compute embeddings");
+        CLEANUP();
+        exit(1);
+    }
+#undef CLEANUP
+#define CLEANUP() \
+    do { \
+        dispose_chunks(chunks); \
+        munmap(full_source_text); \
+        dispose_embedder(embedder); \
+        llama_model_free(model); \
+        dispose_embeddings(embeddings); \
+    } while (false)
+    
+    if (sizeof(double) > SIZE_MAX / chunks->count) {
+        LOG_ERROR("Number overflow");
+        CLEANUP();
+        exit(1);
+    }
+    double *similarity_scores = malloc(sizeof(double) * chunk->count);
+    if (similarity_scores == NULL) {
+        LOG_ERROR("Allocation failed");
+        CLEANUP();
+        exit(1);
+    }
+    double *sorted_text_indices = malloc(sizeof(size_t) * chunk->count);
+    if (sorted_text_indices == NULL) {
+        LOG_ERROR("Allocation failed");
+        CLEANUP();
         exit(1);
     }
 
-    /* Cleanup */
-    dispose_chunks(&chunks);
-    munmap(full_source_text, full_text_length);
+    /* Stdio loop */
+    const int buffer_size = (1 << 24);
+    char *read_buffer = malloc(sizeof(char) * buffer_size);
+    while (true) {
+        char *query = NULL;
+        ssize_t top_k = -1;
+        if (fgets(read_buffer, buffer_size, stdin) == NULL) {
+            LOG_ERROR("Failed to read input");
+            CLEANUP();
+            exit(1);
+        }
+        cJSON *request = cJSON_Parse(read_buffer);
+        if (request == NULL) {
+            const char *error_ptr = cJSON_GetErrorPtr();
+            LOG_ERROR("Failed to parse JSON: %s", error_ptr);
+            continue;
+        }
+        if (!cJSON_IsObject(request)) {
+            LOG_ERROR("Unexpected JSON structure. Root should be object");
+            cJSON_Delete(request);
+            continue;
+        }
+        cJSON *child = request->child;
+        if (child == NULL) {
+            LOG_ERROR("Request body contains no keys");
+            cJSON_Delete(request);
+            continue;
+        }
+        bool error_occurred = false;
+        while (true) {
+            if (child->string == "top_k") {
+                if (!cJSON_IsNumber(child)) {
+                    LOG_ERROR("Request \"top_k\" key should hold a number");
+                    cJSON_Delete(request);
+                    error_occurred = true;
+                    break;
+                }
+                if (child->valuedouble < 1) {
+                    LOG_ERROR("Request \"top_k\" key must be at least 1");
+                    cJSON_Delete(request);
+                    error_occurred = true;
+                    break;
+                }
+                if (child->valuedouble != trunc(child->valuedouble)) {
+                    LOG_ERROR("Request \"top_k\" key must be an integer");
+                    cJSON_Delete(request);
+                    error_occurred = true;
+                    break;
+                }
+                top_k = (ssize_t)child->valuedouble;
+            } else if (child->string == "query") {
+                if (!cjSON_IsString(child)) {
+                    LOG_ERROR("Request \"query\" key must be a string");
+                    cJSON_Delete(request);
+                    error_occurred = true;
+                    break;
+                }
+                query = child->valuestring;
+            } else {
+                LOG_ERROR(
+                        "Request must be JSON object with two keys:"
+                        " \"top_k\" and \"query\"."
+                        " No other keys are allowed");
+                cJSON_Delete(request);
+                error_occurred = true;
+                break;
+            }
+            if (child.next == NULL) break;
+        }
+        if (error_occurred) {
+            cJSON_Delete(request);
+            continue;
+        }
+        if (top_k == -1) {
+            LOG_ERROR("Expected \"top_k\" in request");
+            cJSON_Delete(request);
+            continue;
+        }
+        if (query == NULL) {
+            LOG_ERROR("Expected \"query\" in request");
+            cJSON_Delete(request);
+            continue;
+        }
 
-    dispose_embedder(&embedder);
-    llama_model_free(model); 
+        size_t query_length = strlen(query);
+
+        struct embeddings query_embedding;
+        {
+            if (get_embeddings(
+                    embedder,
+                    &query,
+                    &query_length,
+                    1,
+                    query_embedding) == -1) {
+                CLEANUP();
+                cJSON_Delete(request);
+                exit(1);
+            }
+        }
+        {
+            size_t vector_offset = 0;
+            for (size_t i = 0; i < chunks->count; i++) {
+                similarity_scores[i] = dot_product(
+                        embeddings->embeddings + vector_offset, 
+                        query_embedding->embeddings,
+                        embeddings->dimension_count);
+                vector_offset += embeddings->dimension_count;
+            }
+            qsort(
+                    sorted_text_indices, 
+                    chunks->count, 
+                    sizeof(size_t),
+                    &compare_similarity,
+                    similarity_scores);
+        }
+        cJSON_Delete(request);
+        cJSON *response = cJSON_CreateArray();
+        if (response == NULL) {
+            LOG_ERROR("Response JSON array creation failed: %s", cJSON_GetError());
+            CLEANUP();
+            exit(1);
+        }
+        for (size_t i = 0; i < top_k && i < chunks->count; i++) {
+            char *text_string = calloc(sizeof(char), (chunks->sizes[i] + 1));
+            if (text_string == NULL) {
+                LOG_ERROR("Allocation failed");
+                CLEANUP();
+                cJSON_Delete(request);
+                exit(1);
+            }
+            memcpy(text_string, chunks->texts[i], chunks->sizes[i]);
+
+            cJSON *response_item = cJSON_CreateString(text_string);
+            free(text_string);
+
+            cJSON_AddItemToArray(response, response_item);
+        }
+        char *response_string = cJSON_Print(response);
+        cJSON_Delete(response);
+        if (puts(response_string) == -1) {
+            LOG_ERROR("puts failed");
+            CLEANUP();
+            free(response_string);
+            exit(1);
+        }
+        free(response_string);
+    }
+}
+
+
+            
+
+                
+
+
+
+        
+
+
+
+
+    }
+
+    /* Cleanup */
+    CLEANUP();
     exit(EXIT_SUCCESS);
 }
