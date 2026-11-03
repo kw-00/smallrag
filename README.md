@@ -1,6 +1,13 @@
-# Smallrag - an stdio-based information retrieval server
+# Smallrag - an stdio-based information retrieval server for Linux (also for Windows via WSL)
 ## How to install
-To install **smallrag**, clone the repository, enter its root and run *build.sh* from its root.
+First of all, you need a llama.cpp repository on your system.
+
+To install **smallrag**, clone the repository, enter its root and run *build.sh* from its root. The **LLAMA_CPP_PATH** environment variable must point to the root of the llama.cpp respository. Supposing you have llama.cpp at `/opt/llama.cpp`, you could run:
+```bash
+LLAMA_CPP_PATH='/opt/llama.cpp' ./build.sh
+```
+From repository root.
+
 
 This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
 
