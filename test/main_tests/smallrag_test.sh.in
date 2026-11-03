@@ -1,0 +1,41 @@
+#!/bin/sh
+
+set -eu
+
+smallrag="@BUILD_DIR@/modules/main/smallrag"
+
+fail() {
+    printf 'smallrag_test: %s\n' "$*" >&2
+    exit 1
+}
+
+[ -x "$smallrag" ] || fail "executable not found: $smallrag"
+
+test_dir=$("@SHUTILS_PATH@/tempdir.sh") || fail 'cannot create temporary directory'
+trap 'rm -rf "$test_dir"' 0
+trap 'exit 1' HUP INT TERM
+
+help_output="$test_dir/help_output"
+help_error="$test_dir/help_error"
+"$smallrag" -h > "$help_output" 2> "$help_error" || fail 'help failed'
+[ ! -s "$help_error" ] || fail 'help wrote to stderr'
+for text in 'Usage:' '-h - print this help' '-m <model-path>' \
+        '-d <source-text>' '-e <embeddings-path>' '-s <max-seq>'; do
+    grep -Fq -e "$text" "$help_output" || fail "help is missing: $text"
+done
+
+"$smallrag" -m "$test_dir/missing_model" -d "$test_dir/missing_source" \
+    -e "$test_dir/embeddings" -h > "$test_dir/help_after_options" 2> "$help_error" \
+    || fail 'help after other options failed'
+cmp -s "$help_output" "$test_dir/help_after_options" || fail 'help output changed after other options'
+[ ! -s "$help_error" ] || fail 'help after other options wrote to stderr'
+[ ! -e "$test_dir/embeddings" ] || fail 'help created embeddings'
+
+if "$smallrag" > /dev/null 2>&1; then
+    fail 'missing required options unexpectedly succeeded'
+fi
+if "$smallrag" -z > /dev/null 2>&1; then
+    fail 'unknown option unexpectedly succeeded'
+fi
+
+printf '%s\n' 'smallrag tests passed'

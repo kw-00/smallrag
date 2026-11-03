@@ -23,7 +23,41 @@
 #include <inttypes.h>
 #include <sys/mman.h>
 
-/* -m — model path
+static const char *usage =
+"Stdio-based information retrieval server.\n"
+"Usage:\n"
+"smallrag -h\n"
+"smallrag \\\n"
+"   -m <model-path> \\\n"
+"   -d <source-text> \\\n"
+"   -e <embeddings-path> \\\n"
+"   [ -t <n-tokenizer-threads> ] \\\n"
+"   [ -c <context-size> ] \\\n"
+"   [ -b <batch-size> ] \\\n"
+"   [ -u <ubatch-size> ] \\\n"
+"   [ -s <max-seq> ]\n"
+"\n\n"
+"Options:\n"
+"-h - print this help and exit\n"
+"- model-path - path to .gguf embedding model\n"
+"- source-text - path to source text. Must exist as a file. Source text should contain text fragments\n"
+"   delimited using NUL bytes,\n"
+"- embeddings-path - path to a file that contains/will contain text embeddings. If the file doesn't exist,"
+" it embeddings are created for the source text and saved under the path passed via -e.\n"
+" if the file does exist, then it is used for retrieval of text fragments.\n"
+" Do not attempt to create it yourself - embeddings are managed by the application."
+" Pass a whatever path you want the application to use for storing embeddings."
+"\n\n"
+"The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
+"- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
+" as there are logical processors.\n"
+"- context-size, batch-size, ubatch-size - if they are not self-explanatory, I recommend reading about"
+" them in the context of AI inference backends or similar. context size/batch size/ubatch size are common"
+" terminology that is worth studying separately if you're interested.\n"
+"- <max-seq> - max number of sequences per logical batch.\n";
+
+/* -h — print help and exit
+ * -m — model path
  * -d — source text path
  * -e — embeddings path
  * -t — number of tokenizer threads
@@ -32,7 +66,7 @@
  * -u — ubatch size
  * -s — max sequences per batch
  */
-static const char *optstring = "m:d:e:t:c:b:u:s:";
+static const char *optstring = "hm:d:e:t:c:b:u:s:";
 
 struct similarity {
     size_t text_index;
@@ -190,6 +224,12 @@ int main(int argc, char *argv[])
             break;
         }
         switch (option) {
+            case 'h':
+                if (fputs(usage, stdout) == EOF || fflush(stdout) == EOF) {
+                    perror("stdout");
+                    return EXIT_FAILURE;
+                }
+                return EXIT_SUCCESS;
             case 'm':
                 model_path = optarg;
                 break;
