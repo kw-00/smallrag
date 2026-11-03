@@ -65,4 +65,6 @@ echo >> Makefile.generated
 cat "$recipes" >> Makefile.generated
 
 rm -rf "$temp"
+
+find "$BUILD_DIR" -regex '^'"$BUILD_DIR"'/modules/\w+/\.stamp$' -exec rm {} \;
 "$MAKE" -f Makefile.generated
