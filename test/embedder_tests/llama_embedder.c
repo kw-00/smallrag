@@ -5,11 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
-#ifndef MODEL_PATH
-#error "MODEL_PATH not defined, though required for tests"
+#ifndef GGUF_MODEL_PATHS
+#error "GGUF_MODEL_PATHS expected"
 #endif
-
 
 static void get_embedder(char *model_path, struct embedder* embedder)
 {
@@ -51,14 +51,21 @@ static void test_embedding_counts(char **strings, size_t string_count, struct em
 
 int main(void) 
 {
-    struct embedder embedder;
-    get_embedder(MODEL_PATH, &embedder);
-    {
-        char *strings[3];
-        strings[0] = "Hi, my name is Emma.";
-        strings[1] = "Emma Bed. You can call me Emm Bed for short.";
-        strings[2] = "Nice to meet you, Emm.";
-        test_embedding_counts(strings, 3, &embedder);
+    fprintf(stderr, "PATHS: %s\n", GGUF_MODEL_PATHS);
+    char *saveptr = NULL;
+    char *path = strtok_r(GGUF_MODEL_PATHS, ",", &saveptr);
+    while (path != NULL) {
+        struct embedder embedder;
+        get_embedder(path, &embedder);
+        {
+            char *strings[3];
+            strings[0] = "Hi, my name is Emma.";
+            strings[1] = "Emma Bed. You can call me Emm Bed for short.";
+            strings[2] = "Nice to meet you, Emm.";
+            test_embedding_counts(strings, 3, &embedder);
+        }
+        dispose_embedder(&embedder);
+        path = strtok_r(NULL, ",", &saveptr);
     }
 }
 

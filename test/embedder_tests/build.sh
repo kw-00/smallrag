@@ -1,3 +1,3 @@
-export CFLAGS="$CFLAGS -DMODEL_PATH=\"\\\"$ROOT_DIR/models/v5-nano-retrieval-F16.gguf\\\"\""
+export CFLAGS="$CFLAGS $GGUF_MODEL_PATHS_CFLAGS"
 
 build_executable.sh llama_embedder.c

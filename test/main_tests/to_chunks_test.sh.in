@@ -1,0 +1,106 @@
+#!/bin/sh
+
+set -eu
+
+to_chunks="@BUILD_DIR@/modules/main/to_chunks"
+
+fail() {
+    printf 'to_chunks_test: %s\n' "$*" >&2
+    exit 1
+}
+
+[ -x "$to_chunks" ] || fail "executable not found: $to_chunks"
+
+test_dir=$("@SHUTILS_PATH@/tempdir.sh") || fail 'cannot create temporary directory'
+trap 'rm -rf "$test_dir"' 0
+trap 'exit 1' HUP INT TERM
+
+first="$test_dir/first_input"
+second="$test_dir/second_input"
+third="$test_dir/third_input"
+empty="$test_dir/empty_input"
+expected_first="$test_dir/first.expected"
+expected_second="$test_dir/second.expected"
+expected_third="$test_dir/third.expected"
+expected_empty="$test_dir/empty.expected"
+
+printf '%s\n' 'first line' > "$first"
+printf '%b' 'second\0000with NUL\n' > "$second"
+printf '%s' 'last file' > "$third"
+: > "$empty"
+cp "$first" "$expected_first"
+cp "$second" "$expected_second"
+cp "$third" "$expected_third"
+cp "$empty" "$expected_empty"
+
+assert_inputs_unchanged() {
+    cmp -s "$expected_first" "$first" || fail "$1: first input changed"
+    cmp -s "$expected_second" "$second" || fail "$1: second input changed"
+    cmp -s "$expected_third" "$third" || fail "$1: third input changed"
+    cmp -s "$expected_empty" "$empty" || fail "$1: empty input changed"
+}
+
+expect_failure() {
+    case_name=$1
+    shift
+    if "$to_chunks" "$@" > /dev/null 2>&1; then
+        fail "$case_name unexpectedly succeeded"
+    fi
+}
+
+# A single input is copied exactly, including embedded NUL bytes.
+single_output="$test_dir/single_output"
+"$to_chunks" "$second" "$single_output" || fail 'single input failed'
+cmp -s "$expected_second" "$single_output" || fail 'single input output differs'
+
+empty_output="$test_dir/empty_output"
+"$to_chunks" "$empty" "$empty_output" || fail 'empty input failed'
+cmp -s "$expected_empty" "$empty_output" || fail 'empty input output differs'
+
+# Separators appear only between inputs, including around an empty input.
+multiple_output="$test_dir/multiple_output"
+multiple_expected="$test_dir/multiple.expected"
+printf '%b' 'first line\n\0000\0000second\0000with NUL\n\0000last file' > "$multiple_expected"
+"$to_chunks" "$first" "$empty" "$second" "$third" "$multiple_output" || fail 'multiple inputs failed'
+cmp -s "$multiple_expected" "$multiple_output" || fail 'multiple input output differs'
+
+edge_output="$test_dir/empty_edges_output"
+edge_expected="$test_dir/empty_edges.expected"
+printf '%b' '\0000first line\n\0000' > "$edge_expected"
+"$to_chunks" "$empty" "$first" "$empty" "$edge_output" || fail 'empty edge inputs failed'
+cmp -s "$edge_expected" "$edge_output" || fail 'empty edge input output differs'
+
+# Exercise copying more than one stdio buffer.
+large_input="$test_dir/large_input"
+large_expected="$test_dir/large.expected"
+large_output="$test_dir/large_output"
+awk 'BEGIN { for (i = 0; i < 16384; i++) printf "0123456789abcdef" }' > "$large_input"
+cp "$large_input" "$large_expected"
+"$to_chunks" "$large_input" "$large_output" || fail 'large input failed'
+cmp -s "$large_expected" "$large_output" || fail 'large input output differs'
+cmp -s "$large_expected" "$large_input" || fail 'large input changed'
+assert_inputs_unchanged 'successful invocations'
+
+expect_failure 'no arguments'
+expect_failure 'one argument' "$first"
+assert_inputs_unchanged 'too few arguments'
+
+expect_failure 'single input matching output' "$first" "$first"
+assert_inputs_unchanged 'single input matching output'
+
+for conflict in "$first" "$second" "$third"; do
+    expect_failure "output matching $conflict" "$first" "$second" "$third" "$conflict"
+    assert_inputs_unchanged "output matching $conflict"
+done
+
+hard_link="$test_dir/first_hard_link"
+ln "$first" "$hard_link"
+expect_failure 'hard-linked output' "$first" "$second" "$third" "$hard_link"
+assert_inputs_unchanged 'hard-linked output'
+
+symbolic_link="$test_dir/second_symbolic_link"
+ln -s 'second_input' "$symbolic_link"
+expect_failure 'symbolic-linked output' "$first" "$second" "$third" "$symbolic_link"
+assert_inputs_unchanged 'symbolic-linked output'
+
+printf '%s\n' 'to_chunks tests passed'

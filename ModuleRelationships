@@ -6,13 +6,16 @@ logging:
 data_structures:
 infrastructure: chunker embedder logging
 
-
 llama.cpp:
 cJSON:
+
+main: infrastructure chunker embedder logging cJSON
 
 chunker_tests: chunker
 data_structures_tests: data_structures
 embedder_tests: embedder llama.cpp
 
-main: infrastructure chunker embedder logging cJSON
+main_tests: main
+
+
 

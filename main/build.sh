@@ -1,3 +1,3 @@
 
 
-build_executable.sh smallrag.c
+build_executable.sh smallrag.c to_chunks.c
