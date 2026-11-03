@@ -1,6 +1,14 @@
-# Stdio-based information retrieval server.
+# Smallrag - an stdio-based information retrieval server
+## How to install
+To install **smallrag**, clone the repository, enter its root and run *build.sh* from its root.
 
-## Usage:
+This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
+
+Both executables are self-contained. You will find them in `<project-root>/build/modules/main`. You can move
+them to to a folder in your PATH, such as `usr/local/bin`, or, better yet, create symbolic links to them.
+
+## the smallrag program
+### Usage
 
 ```text
 smallrag -h
@@ -15,25 +23,19 @@ smallrag \
    [ -s <max-seq> ]
 ```
 
-## Options:
-
-```text
--h - print this help and exit
-- model-path - path to .gguf embedding model
-- source-text - path to source text. Must exist as a file. Source text should contain text fragments
+### Arguments:
+- `model-path` - path to .gguf embedding model
+- `source-text` - path to source text. Must exist as a file. Source text should contain text fragments
    delimited using NUL bytes,
-- embeddings-path - path to a file that contains/will contain text embeddings. If the file doesn't exist, it embeddings are created for the source text and saved under the path passed via -e.
+- `embeddings-path` - path to a file that contains/will contain text embeddings. If the file doesn't exist, it embeddings are created for the source text and saved under the path passed via -e.
  if the file does exist, then it is used for retrieval of text fragments.
  Do not attempt to create it yourself - embeddings are managed by the application. Pass a whatever path you want the application to use for storing embeddings.
-```
 
 The remaining arguments are used to configure the llama.cpp backend. They are all optional.
 
-```text
-- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads as there are logical processors.
-- context-size, batch-size, ubatch-size - if they are not self-explanatory, I recommend reading about them in the context of AI inference backends or similar. context size/batch size/ubatch size are common terminology that is worth studying separately if you're interested.
-- <max-seq> - max number of sequences per logical batch.
-```
+- `n-tokenizer-threads` - number of threads to use for tokenization. Default will use as many threads as there are logical processors.
+- `context-size`, `batch-size`, `ubatch-size` - if they are not self-explanatory, I recommend reading about them in the context of AI inference backends or similar. context size/batch size/ubatch size are common terminology that is worth studying separately if you're interested.
+- `max-seq` - max number of sequences per logical batch.
 
 To use smallrag, make sure to enter input into the smallrag process's standard input. The input format is as follows:
 
@@ -50,3 +52,44 @@ The output format is as follows:
 ```
 
 Output results are ranked from most relevant to least relevant. For each query, a single line of output containing a JSON list like this is sent via standard ouput.
+
+
+## the to_chunks program
+### Usage
+```text
+to_chunks input_file [input_file ...] output_file
+```
+
+`to_chunks` takes at least two file paths as its arguments. The last file is the **output file**; the others are input files.
+
+It takes the input files, concatenates their contents with delimiting NUL bytes and saves the result to the output file. The output file should not exist.
+
+The output file can then be used as a source text for the smallrag program, as it expects NUL-delimited text fragments.
+
+## Example workflow
+First, let's prepare a folder with our source text files. Suppose we're deploying smallrag for animal Q&A. A simplified collection of files might look like this:
+```text
+sources/mammals.txt
+sources/reptiles.txt
+sources/insects.txt
+```
+
+Now, we could run:
+```bash
+to_chunks sources/* sources.txt
+```
+Where *sources.txt* is the output file for `to_chunks`.
+
+Now, suppose we have a .gguf embedding model under model.gguf. let's run:
+```bash
+smallrag -m model.gguf -d sources.txt -e embeddings
+```
+Now smallrag is running and listening on standard input. We could enter:
+```json
+{"query": "Find me some information about mammals", "top_k": 2}
+```
+smallrag might output:
+```json
+["Mammals are often cute", "Insects are often a nuisance to mammals"]
+```
+Assuming the statements in the output list are the content of the two most relevant files among `sources/*`.
