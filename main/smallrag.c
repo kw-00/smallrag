@@ -54,7 +54,20 @@ static const char *usage =
 "- context-size, batch-size, ubatch-size - if they are not self-explanatory, I recommend reading about"
 " them in the context of AI inference backends or similar. context size/batch size/ubatch size are common"
 " terminology that is worth studying separately if you're interested.\n"
-"- <max-seq> - max number of sequences per logical batch.\n";
+"- <max-seq> - max number of sequences per logical batch.\n"
+"\n\n"
+"To use smallrag, make sure to enter input into the smallrag process's standard input. The input"
+" format is as follows:\n"
+"{\"query\": \"How many bear species exist in Antarctica?\", \"top_k\": 10}"
+"\n\n"
+"Generally, the input has the form of JSON lines. One line = one query, according to the format above."
+" Splitting the query JSON into multiple lines is an error."
+"\n\n"
+"The output format is as follows:\n"
+"[\"No known bear species live in Antarctica.\", \"The grizzly bear is endemic to North America.\", ...]\n"
+"\n\n"
+"Output results are ranked from most relevant to least relevant. For each query, a single line of output"
+" containing a JSON list like this is sent via standard ouput.";
 
 /* -h — print help and exit
  * -m — model path
@@ -290,14 +303,14 @@ int main(int argc, char *argv[])
     char *full_source_text = NULL;
     size_t full_text_length = 0;
     bool source_text_mapped = false;
-    struct chunks chunks = {0};
+    struct chunks chunks;
     bool chunks_initialized = false;
     struct llama_model *model = NULL;
-    struct embedder llama_embedder = {0};
+    struct embedder llama_embedder;
     bool llama_embedder_initialized = false;
-    struct embedder embedder = {0};
+    struct embedder embedder;
     bool embedder_initialized = false;
-    struct embeddings embeddings = {0};
+    struct embeddings embeddings;
     bool embeddings_initialized = false;
     struct similarity *similarities = NULL;
     char *read_buffer = NULL;
@@ -346,7 +359,7 @@ int main(int argc, char *argv[])
 
     /* Split source text into chunks */
     {
-        struct chunker chunker = {0};
+        struct chunker chunker;
         if (init_char_chunker(&chunker, '\0') == -1) {
             LOG_ERROR("Failed to initialize chunker");
             CLEANUP();
@@ -469,7 +482,7 @@ int main(int argc, char *argv[])
         }
         size_t query_length = strlen(query);
 
-        struct embeddings query_embedding = {0};
+        struct embeddings query_embedding;
         {
             char *query_texts[] = {query};
             size_t query_lengths[] = {query_length};

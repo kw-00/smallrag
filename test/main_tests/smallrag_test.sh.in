@@ -12,7 +12,20 @@ fail() {
 [ -x "$smallrag" ] || fail "executable not found: $smallrag"
 
 test_dir=$("@SHUTILS_PATH@/tempdir.sh") || fail 'cannot create temporary directory'
-trap 'rm -rf "$test_dir"' 0
+server_pid=
+watchdog_pid=
+cleanup() {
+    if [ -n "$watchdog_pid" ]; then
+        kill "$watchdog_pid" 2> /dev/null || :
+        wait "$watchdog_pid" 2> /dev/null || :
+    fi
+    if [ -n "$server_pid" ]; then
+        kill "$server_pid" 2> /dev/null || :
+        wait "$server_pid" 2> /dev/null || :
+    fi
+    rm -rf "$test_dir"
+}
+trap cleanup 0
 trap 'exit 1' HUP INT TERM
 
 help_output="$test_dir/help_output"
@@ -37,5 +50,147 @@ fi
 if "$smallrag" -z > /dev/null 2>&1; then
     fail 'unknown option unexpectedly succeeded'
 fi
+
+# Exercise JSON-lines requests with the first configured embedding model.
+model_paths="@GGUF_MODEL_PATHS@"
+model_path=${model_paths%%,*}
+[ -f "$model_path" ] && [ -r "$model_path" ] || fail "configured model is not readable: $model_path"
+
+io_source="$test_dir/io_source"
+io_output="$test_dir/io_output"
+io_error="$test_dir/io_error"
+io_timeout="$test_dir/io_timeout"
+io_fifo="$test_dir/io_fifo"
+chunk_one='An apple is red.'
+chunk_two='Snow covers a mountain.'
+chunk_three=$(printf '%s\n%s' 'A sign says "hello" and has a \ character.' 'Another line.')
+{
+    printf '%s' "$chunk_one"
+    printf '%b' '\0000'
+    printf '%s' "$chunk_two"
+    printf '%b' '\0000'
+    printf '%s' "$chunk_three"
+} > "$io_source"
+
+fail_io() {
+    printf 'smallrag_test: %s\n' "$*" >&2
+    if [ -f "$io_error" ]; then
+        tail -n 30 "$io_error" >&2 || :
+    fi
+    exit 1
+}
+
+wait_for_lines() {
+    while :; do
+        if [ -f "$io_output" ] && [ "$(wc -l < "$io_output")" -ge "$1" ]; then
+            return
+        fi
+        [ ! -e "$io_timeout" ] || fail_io 'timed out waiting for a response'
+        kill -0 "$server_pid" 2> /dev/null || fail_io 'server ended before responding'
+        sleep 1
+    done
+}
+
+mkfifo "$io_fifo"
+"$smallrag" -m "$model_path" -d "$io_source" -e "$test_dir/io_embeddings" \
+    -t 1 -c 1024 -b 128 -u 128 -s 8 < "$io_fifo" > "$io_output" 2> "$io_error" &
+server_pid=$!
+(
+    sleep 180 &
+    timer_pid=$!
+    trap 'kill "$timer_pid" 2> /dev/null || :; wait "$timer_pid" 2> /dev/null || :; exit 0' HUP INT TERM
+    if wait "$timer_pid"; then
+        : > "$io_timeout"
+        kill "$server_pid" 2> /dev/null || :
+    fi
+) &
+watchdog_pid=$!
+
+exec 3> "$io_fifo"
+printf '%s\n' '{"query":"An apple is red.","top_k":1}' >&3 || fail_io 'failed to send request'
+wait_for_lines 1
+
+# Invalid lines must not prevent the next valid request from receiving a response.
+printf '%s\n' \
+    '{"query":"An apple is red.","top_k":}' \
+    '{"query":"An apple is red."}' \
+    '{"query":"An apple is red.","top_k":0}' \
+    '{"query":"An apple is red.","top_k":"three"}' \
+    '{"query":"An apple is red.","top_k":3}' >&3 || fail_io 'failed to send requests'
+wait_for_lines 2
+
+printf '%s\n' \
+    '{"query":"An apple is red.","top_k":2}' \
+    '{"query":"An apple is red.","top_k":5}' \
+    '{"query":"Snow covers a mountain.","top_k":1}' >&3 || fail_io 'failed to send requests'
+exec 3>&-
+if ! wait "$server_pid"; then
+    server_pid=
+    fail_io 'server failed during JSON-lines requests'
+fi
+server_pid=
+kill "$watchdog_pid" 2> /dev/null || :
+wait "$watchdog_pid" 2> /dev/null || :
+watchdog_pid=
+
+[ "$(wc -l < "$io_output")" -eq 5 ] || fail_io 'expected one output line per valid request'
+grep -Fq -e 'Failed to parse JSON' "$io_error" || fail_io 'invalid JSON was not reported'
+grep -Fq -e 'Request' "$io_error" || fail_io 'invalid requests were not reported'
+
+# Ignore insignificant JSON whitespace, but preserve string contents and escapes.
+normalized="$test_dir/io_normalized"
+awk '
+{
+    quoted = 0
+    escaped = 0
+    for (i = 1; i <= length($0); i++) {
+        character = substr($0, i, 1)
+        if (quoted) {
+            printf "%s", character
+            if (escaped) {
+                escaped = 0
+            } else if (character == "\\") {
+                escaped = 1
+            } else if (character == "\"") {
+                quoted = 0
+            }
+        } else if (character == "\"") {
+            quoted = 1
+            printf "%s", character
+        } else if (character !~ /[[:space:]]/) {
+            printf "%s", character
+        }
+    }
+    printf "\n"
+}' "$io_output" > "$normalized"
+
+{
+    IFS= read -r one_response || fail_io 'missing top_k=1 response'
+    IFS= read -r full_response || fail_io 'missing top_k=3 response'
+    IFS= read -r two_response || fail_io 'missing top_k=2 response'
+    IFS= read -r capped_response || fail_io 'missing top_k=5 response'
+    IFS= read -r other_response || fail_io 'missing second query response'
+    if IFS= read -r extra_response; then
+        fail_io 'unexpected extra response'
+    fi
+} < "$normalized"
+
+json_one='"An apple is red."'
+json_two='"Snow covers a mountain."'
+json_three='"A sign says \"hello\" and has a \\ character.\nAnother line."'
+case "$full_response" in
+    "[$json_one,$json_two,$json_three]" | "[$json_one,$json_three,$json_two]" | \
+    "[$json_two,$json_one,$json_three]" | "[$json_two,$json_three,$json_one]" | \
+    "[$json_three,$json_one,$json_two]" | "[$json_three,$json_two,$json_one]") ;;
+    *) fail_io "unexpected full response: $full_response" ;;
+esac
+# The fixture strings contain no commas, so these are the first one and two results.
+[ "$one_response" = "${full_response%%,*}]" ] || fail_io 'top_k=1 does not match the first result'
+[ "$two_response" = "${full_response%,*}]" ] || fail_io 'top_k=2 does not match the first two results'
+[ "$capped_response" = "$full_response" ] || fail_io 'top_k larger than the corpus was not capped'
+case "$other_response" in
+    "[$json_one]" | "[$json_two]" | "[$json_three]") ;;
+    *) fail_io "unexpected second query response: $other_response" ;;
+esac
 
 printf '%s\n' 'smallrag tests passed'
