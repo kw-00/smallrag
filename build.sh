@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export SHUTILS_PATH="$(pwd -P)/shutils"
 export PATH="$PATH:$SHUTILS_PATH"
 

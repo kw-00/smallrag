@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 if [ -z "$TARGET_TYPE" ]; then
     echo "TARGET_TYPE required" >&2

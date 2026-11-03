@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ -z "$BUILD_DIR" ]; then
     echo "BUILD_DIR required" >&2
     exit 1

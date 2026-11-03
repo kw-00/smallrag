@@ -1,3 +1,5 @@
+#!/bin/bash
+
 
 CJSON_H_URL="https://raw.githubusercontent.com/DaveGamble/cJSON/refs/heads/master/cJSON.h"
 CJSON_C_URL="https://raw.githubusercontent.com/DaveGamble/cJSON/refs/heads/master/cJSON.c"

@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 export MODULE_NAME=llama.cpp
 
@@ -12,7 +12,6 @@ if [ -z "$LLAMA_CPP_PATH" ]; then
 fi
 
 LLAMA_CPP_PATH=$(abspath.sh "$LLAMA_CPP_PATH")
-echo "$LLAMA_CPP_PATH ====="
 
 LIB_DIR="$LLAMA_CPP_PATH/build/bin"
 LLAMA_INCLUDE_DIR="$LLAMA_CPP_PATH/include"

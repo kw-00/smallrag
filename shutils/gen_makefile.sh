@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 USAGE=$(cat << EOF
 Usage:
 BUILD_DIR='absolute_path_to_build_dir' \
@@ -82,8 +80,14 @@ if $is_so; then
 else
     linking_type_option="--static"
 fi
-CFLAGS="$CFLAGS $(pkg-config --cflags "$linking_type_option" "$MODULE_NAME")"
-LIBS="$LIBS $(pkg-config --libs "$linking_type_option" "$MODULE_NAME")"
+if ! CFLAGS="$CFLAGS $(pkg-config --cflags "$linking_type_option" "$MODULE_NAME")"; then
+    echo "pkg-config failed; coult not extract cflags for $MODULE_NAME" >&2
+    exit 1
+fi
+if ! LIBS="$LIBS $(pkg-config --libs "$linking_type_option" "$MODULE_NAME")"; then
+    echo "pkg-config failed; coult not extract libs for $MODULE_NAME" >&2
+    exit 1
+fi
 dependency_include_stamps=$(pkg-config \
     --cflags "$MODULE_NAME" \
     | tr ' ' '\n' | grep '^-I.*include$' \
@@ -92,6 +96,11 @@ dependency_include_stamps=$(pkg-config \
     | sed 's|'"$BUILD_DIR/$MODULE_NAME/include/\.stamp||g" \
     | grep -s '[^\s]' \
     | xargs -r -d '\n' -n 1 bash -c 'printf '"'"'%s '"'"' "$(relpath.sh "$(pwd -P)" $1)"' _)
+
+if [ ! $? -eq 0 ]; then
+    echo "Failed while determining dependency include stamps" >&2
+    exit 1
+fi
 
 echo "all: $RELATIVE_BUILD_DIR/modules/$MODULE_NAME/lib/.stamp $RELATIVE_BUILD_DIR/modules/$MODULE_NAME/include/.stamp"
 echo

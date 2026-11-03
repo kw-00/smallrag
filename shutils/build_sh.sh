@@ -5,6 +5,10 @@ MODULE_BUILD_DIR="$BUILD_DIR/modules/$MODULE_NAME"
 mkdir -p "$MODULE_BUILD_DIR"
 
 for script in "$@"; do
+    if [ ! -f "$script" ]; then
+        echo "$script is not a file" >&2
+        exit 1
+    fi
     case "$script" in
         *.in)
             template="$script"
