@@ -46,7 +46,8 @@ static const char *usage =
 " if the file does exist, then it is used for retrieval of text fragments.\n"
 " Do not attempt to create it yourself - embeddings are managed by the application."
 " Pass a whatever path you want the application to use for storing embeddings.\n"
-"- query-prefix - text prepended directly to each query before embedding (default: empty)."
+"- query-prefix - text prepended directly to each query before embedding. If left unspecified, no"
+" prefix is added.\n"
 "\n\n"
 "The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
 "- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
@@ -60,13 +61,13 @@ static const char *usage =
 "{\"query\": \"How many bear species exist in Antarctica?\", \"top_k\": 10}"
 "\n\n"
 "Generally, the input has the form of JSON lines. One line = one query, according to the format above."
-" Splitting the query JSON into multiple lines is an error."
+" Splitting the query JSON into multiple lines is an error.\n"
 "\n\n"
 "The output format is as follows:\n"
 "[\"No known bear species live in Antarctica.\", \"The grizzly bear is endemic to North America.\", ...]\n"
 "\n\n"
 "Output results are ranked from most relevant to least relevant. For each query, a single line of output"
-" containing a JSON list like this is sent via standard ouput.";
+" containing a JSON list like this is sent via standard ouput.\n";
 
 /* -h — print help and exit
  * -m — model path

@@ -23,6 +23,7 @@ smallrag \
    -m <model-path> \
    -d <source-text> \
    -e <embeddings-path> \
+   [ -p <query-prefix> ] \
    [ -t <n-tokenizer-threads> ] \
    [ -b <batch-size> ] \
    [ -s <max-seq> ]
@@ -35,6 +36,7 @@ smallrag \
 - `embeddings-path` - path to a file that contains/will contain text embeddings. If the file doesn't exist, it embeddings are created for the source text and saved under the path passed via -e.
  if the file does exist, then it is used for retrieval of text fragments.
  Do not attempt to create it yourself - embeddings are managed by the application. Pass a whatever path you want the application to use for storing embeddings.
+- `query-prefix` - text prepended directly to each query before embedding. If left unspecified, no prefix is added.
 
 The remaining arguments are used to configure the llama.cpp backend. They are all optional.
 
