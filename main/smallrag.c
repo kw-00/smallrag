@@ -31,6 +31,7 @@ static const char *usage =
 "   -m <model-path> \\\n"
 "   -d <source-text> \\\n"
 "   -e <embeddings-path> \\\n"
+"   [ -p <query-prefix> ] \\\n"
 "   [ -t <n-tokenizer-threads> ] \\\n"
 "   [ -b <batch-size> ] \\\n"
 "   [ -s <max-seq> ]\n"
@@ -44,7 +45,8 @@ static const char *usage =
 " it embeddings are created for the source text and saved under the path passed via -e.\n"
 " if the file does exist, then it is used for retrieval of text fragments.\n"
 " Do not attempt to create it yourself - embeddings are managed by the application."
-" Pass a whatever path you want the application to use for storing embeddings."
+" Pass a whatever path you want the application to use for storing embeddings.\n"
+"- query-prefix - text prepended directly to each query before embedding (default: empty)."
 "\n\n"
 "The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
 "- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
@@ -70,11 +72,12 @@ static const char *usage =
  * -m — model path
  * -d — source text path
  * -e — embeddings path
+ * -p — query prefix
  * -t — number of tokenizer threads
  * -b — batch size
  * -s — max sequences per batch
  */
-static const char *optstring = "hm:d:e:t:b:s:";
+static const char *optstring = "hm:d:e:p:t:b:s:";
 
 struct similarity {
     size_t text_index;
@@ -220,6 +223,7 @@ int main(int argc, char *argv[])
     char *model_path = NULL;
     char *source_text_path = NULL;
     char *embeddings_path = NULL;
+    const char *query_prefix = "";
     size_t n_tokenizer_threads = 0;
     size_t batch_size = 2048;
     size_t max_sequences_per_batch = 256;
@@ -244,6 +248,9 @@ int main(int argc, char *argv[])
                 break;
             case 'e':
                 embeddings_path = optarg;
+                break;
+            case 'p':
+                query_prefix = optarg;
                 break;
             case 't':
                 n_tokenizer_threads = parse_size_t_arg("t");
@@ -435,6 +442,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    size_t query_prefix_length = strlen(query_prefix);
+
     /* Stdio loop */
     while (true) {
         ssize_t line_length = getline(&read_buffer, &read_buffer_capacity, stdin);
@@ -464,17 +473,39 @@ int main(int argc, char *argv[])
             continue;
         }
         size_t query_length = strlen(query);
+        char *prefixed_query = NULL;
+        if (query_prefix_length != 0) {
+            if (query_length > SIZE_MAX - query_prefix_length - 1) {
+                LOG_ERROR("Query is too large");
+                cJSON_Delete(request);
+                CLEANUP();
+                return EXIT_FAILURE;
+            }
+            prefixed_query = malloc(query_prefix_length + query_length + 1);
+            if (prefixed_query == NULL) {
+                LOG_ERROR("Allocation failed");
+                cJSON_Delete(request);
+                CLEANUP();
+                return EXIT_FAILURE;
+            }
+            memcpy(prefixed_query, query_prefix, query_prefix_length);
+            memcpy(prefixed_query + query_prefix_length, query, query_length + 1);
+            query = prefixed_query;
+            query_length += query_prefix_length;
+        }
 
         struct embeddings query_embedding;
         {
             char *query_texts[] = {query};
             size_t query_lengths[] = {query_length};
-            if (get_embeddings(
-                        &embedder,
-                        query_texts,
-                        query_lengths,
-                        1,
-                        &query_embedding) == -1) {
+            int result = get_embeddings(
+                    &embedder,
+                    query_texts,
+                    query_lengths,
+                    1,
+                    &query_embedding);
+            free(prefixed_query);
+            if (result == -1) {
                 LOG_ERROR("Failed to embed query");
                 cJSON_Delete(request);
                 CLEANUP();
