@@ -1,3 +1,3 @@
 #!/bin/bash
 
-build_executable.sh char_chunker.c
+build_executable_test.sh char_chunker.c

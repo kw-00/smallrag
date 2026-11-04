@@ -12,5 +12,9 @@ if [ -n "$1" ]; then
 else
     regex_arg='.*'
 fi
-find "$BUILD_DIR/modules" -mindepth 2 -maxdepth 2 -regex '.*_tests/.*' -not -name '*.stamp' \( -type f -o -type l -xtype f \) -executable -regex "$regex_arg" \
-    -exec bash -c '$1 > /dev/null && echo $1 SUCCESS || echo $1 FAIL' _ {} \;
+find "$BUILD_DIR/modules" -mindepth 2 -maxdepth 2 -not -name '.test_marker' -not -name '*.stamp' \( -type f -o -type l -xtype f \) -executable -regex "$regex_arg" \
+    -exec bash -c '
+        if [ -f "$(dirname "$1")/.test_marker" ]; then
+            "$1" > /dev/null && echo "$1 SUCCESS" || echo "$1 FAIL"
+        fi
+    ' _ {} \;
