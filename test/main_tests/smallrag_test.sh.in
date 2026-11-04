@@ -33,7 +33,8 @@ help_error="$test_dir/help_error"
 "$smallrag" -h > "$help_output" 2> "$help_error" || fail 'help failed'
 [ ! -s "$help_error" ] || fail 'help wrote to stderr'
 for text in 'Usage:' '-h - print this help' '-m <model-path>' \
-        '-d <source-text>' '-e <embeddings-path>' '-t <n-tokenizer-threads>' \
+        '-d <source-text>' '-e <embeddings-path>' '-p <query-prefix>' '-P <chunk-prefix>' \
+        '-t <n-tokenizer-threads>' \
         '-b <batch-size>' '-s <max-seq>' 'Default: 2048'; do
     grep -Fq -e "$text" "$help_output" || fail "help is missing: $text"
 done
@@ -216,5 +217,19 @@ case "$other_response" in
     "[$json_one]" | "[$json_two]" | "[$json_three]") ;;
     *) fail_io "unexpected second query response: $other_response" ;;
 esac
+
+# Prefixing a chunk for embedding must not change the returned text.
+single_source="$test_dir/single_source"
+single_request="$test_dir/single_request"
+printf '%s' "$chunk_one" > "$single_source"
+printf '%s\n' '{"query":"An apple is red.","top_k":1}' > "$single_request"
+"$smallrag" -m "$model_path" -d "$single_source" -e "$test_dir/single_embeddings" \
+    -t 1 -b 128 -s 2 < "$single_request" > "$test_dir/single_output" 2> "$test_dir/single_error" \
+    || fail 'unprefixed chunk test failed'
+"$smallrag" -m "$model_path" -d "$single_source" -e "$test_dir/prefix_embeddings" \
+    -P 'passage: ' -t 1 -b 128 -s 2 < "$single_request" > "$test_dir/prefix_output" \
+    2> "$test_dir/prefix_error" || fail 'prefixed chunk test failed'
+cmp -s "$test_dir/single_output" "$test_dir/prefix_output" || fail 'chunk prefix changed the response'
+[ "$(cat "$test_dir/prefix_output")" = "[$json_one]" ] || fail 'unexpected prefixed chunk response'
 
 printf '%s\n' 'smallrag tests passed'

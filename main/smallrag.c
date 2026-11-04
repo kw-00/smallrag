@@ -6,6 +6,7 @@
 #include "smallrag/postprocessing_embedder.h"
 #include "smallrag/chunker.h"
 #include "smallrag/char_chunker.h"
+#include "smallrag/prefix_char_chunker.h"
 #include "smallrag/logging.h"
 
 #include "llama.h"
@@ -32,6 +33,7 @@ static const char *usage =
 "   -d <source-text> \\\n"
 "   -e <embeddings-path> \\\n"
 "   [ -p <query-prefix> ] \\\n"
+"   [ -P <chunk-prefix> ] \\\n"
 "   [ -t <n-tokenizer-threads> ] \\\n"
 "   [ -b <batch-size> ] \\\n"
 "   [ -s <max-seq> ]\n"
@@ -48,6 +50,8 @@ static const char *usage =
 " Pass a whatever path you want the application to use for storing embeddings.\n"
 "- query-prefix - text prepended directly to each query before embedding. If left unspecified, no"
 " prefix is added.\n"
+"- chunk-prefix - text prepended directly to each text chunk before embedding. If left unspecified, no"
+" prefix is added. It is not included in responses.\n"
 "\n\n"
 "The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
 "- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
@@ -74,11 +78,12 @@ static const char *usage =
  * -d — source text path
  * -e — embeddings path
  * -p — query prefix
+ * -P — chunk prefix
  * -t — number of tokenizer threads
  * -b — batch size
  * -s — max sequences per batch
  */
-static const char *optstring = "hm:d:e:p:t:b:s:";
+static const char *optstring = "hm:d:e:p:P:t:b:s:";
 
 struct similarity {
     size_t text_index;
@@ -225,6 +230,7 @@ int main(int argc, char *argv[])
     char *source_text_path = NULL;
     char *embeddings_path = NULL;
     const char *query_prefix = "";
+    const char *chunk_prefix = NULL;
     size_t n_tokenizer_threads = 0;
     size_t batch_size = 2048;
     size_t max_sequences_per_batch = 256;
@@ -252,6 +258,9 @@ int main(int argc, char *argv[])
                 break;
             case 'p':
                 query_prefix = optarg;
+                break;
+            case 'P':
+                chunk_prefix = optarg;
                 break;
             case 't':
                 n_tokenizer_threads = parse_size_t_arg("t");
@@ -353,7 +362,13 @@ int main(int argc, char *argv[])
     /* Split source text into chunks */
     {
         struct chunker chunker;
-        if (init_char_chunker(&chunker, '\0') == -1) {
+        int status;
+        if (chunk_prefix == NULL) {
+            status = init_char_chunker(&chunker, '\0');
+        } else {
+            status = init_prefix_char_chunker(&chunker, '\0', chunk_prefix);
+        }
+        if (status == -1) {
             LOG_ERROR("Failed to initialize chunker");
             CLEANUP();
             return EXIT_FAILURE;
@@ -444,6 +459,7 @@ int main(int argc, char *argv[])
     }
 
     size_t query_prefix_length = strlen(query_prefix);
+    size_t chunk_prefix_length = chunk_prefix == NULL ? 0 : strlen(chunk_prefix);
 
     /* Stdio loop */
     while (true) {
@@ -583,7 +599,12 @@ int main(int argc, char *argv[])
             memcpy(text_string, chunks.texts[text_index], text_length);
             text_string[text_length] = '\0';
 
-            cJSON *response_item = cJSON_CreateString(text_string);
+            cJSON *response_item;
+            if (chunk_prefix == NULL) {
+                response_item = cJSON_CreateString(text_string);
+            } else {
+                response_item = cJSON_CreateString(text_string + chunk_prefix_length);
+            }
             free(text_string);
             if (response_item == NULL) {
                 LOG_ERROR("Response JSON string creation failed");
