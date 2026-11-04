@@ -32,9 +32,7 @@ static const char *usage =
 "   -d <source-text> \\\n"
 "   -e <embeddings-path> \\\n"
 "   [ -t <n-tokenizer-threads> ] \\\n"
-"   [ -c <context-size> ] \\\n"
 "   [ -b <batch-size> ] \\\n"
-"   [ -u <ubatch-size> ] \\\n"
 "   [ -s <max-seq> ]\n"
 "\n\n"
 "Options:\n"
@@ -51,9 +49,8 @@ static const char *usage =
 "The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
 "- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
 " as there are logical processors.\n"
-"- context-size, batch-size, ubatch-size - if they are not self-explanatory, I recommend reading about"
-" them in the context of AI inference backends or similar. context size/batch size/ubatch size are common"
-" terminology that is worth studying separately if you're interested.\n"
+"- batch-size - maximum total number of tokens in each embedding batch, including special tokens."
+" Each text must fit within this limit. Default: 2048. Larger values can increase memory use.\n"
 "- <max-seq> - max number of sequences per logical batch.\n"
 "\n\n"
 "To use smallrag, make sure to enter input into the smallrag process's standard input. The input"
@@ -74,12 +71,10 @@ static const char *usage =
  * -d — source text path
  * -e — embeddings path
  * -t — number of tokenizer threads
- * -c — context size
  * -b — batch size
- * -u — ubatch size
  * -s — max sequences per batch
  */
-static const char *optstring = "hm:d:e:t:c:b:u:s:";
+static const char *optstring = "hm:d:e:t:b:s:";
 
 struct similarity {
     size_t text_index;
@@ -226,9 +221,7 @@ int main(int argc, char *argv[])
     char *source_text_path = NULL;
     char *embeddings_path = NULL;
     size_t n_tokenizer_threads = 0;
-    size_t context_size = 65536;
     size_t batch_size = 2048;
-    size_t ubatch_size = 512;
     size_t max_sequences_per_batch = 256;
 
     while (true) {
@@ -255,14 +248,8 @@ int main(int argc, char *argv[])
             case 't':
                 n_tokenizer_threads = parse_size_t_arg("t");
                 break;
-            case 'c':
-                context_size = parse_size_t_arg("c");
-                break;
             case 'b':
                 batch_size = parse_size_t_arg("b");
-                break;
-            case 'u':
-                ubatch_size = parse_size_t_arg("u");
                 break;
             case 's':
                 max_sequences_per_batch = parse_size_t_arg("s");
@@ -289,14 +276,12 @@ int main(int argc, char *argv[])
         print_required_option_message("e", "embeddings path");
         return EXIT_FAILURE;
     }
-    if (context_size == 0 || batch_size == 0 || ubatch_size == 0
-            || max_sequences_per_batch == 0) {
-        LOG_ERROR("Context, batch, ubatch, and max sequence sizes must be positive");
+    if (batch_size == 0 || max_sequences_per_batch == 0) {
+        LOG_ERROR("Batch and max sequence sizes must be positive");
         return EXIT_FAILURE;
     }
-    if (context_size > UINT32_MAX || batch_size > INT32_MAX
-            || ubatch_size > UINT32_MAX || max_sequences_per_batch > UINT32_MAX) {
-        LOG_ERROR("A context, batch, ubatch, or max sequence size is too large");
+    if (batch_size > INT32_MAX || max_sequences_per_batch > UINT32_MAX) {
+        LOG_ERROR("A batch or max sequence size is too large");
         return EXIT_FAILURE;
     }
 
@@ -401,9 +386,7 @@ int main(int argc, char *argv[])
     {
         struct llama_embedder_params params = {
             .n_tokenizer_threads = n_tokenizer_threads,
-            .context_size = context_size,
             .batch_size = batch_size,
-            .ubatch_size = ubatch_size,
             .max_sequences_per_batch = max_sequences_per_batch
         };
         if (init_llama_embedder(&llama_embedder, model, &params) == -1) {

@@ -33,8 +33,17 @@ help_error="$test_dir/help_error"
 "$smallrag" -h > "$help_output" 2> "$help_error" || fail 'help failed'
 [ ! -s "$help_error" ] || fail 'help wrote to stderr'
 for text in 'Usage:' '-h - print this help' '-m <model-path>' \
-        '-d <source-text>' '-e <embeddings-path>' '-s <max-seq>'; do
+        '-d <source-text>' '-e <embeddings-path>' '-t <n-tokenizer-threads>' \
+        '-b <batch-size>' '-s <max-seq>' 'Default: 2048'; do
     grep -Fq -e "$text" "$help_output" || fail "help is missing: $text"
+done
+for option in c u; do
+    if grep -Fq -e "-$option " "$help_output"; then
+        fail "help still lists removed option -$option"
+    fi
+    if "$smallrag" "-$option" 128 -h > /dev/null 2>&1; then
+        fail "removed option -$option unexpectedly succeeded"
+    fi
 done
 
 "$smallrag" -m "$test_dir/missing_model" -d "$test_dir/missing_source" \
@@ -50,6 +59,21 @@ fi
 if "$smallrag" -z > /dev/null 2>&1; then
     fail 'unknown option unexpectedly succeeded'
 fi
+
+expect_invalid_batch() {
+    value=$1
+    expected=$2
+    if "$smallrag" -m unused -d unused -e "$test_dir/invalid_embeddings" \
+            -b "$value" > /dev/null 2> "$test_dir/invalid_batch_error"; then
+        fail "invalid batch size unexpectedly succeeded: $value"
+    fi
+    grep -Fq -e "$expected" "$test_dir/invalid_batch_error" \
+        || fail "unexpected error for batch size: $value"
+}
+expect_invalid_batch 0 'Batch and max sequence sizes must be positive'
+expect_invalid_batch -1 'Invalid value for option -b'
+expect_invalid_batch invalid 'Invalid value for option -b'
+expect_invalid_batch 2147483648 'A batch or max sequence size is too large'
 
 # Exercise JSON-lines requests with the first configured embedding model.
 model_paths="@GGUF_MODEL_PATHS@"
@@ -93,7 +117,7 @@ wait_for_lines() {
 
 mkfifo "$io_fifo"
 "$smallrag" -m "$model_path" -d "$io_source" -e "$test_dir/io_embeddings" \
-    -t 1 -c 1024 -b 128 -u 128 -s 8 < "$io_fifo" > "$io_output" 2> "$io_error" &
+    -t 1 -b 128 -s 2 < "$io_fifo" > "$io_output" 2> "$io_error" &
 server_pid=$!
 (
     sleep 180 &

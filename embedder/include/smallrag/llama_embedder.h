@@ -7,9 +7,8 @@
 
 struct llama_embedder_params {
     size_t n_tokenizer_threads;
-    size_t context_size;
+    /* Maximum total number of tokens per batch, including special tokens. */
     size_t batch_size;
-    size_t ubatch_size;
     size_t max_sequences_per_batch;
 };
 

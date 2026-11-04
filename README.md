@@ -24,9 +24,7 @@ smallrag \
    -d <source-text> \
    -e <embeddings-path> \
    [ -t <n-tokenizer-threads> ] \
-   [ -c <context-size> ] \
    [ -b <batch-size> ] \
-   [ -u <ubatch-size> ] \
    [ -s <max-seq> ]
 ```
 
@@ -41,7 +39,7 @@ smallrag \
 The remaining arguments are used to configure the llama.cpp backend. They are all optional.
 
 - `n-tokenizer-threads` - number of threads to use for tokenization. Default will use as many threads as there are logical processors.
-- `context-size`, `batch-size`, `ubatch-size` - if they are not self-explanatory, I recommend reading about them in the context of AI inference backends or similar. context size/batch size/ubatch size are common terminology that is worth studying separately if you're interested.
+- `batch-size` - maximum total number of tokens in each embedding batch, including special tokens. Each text must fit within this limit. Default: 2048. Larger values can increase memory use.
 - `max-seq` - max number of sequences per logical batch.
 
 To use smallrag, make sure to enter input into the smallrag process's standard input. The input format is as follows:

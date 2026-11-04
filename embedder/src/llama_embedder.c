@@ -505,6 +505,15 @@ int init_llama_embedder(
         struct llama_model *model, 
         const struct llama_embedder_params *params)
 {
+    if (params->batch_size == 0 || params->batch_size > INT32_MAX) {
+        LOG_ERROR("llama_embedder params.batch_size must be positive and at most INT32_MAX");
+        return -1;
+    }
+    if (params->max_sequences_per_batch == 0 || params->max_sequences_per_batch > UINT32_MAX) {
+        LOG_ERROR("llama_embedder params.max_sequences_per_batch must be positive and at most UINT32_MAX");
+        return -1;
+    }
+
     struct embedder_data *data = malloc(sizeof(struct embedder_data));
     if (data == NULL) {
         LOG_ERROR("Allocation failed");
@@ -512,14 +521,19 @@ int init_llama_embedder(
     }
 
     struct llama_context_params context_params = llama_context_default_params();
-    context_params.n_ctx = params->context_size;
+    context_params.n_ctx = params->batch_size;
     context_params.n_batch = params->batch_size;
-    context_params.n_ubatch = params->ubatch_size;
+    context_params.n_ubatch = params->batch_size;
     context_params.n_seq_max = params->max_sequences_per_batch;
     context_params.embeddings = true;
 
     struct llama_context *context = llama_init_from_model(model, context_params);
-    
+    if (context == NULL) {
+        LOG_ERROR("Failed to initialize llama context");
+        free(data);
+        return -1;
+    }
+
     data->params = *params;
     data->context = context;
 
