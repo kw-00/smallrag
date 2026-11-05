@@ -1,0 +1,18 @@
+#ifndef SMALLRAG_EMBEDDINGS_H
+#define SMALLRAG_EMBEDDINGS_H
+
+#include "smallrag/embedder_core.h"
+
+/* Copies and concatenates the embeddings pointed to by input into a new struct returned through
+ * output. input_count is the number of input structs.
+ *
+ * Does not take ownership of input or its resources.
+ *
+ * Returns 0 on success, 1 on failure.
+ */
+int concat_embeddings(
+        struct embeddings **input,
+        size_t input_count,
+        struct embeddings **output);
+
+#endif

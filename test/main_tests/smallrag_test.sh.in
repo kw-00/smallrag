@@ -2,7 +2,7 @@
 
 set -eu
 
-smallrag="@BUILD_DIR@/modules/main/smallrag"
+smallrag="@BUILD_DIR@/bin/smallrag"
 
 fail() {
     printf 'smallrag_test: %s\n' "$*" >&2
@@ -35,7 +35,7 @@ help_error="$test_dir/help_error"
 for text in 'Usage:' '-h - print this help' '-m <model-path>' \
         '-d <source-text>' '-e <embeddings-path>' '-p <query-prefix>' '-P <chunk-prefix>' \
         '-t <n-tokenizer-threads>' \
-        '-b <batch-size>' '-s <max-seq>' 'Default: 2048'; do
+        '-b <batch-size>' '-s <max-seq>' 'Default: 2048' 'comma-separated'; do
     grep -Fq -e "$text" "$help_output" || fail "help is missing: $text"
 done
 for option in c u; do
@@ -53,6 +53,10 @@ done
 cmp -s "$help_output" "$test_dir/help_after_options" || fail 'help output changed after other options'
 [ ! -s "$help_error" ] || fail 'help after other options wrote to stderr'
 [ ! -e "$test_dir/embeddings" ] || fail 'help created embeddings'
+"$smallrag" -m unused -d 'first,,second' -e '' -h > "$test_dir/help_after_lists" \
+    2> "$help_error" || fail 'help with filename lists failed'
+cmp -s "$help_output" "$test_dir/help_after_lists" || fail 'filename lists changed help output'
+[ ! -s "$help_error" ] || fail 'help with filename lists wrote to stderr'
 
 if "$smallrag" > /dev/null 2>&1; then
     fail 'missing required options unexpectedly succeeded'
@@ -75,6 +79,25 @@ expect_invalid_batch 0 'Batch and max sequence sizes must be positive'
 expect_invalid_batch -1 'Invalid value for option -b'
 expect_invalid_batch invalid 'Invalid value for option -b'
 expect_invalid_batch 2147483648 'A batch or max sequence size is too large'
+
+expect_invalid_filenames() {
+    sources=$1
+    embeddings=$2
+    expected=$3
+    if "$smallrag" -m unused -d "$sources" -e "$embeddings" < /dev/null \
+            > /dev/null 2> "$test_dir/invalid_filenames_error"; then
+        fail 'invalid filename lists unexpectedly succeeded'
+    fi
+    grep -Fq -e "$expected" "$test_dir/invalid_filenames_error" \
+        || fail 'unexpected error for filename lists'
+}
+for value in '' ',first' 'first,' 'first,,second'; do
+    expect_invalid_filenames "$value" "$test_dir/invalid_embeddings" 'empty filename'
+    expect_invalid_filenames unused "$value" 'empty filename'
+done
+expect_invalid_filenames 'first,second' "$test_dir/invalid_embeddings" 'filename counts must match'
+expect_invalid_filenames unused 'first,second' 'filename counts must match'
+[ ! -e "$test_dir/invalid_embeddings" ] || fail 'invalid arguments created embeddings'
 
 # Exercise JSON-lines requests with the first configured embedding model.
 model_paths="@GGUF_MODEL_PATHS@"
@@ -231,5 +254,105 @@ printf '%s\n' '{"query":"An apple is red.","top_k":1}' > "$single_request"
     2> "$test_dir/prefix_error" || fail 'prefixed chunk test failed'
 cmp -s "$test_dir/single_output" "$test_dir/prefix_output" || fail 'chunk prefix changed the response'
 [ "$(cat "$test_dir/prefix_output")" = "[$json_one]" ] || fail 'unexpected prefixed chunk response'
+
+# Split the same corpus across files, without delimiters at either side of the file boundary.
+# Spaces in filenames must be preserved by the filename parser.
+multi_source_one="$test_dir/multi source one"
+multi_source_two="$test_dir/multi source two"
+multi_embeddings_one="$test_dir/multi embeddings one"
+multi_embeddings_two="$test_dir/multi embeddings two"
+{
+    printf '%s' "$chunk_one"
+    printf '%b' '\0000'
+    printf '%s' "$chunk_two"
+} > "$multi_source_one"
+printf '%s' "$chunk_three" > "$multi_source_two"
+multi_requests="$test_dir/multi_requests"
+printf '%s\n' \
+    '{"query":"An apple is red.","top_k":5}' \
+    '{"query":"An apple is red.","top_k":1}' \
+    '{"query":"Snow covers a mountain.","top_k":1}' > "$multi_requests"
+printf '%s\n' "$full_response" "$one_response" "$other_response" > "$test_dir/multi_expected"
+
+"$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+    -e "$multi_embeddings_one,$multi_embeddings_two" -t 1 -b 128 -s 2 \
+    < "$multi_requests" > "$test_dir/multi_output" 2> "$test_dir/multi_error" \
+    || fail 'multiple-source embedding generation failed'
+cmp -s "$test_dir/multi_expected" "$test_dir/multi_output" \
+    || fail 'multiple-source retrieval differs from single-source retrieval'
+[ -s "$multi_embeddings_one" ] && [ -s "$multi_embeddings_two" ] \
+    || fail 'multiple-source embeddings were not created'
+first_size=$(wc -c < "$multi_embeddings_one")
+second_size=$(wc -c < "$multi_embeddings_two")
+[ "$first_size" -eq "$((second_size * 2))" ] \
+    || fail 'embedding files do not contain their own source chunks'
+cp "$multi_embeddings_one" "$test_dir/multi_snapshot_one"
+cp "$multi_embeddings_two" "$test_dir/multi_snapshot_two"
+
+"$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+    -e "$multi_embeddings_one,$multi_embeddings_two" -t 1 -b 128 -s 2 \
+    < "$multi_requests" > "$test_dir/multi_cached_output" 2> "$test_dir/multi_cached_error" \
+    || fail 'multiple-source cached retrieval failed'
+cmp -s "$test_dir/multi_output" "$test_dir/multi_cached_output" \
+    || fail 'cached multiple-source retrieval changed'
+cmp -s "$multi_embeddings_one" "$test_dir/multi_snapshot_one" \
+    || fail 'cached first embeddings changed'
+cmp -s "$multi_embeddings_two" "$test_dir/multi_snapshot_two" \
+    || fail 'cached second embeddings changed'
+
+multi_new_embeddings="$test_dir/multi_new_embeddings"
+"$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+    -e "$multi_embeddings_one,$multi_new_embeddings" -t 1 -b 128 -s 2 \
+    < "$multi_requests" > "$test_dir/multi_mixed_output" 2> "$test_dir/multi_mixed_error" \
+    || fail 'mixed cached and new embeddings failed'
+cmp -s "$test_dir/multi_output" "$test_dir/multi_mixed_output" \
+    || fail 'mixed cached and new embeddings changed retrieval'
+cmp -s "$multi_embeddings_one" "$test_dir/multi_snapshot_one" \
+    || fail 'mixed embedding generation changed the existing file'
+cmp -s "$multi_new_embeddings" "$test_dir/multi_snapshot_two" \
+    || fail 'new embedding file does not contain its own source chunks'
+
+printf '%s\n' '{"query":"An apple is red.","top_k":5}' > "$test_dir/multi_prefix_request"
+"$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+    -e "$test_dir/multi_prefix_one,$test_dir/multi_prefix_two" -P 'passage: ' -p 'query: ' \
+    -t 1 -b 128 -s 2 < "$test_dir/multi_prefix_request" > "$test_dir/multi_prefix_output" \
+    2> "$test_dir/multi_prefix_error" || fail 'multiple-source prefixing failed'
+case "$(cat "$test_dir/multi_prefix_output")" in
+    "[$json_one,$json_two,$json_three]" | "[$json_one,$json_three,$json_two]" | \
+    "[$json_two,$json_one,$json_three]" | "[$json_two,$json_three,$json_one]" | \
+    "[$json_three,$json_one,$json_two]" | "[$json_three,$json_two,$json_one]") ;;
+    *) fail 'prefixes changed multiple-source response text' ;;
+esac
+
+if "$smallrag" -m "$model_path" -d "$multi_source_one,$test_dir/missing_source" \
+        -e "$test_dir/unused_one,$test_dir/unused_two" < /dev/null > /dev/null \
+        2> "$test_dir/missing_source_error"; then
+    fail 'missing second source unexpectedly succeeded'
+fi
+grep -Fq -e "Failed to map text: $test_dir/missing_source" "$test_dir/missing_source_error" \
+    || fail 'missing second source was not reported'
+[ ! -e "$test_dir/unused_one" ] && [ ! -e "$test_dir/unused_two" ] \
+    || fail 'missing source created embedding files'
+
+printf '%s' invalid > "$test_dir/invalid_second_embeddings"
+if "$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+        -e "$multi_embeddings_one,$test_dir/invalid_second_embeddings" -t 1 -b 128 -s 2 \
+        < /dev/null > /dev/null 2> "$test_dir/invalid_second_error"; then
+    fail 'invalid second embedding file unexpectedly succeeded'
+fi
+grep -Fq -e 'Failed to load or compute embeddings' "$test_dir/invalid_second_error" \
+    || fail 'invalid second embedding file was not reported'
+
+# The first file is cached; embedding the second file exceeds this deliberately small batch.
+if "$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
+        -e "$multi_embeddings_one,$test_dir/failed_second_embeddings" -t 1 -b 8 -s 2 \
+        < /dev/null > /dev/null 2> "$test_dir/failed_second_error"; then
+    fail 'failed second embedding generation unexpectedly succeeded'
+fi
+grep -Fq -e 'Failed to get embeddings' "$test_dir/failed_second_error" \
+    || fail 'embedding generation failure was not propagated'
+[ ! -s "$test_dir/failed_second_embeddings" ] || fail 'failed generation wrote invalid embeddings'
+cmp -s "$multi_embeddings_one" "$test_dir/multi_snapshot_one" \
+    || fail 'failed loading changed the existing embedding file'
 
 printf '%s\n' 'smallrag tests passed'

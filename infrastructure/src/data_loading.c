@@ -131,7 +131,12 @@ int load_embeddings(
         embeddings->dispose = &dispose_mapped_embeddings;
         CLOSE_OR_EXIT(fd);
     } else {
-        get_embeddings(embedder, chunks->texts, chunks->sizes, chunks->count, embeddings);
+        if (get_embeddings(
+                    embedder, chunks->texts, chunks->sizes, chunks->count, embeddings) == -1) {
+            LOG_ERROR("Failed to get embeddings");
+            CLOSE_OR_EXIT(fd);
+            return -1;
+        }
         FILE *stream = fdopen(fd, "w");
         if (stream == NULL) {
             perror("fdopen");
@@ -175,5 +180,4 @@ int load_embeddings(
     }
     return 0;
 }
-
 

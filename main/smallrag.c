@@ -2,11 +2,14 @@
 #include "smallrag/normalization.h"
 #include "smallrag/dot_product.h"
 #include "smallrag/embedder.h"
+#include "smallrag/embeddings.h"
 #include "smallrag/llama_embedder.h"
 #include "smallrag/postprocessing_embedder.h"
 #include "smallrag/chunker.h"
+#include "smallrag/chunks.h"
 #include "smallrag/char_chunker.h"
 #include "smallrag/prefix_char_chunker.h"
+#include "smallrag/allocation.h"
 #include "smallrag/logging.h"
 
 #include "llama.h"
@@ -41,13 +44,13 @@ static const char *usage =
 "Options:\n"
 "-h - print this help and exit\n"
 "- model-path - path to .gguf embedding model\n"
-"- source-text - path to source text. Must exist as a file. Source text should contain text fragments\n"
-"   delimited using NUL bytes,\n"
-"- embeddings-path - path to a file that contains/will contain text embeddings. If the file doesn't exist,"
-" it embeddings are created for the source text and saved under the path passed via -e.\n"
-" if the file does exist, then it is used for retrieval of text fragments.\n"
-" Do not attempt to create it yourself - embeddings are managed by the application."
-" Pass a whatever path you want the application to use for storing embeddings.\n"
+"- source-text - comma-separated paths to source text files. Each file must exist and contain text\n"
+" fragments delimited using NUL bytes.\n"
+"- embeddings-path - comma-separated paths to files that contain/will contain text embeddings.\n"
+" Both lists must contain the same number of paths, with corresponding files in the same positions.\n"
+" If an embedding file doesn't exist or is empty, embeddings are created for its source text and\n"
+" saved there. Otherwise, its embeddings are used for retrieval of text fragments.\n"
+" Do not attempt to create the embedding files yourself - embeddings are managed by the application.\n"
 "- query-prefix - text prepended directly to each query before embedding. If left unspecified, no"
 " prefix is added.\n"
 "- chunk-prefix - text prepended directly to each text chunk before embedding. If left unspecified, no"
@@ -75,8 +78,8 @@ static const char *usage =
 
 /* -h — print help and exit
  * -m — model path
- * -d — source text path
- * -e — embeddings path
+ * -d — comma-separated source text paths
+ * -e — comma-separated embedding paths
  * -p — query prefix
  * -P — chunk prefix
  * -t — number of tokenizer threads
@@ -89,6 +92,92 @@ struct similarity {
     size_t text_index;
     double score;
 };
+
+struct source_data {
+    char *text;
+    size_t text_length;
+    bool text_mapped;
+    struct chunks chunks;
+    bool chunks_initialized;
+    struct embeddings embeddings;
+    bool embeddings_initialized;
+};
+
+static int parse_filenames(const char *value, char ***filenames, size_t *filename_count)
+{
+    size_t length = strlen(value);
+    if (length == 0) {
+        LOG_ERROR("Filename list contains an empty filename");
+        return -1;
+    }
+
+    size_t count = 1;
+    for (size_t i = 0; i < length; i++) {
+        if (value[i] == ',') {
+            if (i == 0 || i == length - 1 || value[i - 1] == ',') {
+                LOG_ERROR("Filename list contains an empty filename");
+                return -1;
+            }
+            count++;
+        }
+    }
+
+    size_t storage_size;
+    if (__builtin_add_overflow(length, (size_t)1, &storage_size)) {
+        LOG_ERROR("Number overflow");
+        return -1;
+    }
+    char **paths;
+    char *storage;
+    if (allocate_spans(
+                2,
+                &paths,
+                sizeof(char *),
+                count,
+                &storage,
+                sizeof(char),
+                storage_size,
+                _Alignof(char)) == -1) {
+        LOG_ERROR("Allocation failed");
+        return -1;
+    }
+
+    memcpy(storage, value, storage_size);
+    paths[0] = storage;
+    size_t path_index = 1;
+    for (size_t i = 0; i < length; i++) {
+        if (storage[i] == ',') {
+            storage[i] = '\0';
+            paths[path_index++] = storage + i + 1;
+        }
+    }
+    *filenames = paths;
+    *filename_count = count;
+    return 0;
+}
+
+static void dispose_sources(struct source_data *sources, size_t source_count)
+{
+    if (sources == NULL) {
+        return;
+    }
+    for (size_t i = 0; i < source_count; i++) {
+        struct source_data *source = &sources[i];
+        if (source->embeddings_initialized && source->embeddings.dispose != NULL) {
+            source->embeddings.dispose(&source->embeddings);
+        }
+        if (source->chunks_initialized && source->chunks.dispose != NULL) {
+            dispose_chunks(&source->chunks);
+        }
+        if (source->text_mapped) {
+            if (munmap(source->text, source->text_length) == -1) {
+                perror("munmap");
+                LOG_ERROR("Failed to unmap source text");
+            }
+        }
+    }
+    free(sources);
+}
 
 static size_t parse_size_t_arg(const char *option_short)
 {
@@ -227,8 +316,8 @@ static int parse_request(cJSON *request, char **query, double *top_k)
 int main(int argc, char *argv[])
 {
     char *model_path = NULL;
-    char *source_text_path = NULL;
-    char *embeddings_path = NULL;
+    char *source_text_paths_arg = NULL;
+    char *embeddings_paths_arg = NULL;
     const char *query_prefix = "";
     const char *chunk_prefix = NULL;
     size_t n_tokenizer_threads = 0;
@@ -251,10 +340,10 @@ int main(int argc, char *argv[])
                 model_path = optarg;
                 break;
             case 'd':
-                source_text_path = optarg;
+                source_text_paths_arg = optarg;
                 break;
             case 'e':
-                embeddings_path = optarg;
+                embeddings_paths_arg = optarg;
                 break;
             case 'p':
                 query_prefix = optarg;
@@ -285,12 +374,12 @@ int main(int argc, char *argv[])
         print_required_option_message("m", "model path");
         return EXIT_FAILURE;
     }
-    if (source_text_path == NULL) {
-        print_required_option_message("d", "source text path");
+    if (source_text_paths_arg == NULL) {
+        print_required_option_message("d", "source text paths");
         return EXIT_FAILURE;
     }
-    if (embeddings_path == NULL) {
-        print_required_option_message("e", "embeddings path");
+    if (embeddings_paths_arg == NULL) {
+        print_required_option_message("e", "embedding paths");
         return EXIT_FAILURE;
     }
     if (batch_size == 0 || max_sequences_per_batch == 0) {
@@ -302,9 +391,15 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    char *full_source_text = NULL;
-    size_t full_text_length = 0;
-    bool source_text_mapped = false;
+    char **source_text_paths = NULL;
+    char **embedding_paths = NULL;
+    size_t source_count = 0;
+    size_t embedding_path_count = 0;
+    struct source_data *sources = NULL;
+    struct chunks **source_chunks;
+    struct embeddings **source_embeddings;
+    struct chunker chunker;
+    bool chunker_initialized = false;
     struct chunks chunks;
     bool chunks_initialized = false;
     struct llama_model *model = NULL;
@@ -312,8 +407,7 @@ int main(int argc, char *argv[])
     bool llama_embedder_initialized = false;
     struct embedder embedder;
     bool embedder_initialized = false;
-    struct embeddings embeddings;
-    bool embeddings_initialized = false;
+    struct embeddings *embeddings = NULL;
     struct similarity *similarities = NULL;
     char *read_buffer = NULL;
     size_t read_buffer_capacity = 0;
@@ -322,9 +416,9 @@ int main(int argc, char *argv[])
     do { \
         free(read_buffer); \
         free(similarities); \
-        if (embeddings_initialized && embeddings.dispose != NULL) { \
-            embeddings.dispose(&embeddings); \
-            embeddings_initialized = false; \
+        if (embeddings != NULL && embeddings->dispose != NULL) { \
+            embeddings->dispose(embeddings); \
+            embeddings = NULL; \
         } \
         if (embedder_initialized) { \
             dispose_embedder(&embedder); \
@@ -342,26 +436,53 @@ int main(int argc, char *argv[])
             dispose_chunks(&chunks); \
             chunks_initialized = false; \
         } \
-        if (source_text_mapped) { \
-            if (munmap(full_source_text, full_text_length) == -1) { \
-                perror("munmap"); \
-                LOG_ERROR("Failed to unmap source text"); \
-            } \
-            source_text_mapped = false; \
+        if (chunker_initialized) { \
+            dispose_chunker(&chunker); \
+            chunker_initialized = false; \
         } \
+        dispose_sources(sources, source_count); \
+        sources = NULL; \
+        free(source_text_paths); \
+        free(embedding_paths); \
     } while (false)
 
-    /* Map source text */
-    if (map_text(source_text_path, &full_source_text, &full_text_length) == -1) {
-        LOG_ERROR("Failed to map text");
+    /* Parse filenames */
+    if (parse_filenames(source_text_paths_arg, &source_text_paths, &source_count) == -1
+            || parse_filenames(embeddings_paths_arg, &embedding_paths, &embedding_path_count) == -1) {
+        LOG_ERROR("Failed to parse filenames");
         CLEANUP();
         return EXIT_FAILURE;
     }
-    source_text_mapped = true;
+    if (source_count != embedding_path_count) {
+        LOG_ERROR("Source text and embedding filename counts must match");
+        CLEANUP();
+        return EXIT_FAILURE;
+    }
+    if (allocate_spans(
+                3,
+                &sources,
+                sizeof(*sources),
+                source_count,
+                &source_chunks,
+                sizeof(struct chunks *),
+                source_count,
+                _Alignof(struct chunks *),
+                &source_embeddings,
+                sizeof(struct embeddings *),
+                source_count,
+                _Alignof(struct embeddings *)) == -1) {
+        LOG_ERROR("Allocation failed");
+        CLEANUP();
+        return EXIT_FAILURE;
+    }
+    for (size_t i = 0; i < source_count; i++) {
+        sources[i] = (struct source_data) {0};
+        source_chunks[i] = &sources[i].chunks;
+        source_embeddings[i] = &sources[i].embeddings;
+    }
 
-    /* Split source text into chunks */
+    /* Initialize chunker */
     {
-        struct chunker chunker;
         int status;
         if (chunk_prefix == NULL) {
             status = init_char_chunker(&chunker, '\0');
@@ -373,26 +494,37 @@ int main(int argc, char *argv[])
             CLEANUP();
             return EXIT_FAILURE;
         }
+        chunker_initialized = true;
+    }
 
-        if (get_chunks(&chunker, full_source_text, full_text_length, &chunks) == -1) {
-            LOG_ERROR("Failed to split text into chunks");
-            dispose_chunker(&chunker);
+    /* Map and split source texts */
+    for (size_t i = 0; i < source_count; i++) {
+        if (map_text(source_text_paths[i], &sources[i].text, &sources[i].text_length) == -1) {
+            LOG_ERROR("Failed to map text: %s", source_text_paths[i]);
             CLEANUP();
             return EXIT_FAILURE;
         }
-        chunks_initialized = true;
-        dispose_chunker(&chunker);
+        sources[i].text_mapped = true;
+        if (get_chunks(
+                    &chunker, sources[i].text, sources[i].text_length, source_chunks[i]) == -1) {
+            LOG_ERROR("Failed to split text into chunks: %s", source_text_paths[i]);
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
+        sources[i].chunks_initialized = true;
+        if (source_chunks[i]->count == 0) {
+            LOG_ERROR("Source text contains no non-empty chunks: %s", source_text_paths[i]);
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
+        if (source_chunks[i]->count > INT32_MAX) {
+            LOG_ERROR("Source text contains too many chunks for the embedder: %s", source_text_paths[i]);
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
     }
-    if (chunks.count == 0) {
-        LOG_ERROR("Source text contains no non-empty chunks");
-        CLEANUP();
-        return EXIT_FAILURE;
-    }
-    if (chunks.count > INT32_MAX) {
-        LOG_ERROR("Source text contains too many chunks for the embedder");
-        CLEANUP();
-        return EXIT_FAILURE;
-    }
+    dispose_chunker(&chunker);
+    chunker_initialized = false;
 
     /* Load model */
     {
@@ -431,18 +563,38 @@ int main(int argc, char *argv[])
     }
 
     /* Prepare and cache embeddings */
-    if (load_embeddings(embeddings_path, &chunks, &embedder, &embeddings) == -1) {
-        LOG_ERROR("Failed to load or compute embeddings");
+    for (size_t i = 0; i < source_count; i++) {
+        if (load_embeddings(
+                    embedding_paths[i], source_chunks[i], &embedder, source_embeddings[i]) == -1) {
+            LOG_ERROR("Failed to load or compute embeddings: %s", embedding_paths[i]);
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
+        sources[i].embeddings_initialized = true;
+        struct embeddings *source_embedding = source_embeddings[i];
+        if (source_embedding->embeddings == NULL || source_embedding->dispose == NULL
+                || source_embedding->embedding_count != source_chunks[i]->count
+                || source_embedding->dimension_count == 0) {
+            LOG_ERROR("Loaded embeddings do not match source chunks: %s", embedding_paths[i]);
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
+    }
+
+    /* Concatenate source data */
+    if (concat_chunks(source_chunks, source_count, &chunks) == 1) {
+        LOG_ERROR("Failed to concatenate chunks");
         CLEANUP();
         return EXIT_FAILURE;
     }
-    embeddings_initialized = true;
-    if (embeddings.embeddings == NULL || embeddings.dispose == NULL
-            || embeddings.embedding_count != chunks.count || embeddings.dimension_count == 0) {
-        LOG_ERROR("Loaded embeddings do not match source chunks");
+    chunks_initialized = true;
+    if (concat_embeddings(source_embeddings, source_count, &embeddings) == 1) {
+        LOG_ERROR("Failed to concatenate embeddings");
         CLEANUP();
         return EXIT_FAILURE;
     }
+    dispose_sources(sources, source_count);
+    sources = NULL;
 
     size_t similarity_memory_size;
     if (__builtin_mul_overflow(
@@ -533,7 +685,7 @@ int main(int argc, char *argv[])
 
         if (query_embedding.embeddings == NULL || query_embedding.dispose == NULL
                 || query_embedding.embedding_count != 1
-                || query_embedding.dimension_count != embeddings.dimension_count) {
+                || query_embedding.dimension_count != embeddings->dimension_count) {
             LOG_ERROR("Query embedding does not match source embedding dimensions");
             if (query_embedding.dispose != NULL) {
                 query_embedding.dispose(&query_embedding);
@@ -546,9 +698,9 @@ int main(int argc, char *argv[])
             size_t vector_offset = 0;
             for (size_t i = 0; i < chunks.count; i++) {
                 double score = dot_product(
-                        embeddings.embeddings + vector_offset,
+                        embeddings->embeddings + vector_offset,
                         query_embedding.embeddings,
-                        embeddings.dimension_count);
+                        embeddings->dimension_count);
                 if (!isfinite(score)) {
                     LOG_ERROR("Similarity calculation produced a non-finite score");
                     query_embedding.dispose(&query_embedding);
@@ -557,7 +709,7 @@ int main(int argc, char *argv[])
                 }
                 similarities[i].text_index = i;
                 similarities[i].score = score;
-                vector_offset += embeddings.dimension_count;
+                vector_offset += embeddings->dimension_count;
             }
             qsort(
                     similarities,

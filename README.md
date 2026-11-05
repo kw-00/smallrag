@@ -35,13 +35,26 @@ smallrag \
 
 ### Arguments:
 - `model-path` - path to .gguf embedding model
-- `source-text` - path to source text. Must exist as a file. Source text should contain text fragments
-   delimited using NUL bytes,
-- `embeddings-path` - path to a file that contains/will contain text embeddings. If the file doesn't exist, it embeddings are created for the source text and saved under the path passed via -e.
- if the file does exist, then it is used for retrieval of text fragments.
- Do not attempt to create it yourself - embeddings are managed by the application. Pass a whatever path you want the application to use for storing embeddings.
+- `source-text` - comma-separated paths to source text files. Each file must exist and contain text
+  fragments delimited using NUL bytes.
+- `embeddings-path` - comma-separated paths to files that contain/will contain text embeddings.
+  Each path corresponds to the source text path at the same position in `-d`. Both lists must contain
+  the same number of paths. If an embedding file doesn't exist or is empty, embeddings are created
+  for its source text and saved there. Otherwise, its embeddings are used for retrieval of text fragments.
+  Do not attempt to create the embedding files yourself - embeddings are managed by the application.
 - `query-prefix` - text prepended directly to each query before embedding. If left unspecified, no prefix is added.
 - `chunk-prefix` - text prepended directly to each text chunk before embedding. If left unspecified, no prefix is added. It is not included in responses.
+
+For example, to combine chunks from two source files and their corresponding embeddings:
+
+```bash
+smallrag -m model.gguf -d 'a.txt,b.txt' -e 'a.embds,b.embds'
+```
+
+Chunks and embeddings are concatenated in the order given. You are responsible for keeping the
+source files and embedding files correctly paired, including when changing the order or contents
+of source files. Single-file arguments remain supported. Empty filenames are not allowed, and
+filenames containing commas are not supported.
 
 The remaining arguments are used to configure the llama.cpp backend. They are all optional.
 
