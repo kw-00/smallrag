@@ -1,17 +1,22 @@
 # Smallrag - an stdio-based information retrieval server for Linux (also for Windows via WSL)
 ## How to install
-First of all, you need a llama.cpp repository on your system.
+First of all, you need a llama.cpp repository on your system. 
 
-To install **smallrag**, clone the repository, enter its root and run *build.sh* from its root. The **LLAMA_CPP_PATH** environment variable must point to the root of the llama.cpp respository. Supposing you have llama.cpp at `/opt/llama.cpp`, you could run:
+You also need to build llama.cpp. Check <https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md> to see how to build llama.cpp.
+
+Next, build **smallrag**. To build smallrag, clone this repository, enter its root and run *build.sh*. 
+Two environment variables can be set for `build.sh`:
+- LLAMA_PATH — set it to point to your llama.cpp repository root. This is mandatory.
+- LLAMA_BUILD_PATH — optional. Set it to point to your llama.cpp build folder. This variable is optional. If it is unset or empty, the smallrag build system will expect a llama.cpp build at `"$LLAMA_PATH/build"`.
+
+
+To install **smallrag**, clone the smallrag repository, enter its root and run *build.sh* from its root.Supposing you have a llama.cpp repository at `/opt/llama.cpp` and you have built llama.cpp in `/opt/llama.cpp/build`, you could run:
 ```bash
-LLAMA_CPP_PATH='/opt/llama.cpp' ./build.sh
+LLAMA_PATH='/opt/llama.cpp' ./build.sh
 ```
-From repository root.
+From repository root. This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
 
-
-This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
-
-Both executables are self-contained. You will find them in `<project-root>/build/bin`. To install them, you only need to add the <project-root>/build/bin folder to your PATH.
+Both executables are self-contained. You will find them in `<project-root>/build/bin`. To install them, you only need to add the `<project-root>/build/bin` folder to your PATH.
 
 ## the smallrag program
 ### Usage
