@@ -73,8 +73,10 @@ static const char *usage =
 "The output format is as follows:\n"
 "[\"No known bear species live in Antarctica.\", \"The grizzly bear is endemic to North America.\", ...]\n"
 "\n\n"
-"Output results are ranked from most relevant to least relevant. For each query, a single line of output"
-" containing a JSON list like this is sent via standard ouput.\n";
+"Output results are ranked from most relevant to least relevant. For each successful query, a single"
+" line containing a JSON list like this is sent via standard output.\n"
+"On request failure, a plain-text error line is sent instead. Bad requests and query embedding failures"
+" do not stop subsequent requests from being processed. Other runtime errors terminate the program.\n";
 
 /* -h — print help and exit
  * -m — model path
@@ -102,6 +104,29 @@ struct source_data {
     struct embeddings embeddings;
     bool embeddings_initialized;
 };
+
+static bool json_allocation_failed;
+
+static void *json_malloc(size_t size)
+{
+    void *memory = malloc(size);
+    if (memory == NULL) {
+        json_allocation_failed = true;
+    }
+    return memory;
+}
+
+static int send_response(const char *message)
+{
+    if (fputs(message, stdout) == EOF
+            || fputc('\n', stdout) == EOF
+            || fflush(stdout) == EOF) {
+        perror("stdout");
+        LOG_ERROR("Failed to write response");
+        return -1;
+    }
+    return 0;
+}
 
 static int parse_filenames(const char *value, char ***filenames, size_t *filename_count)
 {
@@ -238,13 +263,12 @@ static int compare_similarity(const void *left, const void *right)
     return 0;
 }
 
-static int parse_request(cJSON *request, char **query, double *top_k)
+static const char *parse_request(cJSON *request, char **query, double *top_k)
 {
     *query = NULL;
 
     if (!cJSON_IsObject(request)) {
-        LOG_ERROR("Unexpected JSON structure. Root should be an object");
-        return -1;
+        return "Unexpected JSON structure. Root should be an object";
     }
 
     cJSON *top_k_item = NULL;
@@ -253,64 +277,51 @@ static int parse_request(cJSON *request, char **query, double *top_k)
     for (cJSON *child = request->child; child != NULL; child = child->next) {
         key_count++;
         if (child->string == NULL) {
-            LOG_ERROR("Request object contains a key without a name");
-            return -1;
+            return "Request object contains a key without a name";
         }
         if (strcmp(child->string, "top_k") == 0) {
             if (top_k_item != NULL) {
-                LOG_ERROR("Request contains more than one \"top_k\" key");
-                return -1;
+                return "Request contains more than one \"top_k\" key";
             }
             top_k_item = child;
         } else if (strcmp(child->string, "query") == 0) {
             if (query_item != NULL) {
-                LOG_ERROR("Request contains more than one \"query\" key");
-                return -1;
+                return "Request contains more than one \"query\" key";
             }
             query_item = child;
         } else {
-            LOG_ERROR(
-                    "Request must contain only the \"top_k\" and \"query\" keys");
-            return -1;
+            return "Request must contain only the \"top_k\" and \"query\" keys";
         }
     }
 
     if (key_count != 2) {
-        LOG_ERROR("Request must contain exactly two keys: \"top_k\" and \"query\"");
-        return -1;
+        return "Request must contain exactly two keys: \"top_k\" and \"query\"";
     }
     if (top_k_item == NULL) {
-        LOG_ERROR("Expected \"top_k\" in request");
-        return -1;
+        return "Expected \"top_k\" in request";
     }
     if (query_item == NULL) {
-        LOG_ERROR("Expected \"query\" in request");
-        return -1;
+        return "Expected \"query\" in request";
     }
     if (!cJSON_IsNumber(top_k_item)) {
-        LOG_ERROR("Request \"top_k\" key should hold a number");
-        return -1;
+        return "Request \"top_k\" key should hold a number";
     }
     if (!isfinite(top_k_item->valuedouble) || top_k_item->valuedouble < 1.0) {
-        LOG_ERROR("Request \"top_k\" key must be a finite number of at least 1");
-        return -1;
+        return "Request \"top_k\" key must be a finite number of at least 1";
     }
     if (trunc(top_k_item->valuedouble) != top_k_item->valuedouble) {
-        LOG_ERROR("Request \"top_k\" key must be an integer");
-        return -1;
+        return "Request \"top_k\" key must be an integer";
     }
     if (!cJSON_IsString(query_item) || cJSON_GetStringValue(query_item) == NULL) {
-        LOG_ERROR("Request \"query\" key must be a string");
-        return -1;
+        return "Request \"query\" key must be a string";
     }
     if (cJSON_GetStringValue(query_item)[0] == '\0') {
-        LOG_ERROR("Request \"query\" key must not be empty");
-        return -1;
+        return "Request \"query\" key must not be empty";
     }
 
     *query = cJSON_GetStringValue(query_item);
     *top_k = top_k_item->valuedouble;
-    return 0;
+    return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -613,49 +624,70 @@ int main(int argc, char *argv[])
     size_t query_prefix_length = strlen(query_prefix);
     size_t chunk_prefix_length = chunk_prefix == NULL ? 0 : strlen(chunk_prefix);
 
+    /* Distinguish malformed JSON from allocation failures while parsing it. */
+    cJSON_Hooks json_hooks = {
+        .malloc_fn = &json_malloc,
+        .free_fn = &free
+    };
+    cJSON_InitHooks(&json_hooks);
+
     /* Stdio loop */
     while (true) {
+        /* Errors are fatal unless this request explicitly marks them recoverable. */
+        bool fatal_error = true;
+        cJSON *request = NULL;
+        char *prefixed_query = NULL;
+        struct embeddings query_embedding = {0};
+        cJSON *response = NULL;
+        char *response_string = NULL;
+
+#define REPORT_ERROR(message) \
+    do { \
+        const char *error_message = (message); \
+        LOG_ERROR("%s", error_message); \
+        if (send_response(error_message) == -1) { \
+            fatal_error = true; \
+        } \
+    } while (false)
+
         ssize_t line_length = getline(&read_buffer, &read_buffer_capacity, stdin);
         if (line_length == -1) {
             if (feof(stdin)) {
                 break;
             }
             perror("getline");
-            LOG_ERROR("Failed to read input");
-            CLEANUP();
-            return EXIT_FAILURE;
+            REPORT_ERROR("Failed to read input");
+            goto request_cleanup;
         }
 
-        cJSON *request = cJSON_ParseWithOpts(read_buffer, NULL, 1);
+        json_allocation_failed = false;
+        request = cJSON_ParseWithOpts(read_buffer, NULL, 1);
         if (request == NULL) {
-            const char *error_ptr = cJSON_GetErrorPtr();
-            LOG_ERROR(
-                    "Failed to parse JSON: %s",
-                    error_ptr == NULL ? "unknown error location" : error_ptr);
-            continue;
+            fatal_error = json_allocation_failed;
+            REPORT_ERROR(json_allocation_failed
+                    ? "Request JSON allocation failed" : "Failed to parse JSON");
+            goto request_cleanup;
         }
 
         char *query = NULL;
         double requested_top_k = 0.0;
-        if (parse_request(request, &query, &requested_top_k) == -1) {
-            cJSON_Delete(request);
-            continue;
+        const char *request_error = parse_request(request, &query, &requested_top_k);
+        if (request_error != NULL) {
+            fatal_error = false;
+            REPORT_ERROR(request_error);
+            goto request_cleanup;
         }
         size_t query_length = strlen(query);
-        char *prefixed_query = NULL;
         if (query_prefix_length != 0) {
             if (query_length > SIZE_MAX - query_prefix_length - 1) {
-                LOG_ERROR("Query is too large");
-                cJSON_Delete(request);
-                CLEANUP();
-                return EXIT_FAILURE;
+                fatal_error = false;
+                REPORT_ERROR("Query is too large");
+                goto request_cleanup;
             }
             prefixed_query = malloc(query_prefix_length + query_length + 1);
             if (prefixed_query == NULL) {
-                LOG_ERROR("Allocation failed");
-                cJSON_Delete(request);
-                CLEANUP();
-                return EXIT_FAILURE;
+                REPORT_ERROR("Allocation failed");
+                goto request_cleanup;
             }
             memcpy(prefixed_query, query_prefix, query_prefix_length);
             memcpy(prefixed_query + query_prefix_length, query, query_length + 1);
@@ -663,7 +695,6 @@ int main(int argc, char *argv[])
             query_length += query_prefix_length;
         }
 
-        struct embeddings query_embedding;
         {
             char *query_texts[] = {query};
             size_t query_lengths[] = {query_length};
@@ -673,25 +704,18 @@ int main(int argc, char *argv[])
                     query_lengths,
                     1,
                     &query_embedding);
-            free(prefixed_query);
             if (result == -1) {
-                LOG_ERROR("Failed to embed query");
-                cJSON_Delete(request);
-                CLEANUP();
-                return EXIT_FAILURE;
+                fatal_error = false;
+                REPORT_ERROR("Query embedding failed");
+                goto request_cleanup;
             }
         }
-        cJSON_Delete(request);
 
         if (query_embedding.embeddings == NULL || query_embedding.dispose == NULL
                 || query_embedding.embedding_count != 1
                 || query_embedding.dimension_count != embeddings->dimension_count) {
-            LOG_ERROR("Query embedding does not match source embedding dimensions");
-            if (query_embedding.dispose != NULL) {
-                query_embedding.dispose(&query_embedding);
-            }
-            CLEANUP();
-            return EXIT_FAILURE;
+            REPORT_ERROR("Query embedding does not match source embedding dimensions");
+            goto request_cleanup;
         }
 
         {
@@ -702,10 +726,8 @@ int main(int argc, char *argv[])
                         query_embedding.embeddings,
                         embeddings->dimension_count);
                 if (!isfinite(score)) {
-                    LOG_ERROR("Similarity calculation produced a non-finite score");
-                    query_embedding.dispose(&query_embedding);
-                    CLEANUP();
-                    return EXIT_FAILURE;
+                    REPORT_ERROR("Similarity calculation produced a non-finite score");
+                    goto request_cleanup;
                 }
                 similarities[i].text_index = i;
                 similarities[i].score = score;
@@ -717,7 +739,6 @@ int main(int argc, char *argv[])
                     sizeof(*similarities),
                     &compare_similarity);
         }
-        query_embedding.dispose(&query_embedding);
 
         size_t response_count;
         if ((long double)requested_top_k >= (long double)chunks.count) {
@@ -726,27 +747,22 @@ int main(int argc, char *argv[])
             response_count = (size_t)requested_top_k;
         }
 
-        cJSON *response = cJSON_CreateArray();
+        response = cJSON_CreateArray();
         if (response == NULL) {
-            LOG_ERROR("Response JSON array creation failed");
-            CLEANUP();
-            return EXIT_FAILURE;
+            REPORT_ERROR("Response JSON array creation failed");
+            goto request_cleanup;
         }
         for (size_t i = 0; i < response_count; i++) {
             size_t text_index = similarities[i].text_index;
             size_t text_length = chunks.sizes[text_index];
             if (text_length == SIZE_MAX) {
-                LOG_ERROR("Text chunk is too large");
-                cJSON_Delete(response);
-                CLEANUP();
-                return EXIT_FAILURE;
+                REPORT_ERROR("Text chunk is too large");
+                goto request_cleanup;
             }
             char *text_string = malloc(text_length + 1);
             if (text_string == NULL) {
-                LOG_ERROR("Allocation failed");
-                cJSON_Delete(response);
-                CLEANUP();
-                return EXIT_FAILURE;
+                REPORT_ERROR("Allocation failed");
+                goto request_cleanup;
             }
             memcpy(text_string, chunks.texts[text_index], text_length);
             text_string[text_length] = '\0';
@@ -759,38 +775,40 @@ int main(int argc, char *argv[])
             }
             free(text_string);
             if (response_item == NULL) {
-                LOG_ERROR("Response JSON string creation failed");
-                cJSON_Delete(response);
-                CLEANUP();
-                return EXIT_FAILURE;
+                REPORT_ERROR("Response JSON string creation failed");
+                goto request_cleanup;
             }
             if (!cJSON_AddItemToArray(response, response_item)) {
-                LOG_ERROR("Failed to add response item");
+                REPORT_ERROR("Failed to add response item");
                 cJSON_Delete(response_item);
-                cJSON_Delete(response);
-                CLEANUP();
-                return EXIT_FAILURE;
+                goto request_cleanup;
             }
         }
 
-        char *response_string = cJSON_PrintUnformatted(response);
-        cJSON_Delete(response);
+        response_string = cJSON_PrintUnformatted(response);
         if (response_string == NULL) {
-            LOG_ERROR("Response JSON serialization failed");
-            CLEANUP();
-            return EXIT_FAILURE;
+            REPORT_ERROR("Response JSON serialization failed");
+            goto request_cleanup;
         }
-        if (fputs(response_string, stdout) == EOF
-                || fputc('\n', stdout) == EOF
-                || fflush(stdout) == EOF) {
-            perror("stdout");
-            LOG_ERROR("Failed to write response");
-            free(response_string);
-            CLEANUP();
-            return EXIT_FAILURE;
+        if (send_response(response_string) == -1) {
+            goto request_cleanup;
         }
+        fatal_error = false;
+
+request_cleanup:
+        cJSON_Delete(request);
+        free(prefixed_query);
+        if (query_embedding.dispose != NULL) {
+            query_embedding.dispose(&query_embedding);
+        }
+        cJSON_Delete(response);
         free(response_string);
+        if (fatal_error) {
+            CLEANUP();
+            return EXIT_FAILURE;
+        }
     }
+#undef REPORT_ERROR
 
     /* Cleanup */
     CLEANUP();

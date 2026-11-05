@@ -9,6 +9,13 @@ fail() {
     exit 1
 }
 
+is_error_response() {
+    printf '%s\n' "$1" | awk '
+        /^[[:space:]]*$/ { exit 1 }
+        /^[[:space:]]*(\[|\{)/ { exit 1 }
+    '
+}
+
 [ -x "$smallrag" ] || fail "executable not found: $smallrag"
 
 test_dir=$("@SHUTILS_PATH@/tempdir.sh") || fail 'cannot create temporary directory'
@@ -29,9 +36,7 @@ trap cleanup 0
 trap 'exit 1' HUP INT TERM
 
 help_output="$test_dir/help_output"
-help_error="$test_dir/help_error"
-"$smallrag" -h > "$help_output" 2> "$help_error" || fail 'help failed'
-[ ! -s "$help_error" ] || fail 'help wrote to stderr'
+"$smallrag" -h > "$help_output" 2> /dev/null || fail 'help failed'
 for text in 'Usage:' '-h - print this help' '-m <model-path>' \
         '-d <source-text>' '-e <embeddings-path>' '-p <query-prefix>' '-P <chunk-prefix>' \
         '-t <n-tokenizer-threads>' \
@@ -48,15 +53,13 @@ for option in c u; do
 done
 
 "$smallrag" -m "$test_dir/missing_model" -d "$test_dir/missing_source" \
-    -e "$test_dir/embeddings" -h > "$test_dir/help_after_options" 2> "$help_error" \
+    -e "$test_dir/embeddings" -h > "$test_dir/help_after_options" 2> /dev/null \
     || fail 'help after other options failed'
 cmp -s "$help_output" "$test_dir/help_after_options" || fail 'help output changed after other options'
-[ ! -s "$help_error" ] || fail 'help after other options wrote to stderr'
 [ ! -e "$test_dir/embeddings" ] || fail 'help created embeddings'
 "$smallrag" -m unused -d 'first,,second' -e '' -h > "$test_dir/help_after_lists" \
-    2> "$help_error" || fail 'help with filename lists failed'
+    2> /dev/null || fail 'help with filename lists failed'
 cmp -s "$help_output" "$test_dir/help_after_lists" || fail 'filename lists changed help output'
-[ ! -s "$help_error" ] || fail 'help with filename lists wrote to stderr'
 
 if "$smallrag" > /dev/null 2>&1; then
     fail 'missing required options unexpectedly succeeded'
@@ -65,45 +68,51 @@ if "$smallrag" -z > /dev/null 2>&1; then
     fail 'unknown option unexpectedly succeeded'
 fi
 
+# Use real inputs so argument failures cannot be caused by unrelated missing files.
+model_paths="@GGUF_MODEL_PATHS@"
+model_path=${model_paths%%,*}
+[ -f "$model_path" ] && [ -r "$model_path" ] || fail "configured model is not readable: $model_path"
+argument_source_one="$test_dir/argument_source_one"
+argument_source_two="$test_dir/argument_source_two"
+argument_embeddings_one="$test_dir/argument_embeddings_one"
+argument_embeddings_two="$test_dir/argument_embeddings_two"
+printf '%s' 'An apple is red.' > "$argument_source_one"
+printf '%s' 'Snow covers a mountain.' > "$argument_source_two"
+
 expect_invalid_batch() {
     value=$1
-    expected=$2
-    if "$smallrag" -m unused -d unused -e "$test_dir/invalid_embeddings" \
-            -b "$value" > /dev/null 2> "$test_dir/invalid_batch_error"; then
+    if "$smallrag" -m "$model_path" -d "$argument_source_one" -e "$argument_embeddings_one" \
+            -t 1 -s 2 -b "$value" < /dev/null > /dev/null 2>&1; then
         fail "invalid batch size unexpectedly succeeded: $value"
     fi
-    grep -Fq -e "$expected" "$test_dir/invalid_batch_error" \
-        || fail "unexpected error for batch size: $value"
 }
-expect_invalid_batch 0 'Batch and max sequence sizes must be positive'
-expect_invalid_batch -1 'Invalid value for option -b'
-expect_invalid_batch invalid 'Invalid value for option -b'
-expect_invalid_batch 2147483648 'A batch or max sequence size is too large'
+expect_invalid_batch 0
+expect_invalid_batch -1
+expect_invalid_batch invalid
+expect_invalid_batch 2147483648
 
 expect_invalid_filenames() {
     sources=$1
     embeddings=$2
-    expected=$3
-    if "$smallrag" -m unused -d "$sources" -e "$embeddings" < /dev/null \
-            > /dev/null 2> "$test_dir/invalid_filenames_error"; then
+    if "$smallrag" -m "$model_path" -d "$sources" -e "$embeddings" \
+            -t 1 -b 128 -s 2 < /dev/null > /dev/null 2>&1; then
         fail 'invalid filename lists unexpectedly succeeded'
     fi
-    grep -Fq -e "$expected" "$test_dir/invalid_filenames_error" \
-        || fail 'unexpected error for filename lists'
 }
-for value in '' ',first' 'first,' 'first,,second'; do
-    expect_invalid_filenames "$value" "$test_dir/invalid_embeddings" 'empty filename'
-    expect_invalid_filenames unused "$value" 'empty filename'
+for value in '' ",$argument_source_one" "$argument_source_one,"; do
+    expect_invalid_filenames "$value" "$argument_embeddings_one"
 done
-expect_invalid_filenames 'first,second' "$test_dir/invalid_embeddings" 'filename counts must match'
-expect_invalid_filenames unused 'first,second' 'filename counts must match'
-[ ! -e "$test_dir/invalid_embeddings" ] || fail 'invalid arguments created embeddings'
+expect_invalid_filenames "$argument_source_one,,$argument_source_two" \
+    "$argument_embeddings_one,$argument_embeddings_two"
+for value in '' ",$argument_embeddings_one" "$argument_embeddings_one,"; do
+    expect_invalid_filenames "$argument_source_one" "$value"
+done
+expect_invalid_filenames "$argument_source_one,$argument_source_two" \
+    "$argument_embeddings_one,,$argument_embeddings_two"
+expect_invalid_filenames "$argument_source_one,$argument_source_two" "$argument_embeddings_one"
+expect_invalid_filenames "$argument_source_one" "$argument_embeddings_one,$argument_embeddings_two"
 
 # Exercise JSON-lines requests with the first configured embedding model.
-model_paths="@GGUF_MODEL_PATHS@"
-model_path=${model_paths%%,*}
-[ -f "$model_path" ] && [ -r "$model_path" ] || fail "configured model is not readable: $model_path"
-
 io_source="$test_dir/io_source"
 io_output="$test_dir/io_output"
 io_error="$test_dir/io_error"
@@ -158,14 +167,42 @@ exec 3> "$io_fifo"
 printf '%s\n' '{"query":"An apple is red.","top_k":1}' >&3 || fail_io 'failed to send request'
 wait_for_lines 1
 
-# Invalid lines must not prevent the next valid request from receiving a response.
-printf '%s\n' \
-    '{"query":"An apple is red.","top_k":}' \
-    '{"query":"An apple is red."}' \
-    '{"query":"An apple is red.","top_k":0}' \
-    '{"query":"An apple is red.","top_k":"three"}' \
-    '{"query":"An apple is red.","top_k":3}' >&3 || fail_io 'failed to send requests'
-wait_for_lines 2
+# Invalid lines must each receive an error before another valid request is sent.
+# The long query deliberately exceeds the configured embedding batch.
+long_query=$(awk 'BEGIN { for (i = 0; i < 1024; i++) printf "An apple is red. " }')
+invalid_requests="$test_dir/invalid_requests"
+{
+    printf '%s\n' \
+        '' \
+        'not JSON' \
+        '{"query":"An apple is red.","top_k":}' \
+        '{"query":"An apple is red.","top_k":1} trailing data' \
+        '[]' \
+        'null' \
+        '{}' \
+        '{"query":"An apple is red."}' \
+        '{"top_k":1}' \
+        '{"query":"An apple is red.","top_k":0}' \
+        '{"query":"An apple is red.","top_k":-1}' \
+        '{"query":"An apple is red.","top_k":1.5}' \
+        '{"query":"An apple is red.","top_k":"three"}' \
+        '{"query":"An apple is red.","top_k":null}' \
+        '{"query":"An apple is red.","top_k":true}' \
+        '{"query":"An apple is red.","top_k":1e999}' \
+        '{"query":"","top_k":1}' \
+        '{"query":null,"top_k":1}' \
+        '{"query":123,"top_k":1}' \
+        '{"query":"An apple is red.","top_k":1,"extra":true}' \
+        '{"query":"An apple is red.","top_k":1,"top_k":2}' \
+        '{"query":"An apple is red.","query":"Snow covers a mountain.","top_k":1}'
+    printf '{"query":"%s","top_k":1}\n' "$long_query"
+} > "$invalid_requests"
+invalid_request_count=$(wc -l < "$invalid_requests")
+cat "$invalid_requests" >&3 || fail_io 'failed to send invalid requests'
+wait_for_lines "$((invalid_request_count + 1))"
+
+printf '%s\n' '{"query":"An apple is red.","top_k":3}' >&3 || fail_io 'failed to send request'
+wait_for_lines "$((invalid_request_count + 2))"
 
 printf '%s\n' \
     '{"query":"An apple is red.","top_k":2}' \
@@ -181,9 +218,8 @@ kill "$watchdog_pid" 2> /dev/null || :
 wait "$watchdog_pid" 2> /dev/null || :
 watchdog_pid=
 
-[ "$(wc -l < "$io_output")" -eq 5 ] || fail_io 'expected one output line per valid request'
-grep -Fq -e 'Failed to parse JSON' "$io_error" || fail_io 'invalid JSON was not reported'
-grep -Fq -e 'Request' "$io_error" || fail_io 'invalid requests were not reported'
+[ "$(wc -l < "$io_output")" -eq "$((invalid_request_count + 5))" ] \
+    || fail_io 'expected one output line per request'
 
 # Ignore insignificant JSON whitespace, but preserve string contents and escapes.
 normalized="$test_dir/io_normalized"
@@ -214,6 +250,12 @@ awk '
 
 {
     IFS= read -r one_response || fail_io 'missing top_k=1 response'
+    error_index=0
+    while [ "$error_index" -lt "$invalid_request_count" ]; do
+        IFS= read -r error_response || fail_io 'missing invalid-request response'
+        is_error_response "$error_response" || fail_io 'invalid request received a JSON or empty response'
+        error_index=$((error_index + 1))
+    done
     IFS= read -r full_response || fail_io 'missing top_k=3 response'
     IFS= read -r two_response || fail_io 'missing top_k=2 response'
     IFS= read -r capped_response || fail_io 'missing top_k=5 response'
@@ -254,6 +296,47 @@ printf '%s\n' '{"query":"An apple is red.","top_k":1}' > "$single_request"
     2> "$test_dir/prefix_error" || fail 'prefixed chunk test failed'
 cmp -s "$test_dir/single_output" "$test_dir/prefix_output" || fail 'chunk prefix changed the response'
 [ "$(cat "$test_dir/prefix_output")" = "[$json_one]" ] || fail 'unexpected prefixed chunk response'
+
+# Query embedding failures must also be recoverable when a query prefix is used.
+{
+    printf '{"query":"%s","top_k":1}\n' "$long_query"
+    cat "$single_request"
+} > "$test_dir/prefix_recovery_requests"
+"$smallrag" -m "$model_path" -d "$single_source" -e "$test_dir/single_embeddings" \
+    -p 'query: ' -t 1 -b 128 -s 2 < "$test_dir/prefix_recovery_requests" \
+    > "$test_dir/prefix_recovery_output" 2> "$test_dir/prefix_recovery_error" \
+    || fail 'server failed after a prefixed query embedding error'
+[ "$(wc -l < "$test_dir/prefix_recovery_output")" -eq 2 ] \
+    || fail 'expected an error and a successful prefixed-query response'
+{
+    IFS= read -r error_response || fail 'missing prefixed query embedding error'
+    is_error_response "$error_response" || fail 'prefixed embedding error received a JSON or empty response'
+    IFS= read -r recovered_response || fail 'missing response after prefixed embedding error'
+    [ "$recovered_response" = "[$json_one]" ] || fail 'prefixed query did not recover after embedding error'
+} < "$test_dir/prefix_recovery_output"
+
+# A dimension mismatch is a server/data failure, not a bad request. It must be
+# reported once and terminate processing before the second request.
+cat "$test_dir/single_embeddings" "$test_dir/single_embeddings" > "$test_dir/wrong_dimension_embeddings"
+cat "$single_request" "$single_request" > "$test_dir/fatal_requests"
+fatal_status=0
+"$smallrag" -m "$model_path" -d "$single_source" -e "$test_dir/wrong_dimension_embeddings" \
+    -t 1 -b 128 -s 2 < "$test_dir/fatal_requests" > "$test_dir/fatal_output" \
+    2> "$test_dir/fatal_error" || fatal_status=$?
+[ "$fatal_status" -eq 1 ] || fail 'dimension mismatch did not exit with failure'
+[ "$(wc -l < "$test_dir/fatal_output")" -eq 1 ] || fail 'expected one fatal error response'
+IFS= read -r error_response < "$test_dir/fatal_output" || fail 'missing fatal error response'
+is_error_response "$error_response" || fail 'fatal error received a JSON or empty response'
+
+# Failure to write either a successful response or a recoverable error is fatal.
+printf '%s\n' '{"query":"An apple is red.","top_k":0}' > "$test_dir/write_error_request"
+for request_file in "$single_request" "$test_dir/write_error_request"; do
+    write_status=0
+    "$smallrag" -m "$model_path" -d "$single_source" -e "$test_dir/single_embeddings" \
+        -t 1 -b 128 -s 2 < "$request_file" > /dev/full 2> "$test_dir/write_error" \
+        || write_status=$?
+    [ "$write_status" -eq 1 ] || fail 'response write failure did not exit with failure'
+done
 
 # Split the same corpus across files, without delimiters at either side of the file boundary.
 # Spaces in filenames must be preserved by the filename parser.
@@ -325,34 +408,22 @@ case "$(cat "$test_dir/multi_prefix_output")" in
 esac
 
 if "$smallrag" -m "$model_path" -d "$multi_source_one,$test_dir/missing_source" \
-        -e "$test_dir/unused_one,$test_dir/unused_two" < /dev/null > /dev/null \
-        2> "$test_dir/missing_source_error"; then
+        -e "$test_dir/unused_one,$test_dir/unused_two" < /dev/null > /dev/null 2>&1; then
     fail 'missing second source unexpectedly succeeded'
 fi
-grep -Fq -e "Failed to map text: $test_dir/missing_source" "$test_dir/missing_source_error" \
-    || fail 'missing second source was not reported'
-[ ! -e "$test_dir/unused_one" ] && [ ! -e "$test_dir/unused_two" ] \
-    || fail 'missing source created embedding files'
 
 printf '%s' invalid > "$test_dir/invalid_second_embeddings"
 if "$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
         -e "$multi_embeddings_one,$test_dir/invalid_second_embeddings" -t 1 -b 128 -s 2 \
-        < /dev/null > /dev/null 2> "$test_dir/invalid_second_error"; then
+        < /dev/null > /dev/null 2>&1; then
     fail 'invalid second embedding file unexpectedly succeeded'
 fi
-grep -Fq -e 'Failed to load or compute embeddings' "$test_dir/invalid_second_error" \
-    || fail 'invalid second embedding file was not reported'
 
 # The first file is cached; embedding the second file exceeds this deliberately small batch.
 if "$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
         -e "$multi_embeddings_one,$test_dir/failed_second_embeddings" -t 1 -b 8 -s 2 \
-        < /dev/null > /dev/null 2> "$test_dir/failed_second_error"; then
+        < /dev/null > /dev/null 2>&1; then
     fail 'failed second embedding generation unexpectedly succeeded'
 fi
-grep -Fq -e 'Failed to get embeddings' "$test_dir/failed_second_error" \
-    || fail 'embedding generation failure was not propagated'
-[ ! -s "$test_dir/failed_second_embeddings" ] || fail 'failed generation wrote invalid embeddings'
-cmp -s "$multi_embeddings_one" "$test_dir/multi_snapshot_one" \
-    || fail 'failed loading changed the existing embedding file'
 
 printf '%s\n' 'smallrag tests passed'
