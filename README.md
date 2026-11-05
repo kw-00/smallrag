@@ -9,8 +9,7 @@ Two environment variables can be set for `build.sh`:
 - LLAMA_PATH — set it to point to your llama.cpp repository root. This is mandatory.
 - LLAMA_BUILD_PATH — optional. Set it to point to your llama.cpp build folder. This variable is optional. If it is unset or empty, the smallrag build system will expect a llama.cpp build at `"$LLAMA_PATH/build"`.
 
-
-To install **smallrag**, clone the smallrag repository, enter its root and run *build.sh* from its root.Supposing you have a llama.cpp repository at `/opt/llama.cpp` and you have built llama.cpp in `/opt/llama.cpp/build`, you could run:
+Supposing you have a llama.cpp repository at `/opt/llama.cpp` and you have built llama.cpp in `/opt/llama.cpp/build`, you could run:
 ```bash
 LLAMA_PATH='/opt/llama.cpp' ./build.sh
 ```
