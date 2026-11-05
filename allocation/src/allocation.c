@@ -5,8 +5,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#define MAX_SPAN_COUNT (1 << 4)
-#define MAX_VA_ARG_SPAN_COUNT MAX_SPAN_COUNT - 1
+#define MAX_SPAN_COUNT ((size_t)(1 << 4))
+#define MAX_VA_ARG_SPAN_COUNT (MAX_SPAN_COUNT - 1)
 
 
 int allocate_spans(size_t n_spans, void *pointer_1, size_t sizeof_1, size_t count_1, ...)
