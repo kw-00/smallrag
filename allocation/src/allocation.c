@@ -5,25 +5,24 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#define MAX_SPAN_COUNT (1 << 4)
+#define MAX_VA_ARG_SPAN_COUNT MAX_SPAN_COUNT - 1
 
 
 int allocate_spans(size_t n_spans, void *pointer_1, size_t sizeof_1, size_t count_1, ...)
 {
-    static const size_t max_span_count = 1 << 4;
-    static const size_t max_va_arg_span_count = max_span_count - 1;
-
-    if (n_spans > max_span_count) {
-        LOG_ERROR("Span count too high; up to %zu are allowed.", max_span_count);
+    if (n_spans > MAX_SPAN_COUNT) {
+        LOG_ERROR("Span count too high; up to %zu are allowed.", MAX_SPAN_COUNT);
         return -1;
     }
     size_t n_va_arg_spans = n_spans -1;
 
     
-    void **pointers[max_va_arg_span_count];
-    size_t offsets[max_va_arg_span_count];
-    size_t sizes[max_va_arg_span_count];
-    size_t counts[max_va_arg_span_count];
-    size_t alignments[max_va_arg_span_count];
+    void **pointers[MAX_VA_ARG_SPAN_COUNT];
+    size_t offsets[MAX_VA_ARG_SPAN_COUNT];
+    size_t sizes[MAX_VA_ARG_SPAN_COUNT];
+    size_t counts[MAX_VA_ARG_SPAN_COUNT];
+    size_t alignments[MAX_VA_ARG_SPAN_COUNT];
     {
         va_list ap;
         va_start(ap, count_1);
