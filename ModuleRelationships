@@ -1,7 +1,7 @@
 embedder: allocation logging llama.cpp
 vectors: logging
 allocation: logging
-chunker: logging
+chunker: logging allocation
 logging:
 data_structures:
 infrastructure: chunker embedder logging

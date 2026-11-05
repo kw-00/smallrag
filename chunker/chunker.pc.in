@@ -5,6 +5,6 @@ includedir=${prefix}/include
 Name: chunker 
 Description: smallrag utility library for allocating memory 
 Version: 1.0
-Requires.private: logging
+Requires.private: logging, allocation
 Libs: -L"${libdir}" -lchunker
 Cflags: -I"${includedir}"

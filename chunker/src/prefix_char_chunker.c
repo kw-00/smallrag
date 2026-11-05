@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "smallrag/allocation.h"
 #include "smallrag/char_chunker.h"
 #include "smallrag/logging.h"
 
@@ -31,41 +32,36 @@ static int prefix_chunks(
         return 0;
     }
 
-    size_t texts_size;
-    size_t sizes_size;
-    if (__builtin_mul_overflow(sizeof(char *), source->count, &texts_size) ||
-            __builtin_mul_overflow(sizeof(size_t), source->count, &sizes_size)) {
-        LOG_ERROR("Number overflow");
-        return -1;
-    }
-
-    size_t alignment = _Alignof(size_t);
-    size_t padding = (alignment - texts_size % alignment) % alignment;
-    size_t sizes_offset;
-    size_t alloc_size;
-    if (__builtin_add_overflow(texts_size, padding, &sizes_offset) ||
-            __builtin_add_overflow(sizes_offset, sizes_size, &alloc_size)) {
-        LOG_ERROR("Number overflow");
-        return -1;
-    }
-    size_t text_offset = alloc_size;
+    size_t text_storage_size = 0;
     for (size_t i = 0; i < source->count; i++) {
         size_t chunk_size;
         if (__builtin_add_overflow(prefix_length, source->sizes[i], &chunk_size) ||
-                __builtin_add_overflow(alloc_size, chunk_size, &alloc_size)) {
+                __builtin_add_overflow(text_storage_size, chunk_size, &text_storage_size)) {
             LOG_ERROR("Number overflow");
             return -1;
         }
     }
 
-    void *memory = malloc(alloc_size);
-    if (memory == NULL) {
+    char **texts;
+    size_t *sizes;
+    char *text_storage;
+    if (allocate_spans(
+                3,
+                &texts,
+                sizeof(char *),
+                source->count,
+                &sizes,
+                sizeof(size_t),
+                source->count,
+                _Alignof(size_t),
+                &text_storage,
+                sizeof(char),
+                text_storage_size,
+                _Alignof(char)) == -1) {
         LOG_ERROR("Allocation failed");
         return -1;
     }
-    char **texts = memory;
-    size_t *sizes = (size_t *)((char *)memory + sizes_offset);
-    char *next_text = (char *)memory + text_offset;
+    char *next_text = text_storage;
     for (size_t i = 0; i < source->count; i++) {
         texts[i] = next_text;
         sizes[i] = prefix_length + source->sizes[i];
