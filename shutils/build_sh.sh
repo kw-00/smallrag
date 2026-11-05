@@ -1,8 +1,12 @@
 #!/bin/bash
 
 MODULE_NAME=$(basename "$(pwd -P)")
-MODULE_BUILD_DIR="$BUILD_DIR/modules/$MODULE_NAME"
-mkdir -p "$MODULE_BUILD_DIR"
+MODULE_DIR="$BUILD_DIR/modules/$MODULE_NAME"
+mkdir -p "$MODULE_DIR"
+
+if [ -z "$TARGET_DIR" ]; then
+    TARGET_DIR="$BUILD_DIR/bin"
+fi
 
 for script in "$@"; do
     if [ ! -f "$script" ]; then
@@ -22,10 +26,10 @@ for script in "$@"; do
             > "$generated"
 
             chmod +x "$generated"
-            ln -sfT "$(pwd -P)/$generated" "$MODULE_BUILD_DIR/$(basename "$target")"
+            ln -sfT "$(pwd -P)/$generated" "$TARGET_DIR/$(basename "$target")"
             ;;
         *)
-            ln -sfT "$(pwd -P)/$script" "$MODULE_BUILD_DIR/$(basename "$script")"
+            ln -sfT "$(pwd -P)/$script" "$TARGET_DIR/$(basename "$script")"
             ;;
     esac
     

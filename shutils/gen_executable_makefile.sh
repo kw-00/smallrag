@@ -18,6 +18,10 @@ if [ -z "$BUILD_DIR" ]; then
     echo "BUILD_DIR required" >&2
     exit 1
 fi
+if [ -z "$TARGET_DIR" ]; then
+    echo "TARGET_DIR required" >&2
+    exit 1
+fi
 if [ -z "$CC" ]; then
     echo "CC required" >&2
     exit 1
@@ -26,7 +30,7 @@ fi
 
 MODULE_NAME=$(basename "$(pwd -P)")
 
-RELATIVE_BUILD_DIR=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
+RELATIVE_TARGET_DIR=$(relpath.sh "$(pwd -P)" "$TARGET_DIR")
 
 if [ -d include ]; then
     headers=$(find include -type f -regex '.*\.h$' -exec printf '%s ' {} \;)
@@ -49,7 +53,7 @@ i=0
 executables=
 for source in $sources; do
     echo "$source" > "$sources_dir/$i"
-    executable="$RELATIVE_BUILD_DIR/modules/$MODULE_NAME/${source%??}"
+    executable="$RELATIVE_TARGET_DIR/${source%??}"
     echo "$executable" > "$executables_dir/$i"
     executables+="$executable "
     i=$((i + 1))

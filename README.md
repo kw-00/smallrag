@@ -11,8 +11,7 @@ From repository root.
 
 This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
 
-Both executables are self-contained. You will find them in `<project-root>/build/modules/main`. You can move
-them to to a folder in your PATH, such as `/usr/local/bin`, or, better yet, create symbolic links to them.
+Both executables are self-contained. You will find them in `<project-root>/build/bin`. To install them, you only need to add the <project-root>/build/bin folder to your PATH.
 
 ## the smallrag program
 ### Usage
