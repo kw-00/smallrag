@@ -13,13 +13,40 @@ static size_t context_init_count;
 static size_t context_free_count;
 static bool fail_context_init;
 
-struct llama_context_params llama_context_default_params(void)
+static int sentinel_get_embeddings(
+        struct embedder *embedder,
+        char **texts,
+        size_t *text_lengths,
+        size_t text_count,
+        struct embeddings *embeddings)
 {
-    struct llama_context_params params = {0};
-    params.n_ctx = 1;
-    params.n_batch = 2;
-    params.n_ubatch = 3;
-    return params;
+    (void)embedder;
+    (void)texts;
+    (void)text_lengths;
+    (void)text_count;
+    (void)embeddings;
+    return -1;
+}
+
+static void sentinel_dispose(struct embedder *embedder)
+{
+    (void)embedder;
+}
+
+static struct embedder sentinel_embedder(void)
+{
+    return (struct embedder) {
+        .get_embeddings = &sentinel_get_embeddings,
+        .dispose = &sentinel_dispose,
+        .data = &model_storage
+    };
+}
+
+static void assert_sentinel_embedder(const struct embedder *embedder)
+{
+    assert(embedder->get_embeddings == &sentinel_get_embeddings);
+    assert(embedder->dispose == &sentinel_dispose);
+    assert(embedder->data == &model_storage);
 }
 
 struct llama_context *llama_init_from_model(
@@ -39,26 +66,28 @@ void llama_free(struct llama_context *context)
 
 static void expect_invalid_params(struct llama_embedder_params params)
 {
-    struct embedder embedder = {0};
+    struct embedder embedder = sentinel_embedder();
     size_t previous_init_count = context_init_count;
     assert(init_llama_embedder(
                 &embedder, (struct llama_model *)&model_storage, &params) == -1);
     assert(context_init_count == previous_init_count);
-    assert(embedder.data == NULL && embedder.get_embeddings == NULL && embedder.dispose == NULL);
+    assert_sentinel_embedder(&embedder);
 }
 
 int main(void)
 {
     const size_t batch_sizes[] = {1, 128, 2048, INT32_MAX};
+    struct llama_context_params defaults = llama_context_default_params();
+    size_t max_sequences_per_batch = defaults.n_seq_max == 8 ? 9 : 8;
     struct llama_embedder_params params = {
         .n_tokenizer_threads = 2,
         .batch_size = 1,
-        .max_sequences_per_batch = 8
+        .max_sequences_per_batch = max_sequences_per_batch
     };
 
     for (size_t i = 0; i < sizeof(batch_sizes) / sizeof(batch_sizes[0]); i++) {
         params.batch_size = batch_sizes[i];
-        struct embedder embedder = {0};
+        struct embedder embedder;
         assert(init_llama_embedder(
                     &embedder, (struct llama_model *)&model_storage, &params) == 0);
         assert(received_params.n_ctx == params.batch_size);
@@ -82,14 +111,14 @@ int main(void)
     expect_invalid_params(params);
 #endif
 
-    params.max_sequences_per_batch = 8;
+    params.max_sequences_per_batch = max_sequences_per_batch;
     fail_context_init = true;
-    struct embedder embedder = {0};
+    struct embedder embedder = sentinel_embedder();
     size_t previous_init_count = context_init_count;
     assert(init_llama_embedder(
                 &embedder, (struct llama_model *)&model_storage, &params) == -1);
     assert(context_init_count == previous_init_count + 1);
-    assert(embedder.data == NULL && embedder.get_embeddings == NULL && embedder.dispose == NULL);
+    assert_sentinel_embedder(&embedder);
     assert(context_free_count == sizeof(batch_sizes) / sizeof(batch_sizes[0]));
     return 0;
 }

@@ -28,6 +28,12 @@ static void dispose_input(struct chunks *chunks)
 }
 
 
+static void dispose_sentinel(struct chunks *chunks)
+{
+    (void)chunks;
+}
+
+
 static struct chunks *make_input(const struct expected_chunk *expected, size_t count)
 {
     struct chunks *input = malloc(sizeof(*input));
@@ -121,24 +127,24 @@ static void test_single_and_repeated_input(void)
 
 static void test_empty(void)
 {
-    struct chunks output;
-    assert(concat_chunks(NULL, 0, &output) == 0);
-    assert(output.count == 0 && output.texts == NULL && output.sizes == NULL);
-    output.dispose(&output);
+    struct chunks empty;
+    assert(concat_chunks(NULL, 0, &empty) == 0);
+    assert(empty.count == 0 && empty.texts == NULL && empty.sizes == NULL);
 
-    struct chunks empty = {0};
+    struct chunks output;
     struct chunks *empty_input[] = {&empty};
     assert(concat_chunks(empty_input, 1, &output) == 0);
     assert(output.count == 0);
     output.dispose(&output);
 
     char *texts[] = {NULL};
-    size_t sizes[] = {0};
-    struct chunks source = { .texts = texts, .sizes = sizes, .count = 1 };
+    size_t empty_size = 0;
+    struct chunks source = { .texts = texts, .sizes = &empty_size, .count = 1 };
     struct chunks *input[] = {&empty, &source, &empty};
     assert(concat_chunks(input, 3, &output) == 0);
     assert(output.count == 1 && output.sizes[0] == 0);
     output.dispose(&output);
+    empty.dispose(&empty);
 }
 
 
@@ -149,7 +155,8 @@ static void test_invalid_input(void)
     size_t sizes[] = {1};
     struct chunks source = { .texts = texts, .sizes = sizes, .count = 1 };
     struct chunks *input[] = {&source, NULL};
-    struct chunks output = {0};
+    struct chunks output;
+    output.dispose = &dispose_sentinel;
     assert(concat_chunks(NULL, 1, &output) == 1);
     assert(concat_chunks(input, 1, NULL) == 1);
     assert(concat_chunks(input, 2, &output) == 1);
@@ -161,7 +168,7 @@ static void test_invalid_input(void)
     source.sizes = sizes;
     texts[0] = NULL;
     assert(concat_chunks(input, 1, &output) == 1);
-    assert(output.dispose == NULL);
+    assert(output.dispose == &dispose_sentinel);
 }
 
 
@@ -173,7 +180,8 @@ static void test_overflow(void)
     struct chunks first = { .texts = texts, .sizes = sizes, .count = SIZE_MAX };
     struct chunks second = { .texts = texts, .sizes = sizes, .count = 1 };
     struct chunks *input[] = {&first, &second};
-    struct chunks output = {0};
+    struct chunks output;
+    output.dispose = &dispose_sentinel;
     assert(concat_chunks(input, 2, &output) == 1);
     assert(concat_chunks(input, 1, &output) == 1);
     first.count = 2;
@@ -181,7 +189,7 @@ static void test_overflow(void)
     assert(concat_chunks(input, 1, &output) == 1);
     first.count = 1;
     assert(concat_chunks(input, 1, &output) == 1);
-    assert(output.dispose == NULL);
+    assert(output.dispose == &dispose_sentinel);
 }
 
 

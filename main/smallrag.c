@@ -488,7 +488,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     for (size_t i = 0; i < source_count; i++) {
-        sources[i] = (struct source_data) {0};
+        sources[i].text_mapped = false;
+        sources[i].chunks_initialized = false;
+        sources[i].embeddings_initialized = false;
         source_chunks[i] = &sources[i].chunks;
         source_embeddings[i] = &sources[i].embeddings;
     }
@@ -639,7 +641,8 @@ int main(int argc, char *argv[])
         bool fatal_error = true;
         cJSON *request = NULL;
         char *prefixed_query = NULL;
-        struct embeddings query_embedding = {0};
+        struct embeddings query_embedding;
+        bool query_embedding_initialized = false;
         cJSON *response = NULL;
         char *response_string = NULL;
 
@@ -711,6 +714,7 @@ int main(int argc, char *argv[])
                 REPORT_ERROR("Query embedding failed");
                 goto request_cleanup;
             }
+            query_embedding_initialized = true;
         }
 
         if (query_embedding.embeddings == NULL || query_embedding.dispose == NULL
@@ -800,7 +804,7 @@ int main(int argc, char *argv[])
 request_cleanup:
         cJSON_Delete(request);
         free(prefixed_query);
-        if (query_embedding.dispose != NULL) {
+        if (query_embedding_initialized && query_embedding.dispose != NULL) {
             query_embedding.dispose(&query_embedding);
         }
         cJSON_Delete(response);

@@ -17,6 +17,12 @@ static void dispose_input(struct embeddings *embeddings)
 }
 
 
+static void dispose_empty(struct embeddings *embeddings)
+{
+    (void)embeddings;
+}
+
+
 static struct embeddings *make_input(const float *values, size_t count, size_t dimensions)
 {
     struct embeddings *input = malloc(sizeof(*input));
@@ -91,7 +97,12 @@ static void test_empty(void)
     struct embeddings output;
     assert(concat_embeddings(NULL, 0, &output) == -1);
 
-    struct embeddings empty = {0};
+    struct embeddings empty = {
+        .embeddings = NULL,
+        .dimension_count = 0,
+        .embedding_count = 0,
+        .dispose = &dispose_empty
+    };
     struct embeddings *empty_input[] = {&empty};
     assert(concat_embeddings(empty_input, 1, &output) == 0);
     assert(output.embeddings == NULL);
@@ -109,6 +120,7 @@ static void test_empty(void)
     assert(output.embedding_count == 1 && output.dimension_count == 2);
     assert(memcmp(output.embeddings, values, sizeof(values)) == 0);
     output.dispose(&output);
+    empty.dispose(&empty);
 }
 
 
