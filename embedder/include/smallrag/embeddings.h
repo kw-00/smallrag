@@ -6,6 +6,8 @@
 /* Copies and concatenates the embeddings pointed to by input into a new struct returned through
  * output. input_count is the number of input structs.
  *
+ * input_count must be a positive number — 0 is not allowed.
+ *
  * Does not take ownership of input or its resources.
  *
  * Returns 0 on success, 1 on failure.
