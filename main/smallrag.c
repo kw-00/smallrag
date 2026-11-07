@@ -418,7 +418,8 @@ int main(int argc, char *argv[])
     bool llama_embedder_initialized = false;
     struct embedder embedder;
     bool embedder_initialized = false;
-    struct embeddings *embeddings = NULL;
+    struct embeddings embeddings;
+    bool embeddings_initialized = false;
     struct similarity *similarities = NULL;
     char *read_buffer = NULL;
     size_t read_buffer_capacity = 0;
@@ -427,9 +428,9 @@ int main(int argc, char *argv[])
     do { \
         free(read_buffer); \
         free(similarities); \
-        if (embeddings != NULL && embeddings->dispose != NULL) { \
-            embeddings->dispose(embeddings); \
-            embeddings = NULL; \
+        if (embeddings_initialized) { \
+            embeddings.dispose(&embeddings); \
+            embeddings_initialized = false; \
         } \
         if (embedder_initialized) { \
             dispose_embedder(&embedder); \
@@ -599,11 +600,12 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     chunks_initialized = true;
-    if (concat_embeddings(source_embeddings, source_count, &embeddings) == 1) {
+    if (concat_embeddings(source_embeddings, source_count, &embeddings) == -1) {
         LOG_ERROR("Failed to concatenate embeddings");
         CLEANUP();
         return EXIT_FAILURE;
     }
+    embeddings_initialized = true;
     dispose_sources(sources, source_count);
     sources = NULL;
 
@@ -713,7 +715,7 @@ int main(int argc, char *argv[])
 
         if (query_embedding.embeddings == NULL || query_embedding.dispose == NULL
                 || query_embedding.embedding_count != 1
-                || query_embedding.dimension_count != embeddings->dimension_count) {
+                || query_embedding.dimension_count != embeddings.dimension_count) {
             REPORT_ERROR("Query embedding does not match source embedding dimensions");
             goto request_cleanup;
         }
@@ -722,16 +724,16 @@ int main(int argc, char *argv[])
             size_t vector_offset = 0;
             for (size_t i = 0; i < chunks.count; i++) {
                 double score = dot_product(
-                        embeddings->embeddings + vector_offset,
+                        embeddings.embeddings + vector_offset,
                         query_embedding.embeddings,
-                        embeddings->dimension_count);
+                        embeddings.dimension_count);
                 if (!isfinite(score)) {
                     REPORT_ERROR("Similarity calculation produced a non-finite score");
                     goto request_cleanup;
                 }
                 similarities[i].text_index = i;
                 similarities[i].score = score;
-                vector_offset += embeddings->dimension_count;
+                vector_offset += embeddings.dimension_count;
             }
             qsort(
                     similarities,
