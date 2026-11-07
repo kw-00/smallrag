@@ -23,6 +23,7 @@ static int get_embeddings(
         return -1;
     }
     if (embedder_data->postprocessing_function(embeddings) == -1) {
+        embeddings->dispose(embeddings);
         return -1;
     }
     return 0;
