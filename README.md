@@ -1,27 +1,45 @@
 # Smallrag - an stdio-based information retrieval server for Linux (also for Windows via WSL)
 ## How to install
-First of all, you need a llama.cpp repository on your system. 
+Smallrag supports llama.cpp and ONNX Runtime embedding backends. Both are enabled by default;
+at least one must be enabled. Clone this repository, enter its root and run `./build.sh`.
 
-You also need to build llama.cpp. Check <https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md> to see how to build llama.cpp.
+Environment variables for `build.sh`:
+- BUILD_LLAMA — `true` or `false`, default `true`.
+- BUILD_ONNX — `true` or `false`, default `true`.
+- LLAMA_PATH — llama.cpp repository root; required only when BUILD_LLAMA is `true`.
+- LLAMA_BUILD_PATH — optional llama.cpp build folder, default `"$LLAMA_PATH/build"`.
+- ONNX_PATH — ONNX Runtime repository or prebuilt SDK root; required only when BUILD_ONNX is `true`.
+- ONNX_BUILD_PATH — optional ONNX Runtime build folder. Defaults to `"$ONNX_PATH/build"` for a
+  repository, or ONNX_PATH itself for an SDK with `include/` and `lib/`. The runtime library is
+  expected in `lib/`, `Linux/Release/`, or directly in that folder.
 
-Next, build **smallrag**. To build smallrag, clone this repository, enter its root and run *build.sh*. 
-Two environment variables can be set for `build.sh`:
-- LLAMA_PATH — set it to point to your llama.cpp repository root. This is mandatory.
-- LLAMA_BUILD_PATH — optional. Set it to point to your llama.cpp build folder. This variable is optional. If it is unset or empty, the smallrag build system will expect a llama.cpp build at `"$LLAMA_PATH/build"`.
+When using llama.cpp, build it first following
+<https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md>.
+When using ONNX, install a prebuilt ONNX Runtime SDK or build ONNX Runtime, and install Rust
+(`cargo` and `rustc`). The build compiles a small static HuggingFace tokenizer library using Cargo.
+Disabled backends do not require their libraries, tooling, or path variables.
 
-Supposing you have a llama.cpp repository at `/opt/llama.cpp` and you have built llama.cpp in `/opt/llama.cpp/build`, you could run:
+For a llama-only build:
 ```bash
-LLAMA_PATH='/opt/llama.cpp' ./build.sh
+BUILD_ONNX=false LLAMA_PATH='/opt/llama.cpp' ./build.sh
 ```
-From repository root. This will build the entire project, including its two executable programs: **smallrag** and **to_chunks**.
+For an ONNX-only build with a prebuilt SDK:
+```bash
+BUILD_LLAMA=false ONNX_PATH='/opt/onnxruntime-linux-x64-1.31.1' ./build.sh
+```
+To build both, leave the BUILD_* variables unset and provide both LLAMA_PATH and ONNX_PATH.
+This builds the entire project, including **smallrag** and **to_chunks**.
 
-Both executables are self-contained. You will find them in `<project-root>/build/bin`. To install them, you only need to add the `<project-root>/build/bin` folder to your PATH.
+You will find the executables in `<project-root>/build/bin`. Add that folder to your PATH to
+install them. Keep enabled backends' shared libraries at their configured locations, which are
+recorded in the executable's runtime library search path.
 
 ## the smallrag program
 ### Usage
 
 ```text
 smallrag -h
+smallrag -B
 smallrag \
    -m <model-path> \
    -d <source-text> \
@@ -34,7 +52,9 @@ smallrag \
 ```
 
 ### Arguments:
-- `model-path` - path to .gguf embedding model
+- `-B` - print the built backends (`llama`, `onnx`, or `llama,onnx`) and exit without loading a model.
+- `model-path` - a .gguf embedding model file or an ONNX model directory. The backend is selected
+  automatically. A model requiring a disabled backend produces an informative error.
 - `source-text` - comma-separated paths to source text files. Each file must exist and contain text
   fragments delimited using NUL bytes.
 - `embeddings-path` - comma-separated paths to files that contain/will contain text embeddings.
@@ -55,12 +75,29 @@ Chunks and embeddings are concatenated in the order given. You are responsible f
 source files and embedding files correctly paired, including when changing the order or contents
 of source files. Single-file arguments remain supported. Empty filenames are not allowed, and
 filenames containing commas are not supported.
+Use separate embedding files for different models or backends; existing caches are not regenerated
+automatically when the model changes.
 
-The remaining arguments are used to configure the llama.cpp backend. They are all optional.
+An ONNX model directory must contain `tokenizer.json` and `tokenizer_config.json`, plus
+`model.onnx` either directly or under `onnx/`. A single differently named .onnx graph is also
+accepted when no `model.onnx` exists. Keep any external weight files beside the graph.
+The backend supports float32 sentence embeddings and masked mean pooling of `last_hidden_state`,
+with dynamic or singleton batch dimensions. The bundled EmbeddingGemma model is used in text-only
+mode; its image, video, and audio encoders are not loaded. Model-specific query/chunk prefixes
+remain controlled by `-p` and `-P`.
 
-- `n-tokenizer-threads` - number of threads to use for tokenization. Default will use as many threads as there are logical processors.
-- `batch-size` - maximum total number of tokens in each embedding batch, including special tokens. Each text must fit within this limit. Default: 2048. Larger values can increase memory use.
+The remaining arguments configure the embedding backend. They are all optional.
+
+- `n-tokenizer-threads` - number of threads to use for tokenization. Default uses as many threads as
+  there are logical processors. ONNX Runtime inference also uses this option.
+- `batch-size` - maximum total number of tokens in each embedding batch, including special tokens
+  and, for ONNX, padding. Each text must fit within this limit; oversized texts are rejected rather
+  than truncated. Default: 2048. Larger values can increase memory use.
 - `max-seq` - max number of sequences per logical batch.
+
+After building, run `./test.sh` for compiled tests and `./build/test/smallrag_test.sh` for application
+tests. Both use the enabled backends; the ONNX test model defaults to `models/embeddinggemma-2-ONNX`
+and can be overridden with ONNX_MODEL_PATH when building.
 
 To use smallrag, make sure to enter input into the smallrag process's standard input. The input format is as follows:
 
