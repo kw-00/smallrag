@@ -1,0 +1,8 @@
+libdir=@LIB_DIR@
+includedir=@INCLUDE_DIR@
+
+Name: onnxruntime
+Description: module integrating ONNX Runtime with smallrag build system
+Version: 0
+Libs: -L"${libdir}" -lonnxruntime -Wl,-rpath,"${libdir}"
+Cflags: -I"${includedir}"

@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: hf_tokenizer
+Description: C-compatible HuggingFace Rust tokenizer
+Version: 0.1.0
+Libs: -L"${libdir}" -lhf_tokenizer
+Libs.private: -ldl -lpthread -lm -lrt -lutil
+Cflags: -I"${includedir}"
