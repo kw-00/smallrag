@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "$BUILD_LLAMA" = false ]; then
+    exit 0
+fi
+
 export MODULE_NAME=llama.cpp
 
 TARGET_TYPE="so" prepare_library_build_dirs.sh
@@ -47,5 +51,4 @@ sed \
     -e 's|@INCLUDE_DIR@|'"$MODULE_BUILD_DIR/include"'|g' \
     "$MODULE_NAME.pc.in" \
     > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
-
 

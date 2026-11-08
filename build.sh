@@ -1,8 +1,31 @@
 #!/bin/bash
 
-source build_var_source.sh 
+source build_var_source.sh || exit 1
 
 mkdir -p "$BUILD_DIR/pkgconfig"
+
+embedder_configuration=$(printf '%s\n' "$BUILD_BACKENDS" "$GGUF_MODEL_PATHS" "$ONNX_MODEL_PATH")
+configuration_file="$BUILD_DIR/.embedder_configuration"
+if [ ! -f "$configuration_file" ] || [ "$(cat "$configuration_file")" != "$embedder_configuration" ]; then
+    # Backend macros must not reuse objects or test executables from a different build type.
+    rm -f \
+        "$BUILD_DIR/modules/embedder/obj/src/llama_embedder.o" \
+        "$BUILD_DIR/modules/embedder/obj/src/onnx_embedder.o" \
+        "$BUILD_DIR/modules/embedder/lib/libembedder.a" \
+        "$BUILD_DIR/bin/smallrag" \
+        "$BUILD_DIR/test/embedder" \
+        "$BUILD_DIR/test/llama_embedder" \
+        "$BUILD_DIR/test/llama_embedder_params"
+    printf '%s\n' "$embedder_configuration" > "$configuration_file"
+fi
+
+module_enabled() {
+    case "$1" in
+        llama.cpp) [ "$BUILD_LLAMA" = true ] ;;
+        onnxruntime|hf_tokenizer) [ "$BUILD_ONNX" = true ] ;;
+        *) return 0 ;;
+    esac
+}
 
 relative_build_dir=$(relpath.sh "$(pwd -P)" "$BUILD_DIR")
 relative_build_dir="${relative_build_dir#/}"
@@ -22,11 +45,14 @@ grep ':' ModuleRelationships | while IFS= read -r entry; do
     for token in $entry; do
         if [ $i -eq 0 ]; then
             target="${token%:}"
-        else
+        elif module_enabled "$token"; then
             prerequisites+="$token "
         fi
         i=$((i + 1))
     done
+    if ! module_enabled "$target"; then
+        continue
+    fi
     target_path=$(find . -type f -regex ".*$target/MODULE_MARKER$" -exec printf '%s ' {} \;)
     i=0
     for path in $target_path; do

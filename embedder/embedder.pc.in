@@ -5,6 +5,6 @@ includedir=${prefix}/include
 Name: embedder 
 Description: smallrag utility library for allocating memory 
 Version: 1.0
-Requires.private: logging, allocation, llama.cpp
+Requires.private: logging, allocation, @BACKEND_DEPENDENCIES@
 Libs: -L"${libdir}" -lembedder
 Cflags: -I"${includedir}"

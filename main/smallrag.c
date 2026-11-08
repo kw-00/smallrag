@@ -3,7 +3,10 @@
 #include "smallrag/dot_product.h"
 #include "smallrag/embedder.h"
 #include "smallrag/embeddings.h"
+#if BUILD_LLAMA
 #include "smallrag/llama_embedder.h"
+#endif
+#include "smallrag/onnx_embedder.h"
 #include "smallrag/postprocessing_embedder.h"
 #include "smallrag/chunker.h"
 #include "smallrag/chunks.h"
@@ -12,7 +15,9 @@
 #include "smallrag/allocation.h"
 #include "smallrag/logging.h"
 
+#if BUILD_LLAMA
 #include "llama.h"
+#endif
 #include "cJSON.h"
 
 #include <errno.h>
@@ -26,11 +31,13 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 
 static const char *usage =
 "Stdio-based information retrieval server.\n"
 "Usage:\n"
 "smallrag -h\n"
+"smallrag -B\n"
 "smallrag \\\n"
 "   -m <model-path> \\\n"
 "   -d <source-text> \\\n"
@@ -43,7 +50,8 @@ static const char *usage =
 "\n\n"
 "Options:\n"
 "-h - print this help and exit\n"
-"- model-path - path to .gguf embedding model\n"
+"-B - print built embedding backends and exit\n"
+"- model-path - path to a .gguf embedding model or an ONNX model directory\n"
 "- source-text - comma-separated paths to source text files. Each file must exist and contain text\n"
 " fragments delimited using NUL bytes.\n"
 "- embeddings-path - comma-separated paths to files that contain/will contain text embeddings.\n"
@@ -56,10 +64,11 @@ static const char *usage =
 "- chunk-prefix - text prepended directly to each text chunk before embedding. If left unspecified, no"
 " prefix is added. It is not included in responses.\n"
 "\n\n"
-"The remaining arguments are used to configure the llama.cpp backend. They are all optional.\n"
+"The remaining arguments are used to configure the embedding backend. They are all optional.\n"
 "- n-tokenizer-threads - number of threads to use for tokenization. Default will use as many threads"
-" as there are logical processors.\n"
+" as there are logical processors. ONNX inference also uses this option.\n"
 "- batch-size - maximum total number of tokens in each embedding batch, including special tokens."
+" ONNX also counts padding."
 " Each text must fit within this limit. Default: 2048. Larger values can increase memory use.\n"
 "- <max-seq> - max number of sequences per logical batch.\n"
 "\n\n"
@@ -79,6 +88,7 @@ static const char *usage =
 " do not stop subsequent requests from being processed. Other runtime errors terminate the program.\n";
 
 /* -h — print help and exit
+ * -B — print built embedding backends and exit
  * -m — model path
  * -d — comma-separated source text paths
  * -e — comma-separated embedding paths
@@ -88,7 +98,47 @@ static const char *usage =
  * -b — batch size
  * -s — max sequences per batch
  */
-static const char *optstring = "hm:d:e:p:P:t:b:s:";
+static const char *optstring = "hBm:d:e:p:P:t:b:s:";
+
+enum model_backend {
+    MODEL_BACKEND_LLAMA,
+    MODEL_BACKEND_ONNX
+};
+
+static int check_model_path(const char *model_path, enum model_backend *backend)
+{
+    struct stat info;
+    if (stat(model_path, &info) == -1) {
+        perror(model_path);
+        LOG_ERROR("Model path does not exist or is inaccessible: %s", model_path);
+        return -1;
+    }
+    size_t length = strlen(model_path);
+    if (S_ISREG(info.st_mode) && length >= 5
+            && strcmp(model_path + length - 5, ".gguf") == 0) {
+        if (!BUILD_LLAMA) {
+            LOG_ERROR("GGUF model requires llama, but smallrag was built without the llama backend");
+            return -1;
+        }
+        *backend = MODEL_BACKEND_LLAMA;
+        return 0;
+    }
+    if (S_ISDIR(info.st_mode)) {
+        char *model_file;
+        if (find_onnx_model_file(model_path, &model_file) == -1) {
+            return -1;
+        }
+        free(model_file);
+        if (!BUILD_ONNX) {
+            LOG_ERROR("ONNX model requires onnx, but smallrag was built without the ONNX backend");
+            return -1;
+        }
+        *backend = MODEL_BACKEND_ONNX;
+        return 0;
+    }
+    LOG_ERROR("Expected a .gguf model file or an ONNX model directory: %s", model_path);
+    return -1;
+}
 
 struct similarity {
     size_t text_index;
@@ -347,6 +397,13 @@ int main(int argc, char *argv[])
                     return EXIT_FAILURE;
                 }
                 return EXIT_SUCCESS;
+            case 'B':
+                if (fputs(BUILD_BACKENDS, stdout) == EOF || fputc('\n', stdout) == EOF
+                        || fflush(stdout) == EOF) {
+                    perror("stdout");
+                    return EXIT_FAILURE;
+                }
+                return EXIT_SUCCESS;
             case 'm':
                 model_path = optarg;
                 break;
@@ -401,6 +458,10 @@ int main(int argc, char *argv[])
         LOG_ERROR("A batch or max sequence size is too large");
         return EXIT_FAILURE;
     }
+    enum model_backend backend;
+    if (check_model_path(model_path, &backend) == -1) {
+        return EXIT_FAILURE;
+    }
 
     char **source_text_paths = NULL;
     char **embedding_paths = NULL;
@@ -413,9 +474,20 @@ int main(int argc, char *argv[])
     bool chunker_initialized = false;
     struct chunks chunks;
     bool chunks_initialized = false;
+#if BUILD_LLAMA
     struct llama_model *model = NULL;
-    struct embedder llama_embedder;
-    bool llama_embedder_initialized = false;
+#define CLEANUP_MODEL() \
+    do { \
+        if (model != NULL) { \
+            llama_model_free(model); \
+            model = NULL; \
+        } \
+    } while (false)
+#else
+#define CLEANUP_MODEL() ((void)0)
+#endif
+    struct embedder base_embedder;
+    bool base_embedder_initialized = false;
     struct embedder embedder;
     bool embedder_initialized = false;
     struct embeddings embeddings;
@@ -436,14 +508,11 @@ int main(int argc, char *argv[])
             dispose_embedder(&embedder); \
             embedder_initialized = false; \
         } \
-        if (llama_embedder_initialized) { \
-            dispose_embedder(&llama_embedder); \
-            llama_embedder_initialized = false; \
+        if (base_embedder_initialized) { \
+            dispose_embedder(&base_embedder); \
+            base_embedder_initialized = false; \
         } \
-        if (model != NULL) { \
-            llama_model_free(model); \
-            model = NULL; \
-        } \
+        CLEANUP_MODEL(); \
         if (chunks_initialized && chunks.dispose != NULL) { \
             dispose_chunks(&chunks); \
             chunks_initialized = false; \
@@ -540,40 +609,62 @@ int main(int argc, char *argv[])
     dispose_chunker(&chunker);
     chunker_initialized = false;
 
-    /* Load model */
-    {
-        struct llama_model_params params = llama_model_default_params();
-        model = llama_model_load_from_file(model_path, params);
-    }
-    if (model == NULL) {
-        LOG_ERROR("Failed to load model");
-        CLEANUP();
-        return EXIT_FAILURE;
-    }
-
     /* Initialize embedder */
     {
-        struct llama_embedder_params params = {
-            .n_tokenizer_threads = n_tokenizer_threads,
-            .batch_size = batch_size,
-            .max_sequences_per_batch = max_sequences_per_batch
-        };
-        if (init_llama_embedder(&llama_embedder, model, &params) == -1) {
-            LOG_ERROR("Failed to initialize embedder");
-            CLEANUP();
-            return EXIT_FAILURE;
+        switch (backend) {
+#if BUILD_LLAMA
+            case MODEL_BACKEND_LLAMA: {
+                struct llama_model_params model_params = llama_model_default_params();
+                model = llama_model_load_from_file(model_path, model_params);
+                if (model == NULL) {
+                    LOG_ERROR("Failed to load llama model");
+                    CLEANUP();
+                    return EXIT_FAILURE;
+                }
+                struct llama_embedder_params params = {
+                    .n_tokenizer_threads = n_tokenizer_threads,
+                    .batch_size = batch_size,
+                    .max_sequences_per_batch = max_sequences_per_batch
+                };
+                if (init_llama_embedder(&base_embedder, model, &params) == -1) {
+                    LOG_ERROR("Failed to initialize llama embedder");
+                    CLEANUP();
+                    return EXIT_FAILURE;
+                }
+                break;
+            }
+#endif
+#if BUILD_ONNX
+            case MODEL_BACKEND_ONNX: {
+                struct onnx_embedder_params params = {
+                    .n_tokenizer_threads = n_tokenizer_threads,
+                    .batch_size = batch_size,
+                    .max_sequences_per_batch = max_sequences_per_batch
+                };
+                if (init_onnx_embedder(&base_embedder, model_path, &params) == -1) {
+                    LOG_ERROR("Failed to initialize ONNX embedder");
+                    CLEANUP();
+                    return EXIT_FAILURE;
+                }
+                break;
+            }
+#endif
+            default:
+                LOG_ERROR("Model backend is not available");
+                CLEANUP();
+                return EXIT_FAILURE;
         }
-        llama_embedder_initialized = true;
+        base_embedder_initialized = true;
 
         if (init_postprocessing_embedder(
-                    &embedder, &llama_embedder, &embedding_postprocessing) == -1) {
-            LOG_ERROR("Failed to wrap llama embedder with postprocessing");
+                    &embedder, &base_embedder, &embedding_postprocessing) == -1) {
+            LOG_ERROR("Failed to wrap embedder with postprocessing");
             CLEANUP();
             return EXIT_FAILURE;
         }
         embedder_initialized = true;
-        /* The wrapper now owns the llama embedder's resources. */
-        llama_embedder_initialized = false;
+        /* The wrapper now owns the base embedder's resources. */
+        base_embedder_initialized = false;
     }
 
     /* Prepare and cache embeddings */
@@ -819,5 +910,6 @@ request_cleanup:
     /* Cleanup */
     CLEANUP();
 #undef CLEANUP
+#undef CLEANUP_MODEL
     return EXIT_SUCCESS;
 }

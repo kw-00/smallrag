@@ -22,6 +22,7 @@ for script in "$@"; do
             -e 's|@BUILD_DIR@|'"$BUILD_DIR"'|g' \
             -e 's|@SHUTILS_PATH@|'"$SHUTILS_PATH"'|g' \
             -e 's|@GGUF_MODEL_PATHS@|'"$GGUF_MODEL_PATHS"'|g' \
+            -e 's|@ONNX_MODEL_PATH@|'"$ONNX_MODEL_PATH"'|g' \
             "$template" \
             > "$generated"
 
@@ -34,4 +35,3 @@ for script in "$@"; do
     esac
     
 done
-

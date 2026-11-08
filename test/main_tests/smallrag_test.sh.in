@@ -18,6 +18,11 @@ is_error_response() {
 
 [ -x "$smallrag" ] || fail "executable not found: $smallrag"
 
+test_model() (
+model_path=$1
+[ -r "$model_path" ] && { [ -f "$model_path" ] || [ -d "$model_path" ]; } \
+    || fail "configured model is not readable: $model_path"
+
 test_dir=$("@SHUTILS_PATH@/tempdir.sh") || fail 'cannot create temporary directory'
 server_pid=
 watchdog_pid=
@@ -69,9 +74,6 @@ if "$smallrag" -z > /dev/null 2>&1; then
 fi
 
 # Use real inputs so argument failures cannot be caused by unrelated missing files.
-model_paths="@GGUF_MODEL_PATHS@"
-model_path=${model_paths%%,*}
-[ -f "$model_path" ] && [ -r "$model_path" ] || fail "configured model is not readable: $model_path"
 argument_source_one="$test_dir/argument_source_one"
 argument_source_two="$test_dir/argument_source_two"
 argument_embeddings_one="$test_dir/argument_embeddings_one"
@@ -112,7 +114,7 @@ expect_invalid_filenames "$argument_source_one,$argument_source_two" \
 expect_invalid_filenames "$argument_source_one,$argument_source_two" "$argument_embeddings_one"
 expect_invalid_filenames "$argument_source_one" "$argument_embeddings_one,$argument_embeddings_two"
 
-# Exercise JSON-lines requests with the first configured embedding model.
+# Exercise JSON-lines requests with the configured embedding model.
 io_source="$test_dir/io_source"
 io_output="$test_dir/io_output"
 io_error="$test_dir/io_error"
@@ -427,3 +429,19 @@ if "$smallrag" -m "$model_path" -d "$multi_source_one,$multi_source_two" \
 fi
 
 printf '%s\n' 'smallrag tests passed'
+)
+
+backends=$("$smallrag" -B) || fail 'cannot determine built backends'
+case "$backends" in
+    llama|onnx|llama,onnx) ;;
+    *) fail "unexpected built backends: $backends" ;;
+esac
+case ",$backends," in
+    *,llama,*)
+        model_paths="@GGUF_MODEL_PATHS@"
+        test_model "${model_paths%%,*}"
+        ;;
+esac
+case ",$backends," in
+    *,onnx,*) test_model "@ONNX_MODEL_PATH@" ;;
+esac

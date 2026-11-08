@@ -1,5 +1,9 @@
 #!/bin/bash
 
-export CFLAGS="$CFLAGS $GGUF_MODEL_PATHS_CFLAGS"
+export CFLAGS="$CFLAGS $GGUF_MODEL_PATHS_CFLAGS $ONNX_MODEL_PATH_CFLAGS"
 
-build_executable_test.sh llama_embedder.c llama_embedder_params.c embeddings.c
+sources="embeddings.c embedder.c"
+if [ "$BUILD_LLAMA" = true ]; then
+    sources+=" llama_embedder.c llama_embedder_params.c"
+fi
+build_executable_test.sh $sources

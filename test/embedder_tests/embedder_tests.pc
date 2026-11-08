@@ -1,4 +1,5 @@
 Name: embedder_tests
 Description: embedder test programs
 Version: 1.0
-Requires.private: embedder, llama.cpp
+Requires.private: embedder
+Libs.private: -lm

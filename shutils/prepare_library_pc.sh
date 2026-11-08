@@ -17,6 +17,6 @@ MODULE_BUILD_DIR="$BUILD_DIR/modules/$MODULE_NAME"
 
 sed \
     -e 's|@PREFIX@|'"$MODULE_BUILD_DIR"'|g' \
+    -e 's|@BACKEND_DEPENDENCIES@|'"$BACKEND_DEPENDENCIES"'|g' \
     "$MODULE_NAME.pc.in" \
     > "$BUILD_DIR/pkgconfig/$MODULE_NAME.pc"
-

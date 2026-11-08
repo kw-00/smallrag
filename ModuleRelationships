@@ -1,4 +1,4 @@
-embedder: allocation logging llama.cpp
+embedder: allocation logging llama.cpp onnxruntime hf_tokenizer
 vectors: logging
 allocation: logging
 chunker: logging allocation
@@ -7,15 +7,16 @@ data_structures:
 infrastructure: chunker embedder logging
 
 llama.cpp:
+onnxruntime:
+hf_tokenizer:
 cJSON:
 
 main: infrastructure chunker embedder logging cJSON
 
 chunker_tests: chunker
 data_structures_tests: data_structures
-embedder_tests: embedder llama.cpp
+embedder_tests: embedder
 
 main_tests: main
-
 
 

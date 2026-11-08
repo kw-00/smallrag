@@ -1,3 +1,5 @@
+#if BUILD_LLAMA
+
 #include "smallrag/llama_embedder.h"
 
 #include "smallrag/logging.h"
@@ -543,3 +545,5 @@ int init_llama_embedder(
     embedder->dispose = &dispose_embedder;
     return 0;
 }
+
+#endif
