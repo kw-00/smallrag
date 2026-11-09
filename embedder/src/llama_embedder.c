@@ -11,6 +11,13 @@
 #include <pthread.h>
 #include <sys/param.h>
 
+#define UNEXPECTED_JOIN_ERROR_MESSAGE \
+    "failed to join thread a cleanup measure. This is a serious, \
+    unexpected error that may have caused a resource leak. It \
+    is never expected to happen; since it did, this may be due to \
+    platform-specific deviations from the POSIX standard. Program \
+    may be in a corrupted state; aborting"
+
 struct embedder_data {
     struct llama_context *context;
     struct llama_embedder_params params;
@@ -182,6 +189,14 @@ static ssize_t tokenize(
                         &tokenize_task,
                         context) != 0) {
                 LOG_ERROR("Thread creation failed");
+                for (size_t thread_idx = 0; thread_idx < i; thread_idx++) {
+                    if (pthread_join(thread_handles[thread_idx], NULL) != 0) {
+                        LOG_ERROR(
+                                "Error while handling thread creation failure; "
+                                UNEXPECTED_JOIN_ERROR_MESSAGE);
+                        abort();
+                    }
+                }
                 ERROR_CLEANUP();
                 return -1;
             }
@@ -206,12 +221,10 @@ static ssize_t tokenize(
     for (size_t i = 0; i < n_workers; i++) {
         int *worker_return;
         if (pthread_join(thread_handles[i], (void **)&worker_return) != 0) {
-            LOG_ERROR("Joining worker ended in an error");
-            ERROR_CLEANUP();
-            error_occurred = true;
+            LOG_ERROR("Joining worker ended in an error; "UNEXPECTED_JOIN_ERROR_MESSAGE);
+            abort();
         } else if (*worker_return == -1) {
             LOG_ERROR("Worker thread ended with an error");
-            ERROR_CLEANUP();
             error_occurred = true;
         }
     }
@@ -273,6 +286,7 @@ static ssize_t tokenize(
                 size_t offset_delta;
                 if (get_max_token_count(context->text_lengths[text_idx], &offset_delta) == -1) {
                     LOG_ERROR("Number overflow");
+                    ERROR_CLEANUP();
                     return -1;
                 }
                 source_offset += offset_delta; 
