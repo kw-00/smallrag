@@ -269,7 +269,7 @@ static ssize_t tokenize(
         do { \
             free(tokenization_memory); \
             free(token_count_memory); \
-            free(tokens_contiguous) \
+            free(tokens_contiguous); \
         } while (false)
     }
     {
@@ -340,7 +340,7 @@ static int get_embeddings(
     }
     size_t n_tokenizer_threads = params.n_tokenizer_threads;
     if (n_tokenizer_threads == 0) {
-        n_tokenizer_threads = _SC_NPROCESSORS_ONLN;
+        n_tokenizer_threads = sysconf(_SC_NPROCESSORS_ONLN);
     }
     const struct llama_model *model = llama_get_model(context);
     /* Check pooling type */
